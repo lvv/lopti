@@ -22,7 +22,7 @@ template<typename V>  typename V::value_type  of_rb(V X)   {  return 100*pow2(X[
 int main(int argc, char **argv) {
 	
 	array_t		X0 = {{ -1.2, 1 }};
-	array_t		R  = {{ 100, 1 }};
+	array_t		R  = {{ 0.1, 0.1 }};
 
 	minimizer<array_t>	mzr(of_rb, X0);
 	mzr.condor_rho_start	(1);
@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
 	mzr.gnuplot_print	(true);
 	array_t	Xmin = mzr.argmin();
 	
-	cout << "# Result: Xmin" << Xmin << endl;
+	MSG("Result: Xmin%g   y=%g   iter=%d \n") %Xmin  %(mzr.ymin())  %(mzr.iter());
 
 	return 0;
  }

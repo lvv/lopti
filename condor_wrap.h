@@ -70,10 +70,20 @@ class	minimizer { public:
 	};
 
 
-	minimizer& 	 condor_rho_start	(v rho)		{ c_rho_start = rho;	return *this; };
-	minimizer& 	 condor_rho_end		(v rho)		{ c_rho_end   = rho;	return *this; };
-	minimizer& 	 max_iter		(int mx)	{ max_iter_   = mx;	return *this; };
-	minimizer& 	 gnuplot_print		(bool flag)	{ c_of_wrap->gnuplot_print =flag;	return *this; };
+	minimizer& 	condor_rho_start	(v rho)		{ c_rho_start = rho;	return *this; };
+	minimizer& 	condor_rho_end		(v rho)		{ c_rho_end   = rho;	return *this; };
+	minimizer& 	max_iter		(int mx)	{ max_iter_   = mx;	return *this; };
+	v 	 	ymin			()		{  return c_of_wrap->valueBest; };
+	v 	 	iter			()		{  return c_of_wrap->getNFE(); };
+
+	minimizer& 	 gnuplot_print		(bool flag)	{
+		#define  GP_F "splot [-2:1.5][-0.5:2] log(100 * (y - x*x)**2 + (1 - x)**2),  "
+		cout << "# :gnuplot: set view 0,0,1.7;   set font \"arial,6\"; set dgrid3d;  set key off;"
+			"  set contour surface;  set cntrparam levels 20;  set isosample 40;"
+			GP_F "\"pipe\" using 3:4:2:1 with labels; \n";
+
+		c_of_wrap->gnuplot_print =flag;	return *this;
+	};
 
 	V&		 argmin			()		{
 						assert(c_of_wrap);
