@@ -6,6 +6,7 @@ t-gz*  t-gunzip : LDFLAGS  += -lgzstream -lz
 
 LDFLAGS += -lgsl -lgslcblas
 
+t-condor: CXXFLAGS +=   -I ..
 t-condor: LDFLAGS  +=   -L /usr/local/lib/ -lcondor  -lm
 t-condor: t-condor.cc
 
