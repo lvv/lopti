@@ -1,10 +1,16 @@
 
-.DEFAULT_GOAL := t-cdf-model-gp
+.DEFAULT_GOAL := t-condor
 	
 t-*     : lvv.h math.h check.h
 t-gz*  t-gunzip : LDFLAGS  += -lgzstream -lz
 
 LDFLAGS += -lgsl -lgslcblas
+
+t-condor: LDFLAGS  +=   -L /usr/local/lib/ -lcondor  -lm
+t-condor: t-condor.cc
+
+
+#	make -f condor.mk
 
 t-cdf-model: t-cdf-model.cc *.h
 
@@ -23,4 +29,4 @@ install:
 	cd /usr/local &&  git merge lvvlib
 
 
-include include.mk
+include ../lvv/include.mk
