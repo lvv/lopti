@@ -17,12 +17,12 @@
 
 template<typename V>  typename V::value_type  of_rb(V X)   {  return 100*pow2(X[1]-pow2(X[0]))+pow2(1-X[0]);  };
 
-#include <lopti/condor_wrap.h>
+#include <lopti/condor-wrap.h>
 
 int main(int argc, char **argv) {
 	
 	array_t		X0 = {{ -1.2, 1 }};
-	array_t		R  = {{ 0.1, 0.1 }};
+	array_t		R  = {{ 1, 1 }};
 
 	minimizer<array_t>	mzr(of_rb, X0);
 	mzr.condor_rho_start	(1);
