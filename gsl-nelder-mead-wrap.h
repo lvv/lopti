@@ -1,7 +1,4 @@
 
-	#ifndef LVV_MULTIMIN_H
-	#define LVV_MULTIMIN_H
-	
 #include <stdlib.h>
 #include <iostream>
 using std::cerr;
@@ -11,78 +8,138 @@ using std::cerr;
 #include <lvv/lvv.h>
 #include <lvv/math.h>
 
-namespace lvv {
  
 
-class f_minimizer {  public:
 
-	f_minimizer (const int N, double F(const gsl_vector*, void *), double *xa,  double *ssa, void *var, bool _trace=false)
-	:	T (gsl_multimin_fminimizer_nmsimplex), trace(_trace), found(false), fmin(999999)
+/*
+double gsl_of_wrap(const gsl_vector*, void * var) {
+	V	X;
+	for (int i = X.ibegin();  i<X.iend();  i++)     X[i] = gsl_vector_get(gX, i);
+	return  (*real_of_ptr)(X);
+}	
+
+	
+static v (*real_of_ptr)(V);
+*/
+
+                 template<typename V>
+class gsl_of_wrap {  public:
+	typedef  typename V::value_type v;
+	typedef  v (*of_ptr_t)(V ) ;	
+	static of_ptr_t  of_ptr;
+
+	gsl_of_wrap(){};
+
+
+	static void  init(v (*F)(V)) { of_ptr = F; }	
+
+	static double  eval(const gsl_vector* gX, void * var) {
+		V	X;
+		for (int i = X.ibegin();  i<X.iend();  i++)     X[i] = gsl_vector_get(gX, i);
+		return  (*of_ptr)(X);
+	}	
+
+};
+
+template<typename V>  typename V::value_type  (*gsl_of_wrap<V>::of_ptr)(V);
+//template<typename V>  typename gsl_of_wrap<V>::of_ptr_t  gsl_of_wrap<V>::of_ptr;
+
+                 template<typename V>
+class	minimizer { public:
+		typedef  typename V::value_type v;
+		int				max_iter_;
+		bool				gnuplot_print_;
+		V				Xmin;
+		int				iter_;
+
+		gsl_vector*			gX;	
+		gsl_vector* 			gS;	
+		const gsl_multimin_fminimizer_type *T;
+		gsl_multimin_fminimizer*	gsl_minimizer;
+		gsl_multimin_function		minex_func;
+		double 				characteristic_size;
+	//gsl_of_wrap<array_t>::of_ptr;;
+		bool				found_;
+		//gsl_of_wrap<V>::of_ptr;
+		//double*			xmin;
+		//double			fmin;
+
+	minimizer		(v (*F)(V), V X)     
+	:	
+		max_iter_(500),
+		T (gsl_multimin_fminimizer_nmsimplex)
 	{
-		minex_func.n = N;
-		minex_func.f = F;
-		minex_func.params = var;
+		gsl_of_wrap<V>::init(F);
+		minex_func.f = &gsl_of_wrap<V>::eval;
+		minex_func.n = X.size();
+		gX  = gsl_vector_alloc(X.size());	for (int i=0; i<X.size(); i++)  gsl_vector_set(gX, i, X[i]);
+	
 
-		mk_gsl_vector x (xa,N);// this is auto on stack(temp), will be copied in minimizer, //  so we are fine when it will go out of scope
-		mk_gsl_vector ss(ssa, N);
-		//gv_x  = gsl_vector_alloc(N);	for (int i=0; i<N; i++)  gsl_vector_set(gv_x,  i, xa [i]);
-		//gv_ss = gsl_vector_alloc(N);	for (int i=0; i<N; i++)  gsl_vector_set(gv_ss, i, ssa[i]);
-
-
-		minimizer = gsl_multimin_fminimizer_alloc(T, N);
-		  gsl_multimin_fminimizer_set(minimizer, &minex_func, &x  , &ss);
-		//gsl_multimin_fminimizer_set(minimizer, &minex_func, gv_x, gv_ss);
-		xmin = minimizer->x->data;
-		if (trace)   cout << "#  minimizer: "  <<  gsl_multimin_fminimizer_name (minimizer)  <<  endl;
+		//xmin = minimizer->x->data;
+		if (gnuplot_print_)   cerr << "#  minimizer: "  <<  gsl_multimin_fminimizer_name (gsl_minimizer)  <<  endl;
 	};
 
+	~minimizer () { gsl_multimin_fminimizer_free(gsl_minimizer);  gsl_vector_free(gX);   gsl_vector_free(gS);  };
 
-	~f_minimizer () { gsl_multimin_fminimizer_free(minimizer);  /* gsl_vector_free(gv_x);   gsl_vector_free(gv_ss) ;*/ };
+	void		step			(V S)		{
+		gS = gsl_vector_alloc(S.size());  for (int i=0; i<S.size(); i++)  gsl_vector_set(gS, i, S[i]); 
+		gsl_minimizer = gsl_multimin_fminimizer_alloc(T, V::size());
+		gsl_multimin_fminimizer_set(gsl_minimizer, &minex_func, gX  , gS);
+	};
+
+	void 		max_iter		(int mx)	{ max_iter_ 	= mx;	 };
+	void 		gsl_var			(void* var )	{ minex_func.params = var; };
+	void   		gsl_characteristic_size	(double cs)	{ characteristic_size = cs; };
 
 
-	void   find_min (double characteristic_size, int max_iter) {
+	v 	 	ymin			()		{  return gsl_minimizer->fval; };
+	v 	 	iter			()		{  return iter_; };
+
+
+	V&		argmin () {
+
 		int	test_status=GSL_CONTINUE;			// test_status:  GSL_SUCCESS==0; GSL_CONTINUE==-2; 
 
-		if (trace)  FMT("# Itr  %10t Y   %20t Step  %30t X[0..]\n");
+		if (gnuplot_print_)  FMT("# Itr  %10t Y   %20t  X[0..]   Step\n");
 	
-		for  ( iter=0;  iter<max_iter && (test_status==GSL_CONTINUE);   ++iter )   {
+		for  ( iter_=0;  iter_ < max_iter_  &&  (test_status==GSL_CONTINUE);   ++iter_ )   {
 
-			int  iterate_status = gsl_multimin_fminimizer_iterate(minimizer);
+			int  iterate_status = gsl_multimin_fminimizer_iterate(gsl_minimizer);
 
 			if (iterate_status) {
 				cerr << "error: FMinimizer: in gsl_multimin_fminimizer_iterate()\n";
 				break;
 			}
 
-			double size = gsl_multimin_fminimizer_size(minimizer);
+			double size = gsl_multimin_fminimizer_size(gsl_minimizer);
 			test_status = gsl_multimin_test_size(size, characteristic_size);
 
 			if (test_status == GSL_SUCCESS)  {
-				found=true;
-				fmin=minimizer->fval;
-				if (trace )    cout  << "converged to minimum at\n";
+				found_=true;
+				//fmin=gsl_minimizer->fval;
+				if (gnuplot_print_ )    cerr  << "# converged to minimum at\n";
 			}
 			
-			if (trace) { 
-				FMT("%5d %10.5d %10.5d") %iter   %(minimizer->fval)  %size;
-				for (unsigned i=0; i < minimizer->x->size; ++i) FMT("%10.5d") %gsl_vector_get(minimizer->x, i);
+			if (gnuplot_print_) { 
+				FMT("%5d %10.5d %10.5d") %iter_   %(gsl_minimizer->fval)  %size;
+				for (unsigned i=0; i < gsl_minimizer->x->size; ++i) FMT("%10.5d") %gsl_vector_get(gsl_minimizer->x, i);
 				cout << endl;
 			}
-		
 		}
+
+		for (int i = Xmin.ibegin();  i<Xmin.iend();  i++)     Xmin[i] = gsl_vector_get(gX, i);
+		return Xmin;
 	}
 
-	const gsl_multimin_fminimizer_type *T;
-	gsl_multimin_fminimizer            *minimizer;
-	gsl_multimin_function               minex_func;
-	bool                                trace;
-	bool                                found;
-	double                             *xmin;
-	double                              fmin;
-	gsl_vector                         *gv_x;
-	gsl_vector                         *gv_ss;
-	int					iter;
+
+	minimizer& 	 gnuplot_print		(bool flag)	{
+		/*
+		#define  GP_F  "splot [-2:1.5][-0.5:2] log(100 * (y - x*x)**2 + (1 - x)**2),  "
+		cout << "# :gnuplot: set view 0,0,1.7;   set font \"arial,6\"; set dgrid3d;  set key off;"
+			"  set contour surface;  set cntrparam levels 20;  set isosample 40;"
+			GP_F "\"pipe\" using 3:4:2:1 with labels; \n";
+		*/
+		gnuplot_print_ =flag;	return *this;
+	};
+
  };
- } // namespace
- 
-    #endif // LVV_MULTIMIN_H

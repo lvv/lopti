@@ -17,11 +17,13 @@
 
 template<typename V>  typename V::value_type  of_rb(V X)   {  return 100*pow2(X[1]-pow2(X[0]))+pow2(1-X[0]);  };
 
+		#include <lopti/gsl-nelder-mead-wrap.h>
 
 int main(int argc, char **argv) {
 	
 	array_t		X0 = {{ -1.2, 1 }};
-	array_t		R  = {{ 0.1, 0.1 }};
+	//array_t		R  = {{ 0.1, 0.1 }};
+	array_t		S  = {{ 0.1, 0.1 }};
 
 	/*{ 
 		#include <lopti/condor_wrap.h>
@@ -36,11 +38,8 @@ int main(int argc, char **argv) {
 	}*/
 
 	{ 
-		#include <lopti/gsl-nelder-mead-wrap.h>
 		minimizer<array_t>	mzr(of_rb, X0);
-		mzr.condor_rho_start	(1);
-		mzr.condor_rho_end	(1e-7);
-		mzr.rescale		(R);
+		mzr.step		(S);
 		mzr.gnuplot_print	(true);
 		array_t	Xmin = mzr.argmin();
 		
