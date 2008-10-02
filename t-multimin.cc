@@ -62,7 +62,7 @@ int	main(void)  {
 
 	f_minimizer 	fm(N, curved_trench, x, step0, NULL);	
 	//f_minimizer 	fm(N, f3d, x, step0, NULL, true);	
-	fm.find_min(1e-10, 300);
+	fm.find_min(1e-7, 300);
 
 	if (fm.found)  {
 		FMT("Result: Fmin=%10.5f   Xmin: ") % fm.fmin ;    for  ( int i=0;   i < N;   ++i )   FMT("%12.5g") % fm.xmin[i];  cout << endl;
