@@ -16,7 +16,7 @@ namespace lvv {
 
 class f_minimizer {  public:
 
-	f_minimizer (const int N, double F(const gsl_vector*, void *), double *xa,  double *ssa, void *var, bool _trace=false)
+	f_minimizer (const int N, double f(const gsl_vector*, void *), double *xa,  double *ssa, void *var, bool _trace=false)
 	:	T (gsl_multimin_fminimizer_nmsimplex), trace(_trace), found(false), fmin(999999)
 	{
 		minex_func.n = N;

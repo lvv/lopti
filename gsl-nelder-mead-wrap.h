@@ -1,27 +1,13 @@
 
 #include <stdlib.h>
-#include <iostream>
+//#include <iostream>
 using std::cerr;
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_multimin.h>
 #include <lvv/lvv.h>
-#include <lvv/math.h>
 
  
-
-
-/*
-double gsl_of_wrap(const gsl_vector*, void * var) {
-	V	X;
-	for (int i = X.ibegin();  i<X.iend();  i++)     X[i] = gsl_vector_get(gX, i);
-	return  (*real_of_ptr)(X);
-}	
-
-	
-static v (*real_of_ptr)(V);
-*/
-
                  template<typename V>
 class gsl_of_wrap {  public:
 	typedef  typename V::value_type v;
@@ -38,7 +24,6 @@ class gsl_of_wrap {  public:
 		for (int i = X.ibegin();  i<X.iend();  i++)     X[i] = gsl_vector_get(gX, i);
 		return  (*of_ptr)(X);
 	}	
-
 };
 
 template<typename V>  typename V::value_type  (*gsl_of_wrap<V>::of_ptr)(V);
@@ -58,7 +43,6 @@ class	minimizer { public:
 		gsl_multimin_fminimizer*	gsl_minimizer;
 		gsl_multimin_function		minex_func;
 		double 				characteristic_size;
-	//gsl_of_wrap<array_t>::of_ptr;;
 		bool				found_;
 		//gsl_of_wrap<V>::of_ptr;
 		//double*			xmin;
@@ -66,7 +50,7 @@ class	minimizer { public:
 
 	minimizer		(v (*F)(V), V X)     
 	:	
-		max_iter_(500),
+		max_iter_(300),
 		T (gsl_multimin_fminimizer_nmsimplex)
 	{
 		gsl_of_wrap<V>::init(F);
@@ -75,15 +59,15 @@ class	minimizer { public:
 		gX  = gsl_vector_alloc(X.size());	for (int i=0; i<X.size(); i++)  gsl_vector_set(gX, i, X[i]);
 	
 
-		//xmin = minimizer->x->data;
-		if (gnuplot_print_)   cerr << "#  minimizer: "  <<  gsl_multimin_fminimizer_name (gsl_minimizer)  <<  endl;
 	};
 
 	~minimizer () { gsl_multimin_fminimizer_free(gsl_minimizer);  gsl_vector_free(gX);   gsl_vector_free(gS);  };
 
 	void		step			(V S)		{
-		gS = gsl_vector_alloc(S.size());  for (int i=0; i<S.size(); i++)  gsl_vector_set(gS, i, S[i]); 
+		gS = gsl_vector_alloc(V::size());  for (int i=0; i<V::size(); i++)  gsl_vector_set(gS, i, S[i]); 
 		gsl_minimizer = gsl_multimin_fminimizer_alloc(T, V::size());
+		//xmin = minimizer->x->data;
+		if (gnuplot_print_)   cerr << "#  minimizer: "  <<  gsl_multimin_fminimizer_name (gsl_minimizer)  <<  endl;
 		gsl_multimin_fminimizer_set(gsl_minimizer, &minex_func, gX  , gS);
 	};
 
@@ -121,25 +105,24 @@ class	minimizer { public:
 			}
 			
 			if (gnuplot_print_) { 
-				FMT("%5d %10.5d %10.5d") %iter_   %(gsl_minimizer->fval)  %size;
-				for (unsigned i=0; i < gsl_minimizer->x->size; ++i) FMT("%10.5d") %gsl_vector_get(gsl_minimizer->x, i);
+				FMT("%5d \t %18.10g \t ") %iter_   %(gsl_minimizer->fval);
+				for (int i=0; i < gsl_minimizer->x->size; ++i) FMT("%18.10d") %gsl_vector_get(gsl_minimizer->x, i);
+				FMT("%18.10g")  %size;
 				cout << endl;
 			}
 		}
 
-		for (int i = Xmin.ibegin();  i<Xmin.iend();  i++)     Xmin[i] = gsl_vector_get(gX, i);
+		for (int i = Xmin.ibegin();  i<Xmin.iend();  i++)     Xmin[i] = gsl_vector_get(gsl_minimizer->x, i);
 		return Xmin;
 	}
 
 
-	minimizer& 	 gnuplot_print		(bool flag)	{
-		/*
+	void 	 gnuplot_print		(bool flag)	{
+		gnuplot_print_ =flag;
 		#define  GP_F  "splot [-2:1.5][-0.5:2] log(100 * (y - x*x)**2 + (1 - x)**2),  "
 		cout << "# :gnuplot: set view 0,0,1.7;   set font \"arial,6\"; set dgrid3d;  set key off;"
 			"  set contour surface;  set cntrparam levels 20;  set isosample 40;"
 			GP_F "\"pipe\" using 3:4:2:1 with labels; \n";
-		*/
-		gnuplot_print_ =flag;	return *this;
 	};
 
  };

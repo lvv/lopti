@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
 	mzr.condor_rho_start	(1);
 	mzr.condor_rho_end	(1e-7);
 	mzr.rescale		(R);
-	mzr.gnuplot_print	(true);
+	mzr.verbose		(true);
 	array_t	Xmin = mzr.argmin();
 	
 	MSG("Result: Xmin%g   y=%g   iter=%d \n") %Xmin  %(mzr.ymin())  %(mzr.iter());

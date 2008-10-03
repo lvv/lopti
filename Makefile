@@ -4,7 +4,7 @@
 t-*     : lvv.h math.h check.h
 t-gz*  t-gunzip : LDFLAGS  += -lgzstream -lz
 
-LDFLAGS += -lgsl -lgslcblas
+LDFLAGS += -lgsl -lgslcblas -lcondor
 
 t-condor: CXXFLAGS +=   -I ..
 t-condor: LDFLAGS  +=   -L /usr/local/lib/ -lcondor  -lm

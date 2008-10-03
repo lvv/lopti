@@ -15,7 +15,7 @@ class	of_wrap  : public CONDOR::ObjectiveFunction { public:
 			typedef  typename V::value_type v;
 			v (*F)(V);
 			int eval_cnt;
-			bool gnuplot_print;
+			bool verbose;
 
 	of_wrap (v F(V), V X0) {
 		strcpy(name,"condor_of_wrap");
@@ -24,7 +24,7 @@ class	of_wrap  : public CONDOR::ObjectiveFunction { public:
 		for (int i=X0.ibegin();  i < X0.iend();  i++)      xStart[i] = X0[i];
 		this->F =  F;
 		eval_cnt = 0;
-		gnuplot_print = false;
+		verbose = false;
 	};
 
 			//typeof(*X.begin())	eval (V X) {
@@ -35,7 +35,7 @@ class	of_wrap  : public CONDOR::ObjectiveFunction { public:
 		updateCounter(y,cX);
 		eval_cnt++;
 
-		if (gnuplot_print) {
+		if (verbose) {
 			FMT("%5d \t %19.15g  ")  %eval_cnt  %y;
 			for  (typename V::iterator x=X.begin();   x != X.end();   x++)    FMT("\t%19.15g")   %(*x);
 			cout << endl;
@@ -49,7 +49,7 @@ class	of_wrap  : public CONDOR::ObjectiveFunction { public:
 class	minimizer { public:
 		typedef  typename V::value_type v;
 		int				max_iter_;
-		bool				gnuplot_print_;
+		//bool				verbose_;
 		v 				c_rho_start;
 		v 				c_rho_end;
 		of_wrap<V>*			c_of_wrap;		
@@ -76,13 +76,13 @@ class	minimizer { public:
 	v 	 	ymin			()		{  return c_of_wrap->valueBest; };
 	v 	 	iter			()		{  return c_of_wrap->getNFE(); };
 
-	minimizer& 	 gnuplot_print		(bool flag)	{
+	minimizer& 	 verbose		(bool flag)	{
 		#define  GP_F "splot [-2:1.5][-0.5:2] log(100 * (y - x*x)**2 + (1 - x)**2),  "
 		cout << "# :gnuplot: set view 0,0,1.7;   set font \"arial,6\"; set dgrid3d;  set key off;"
 			"  set contour surface;  set cntrparam levels 20;  set isosample 40;"
 			GP_F "\"pipe\" using 3:4:2:1 with labels; \n";
 
-		c_of_wrap->gnuplot_print =flag;	return *this;
+		c_of_wrap->verbose =flag;	return *this;
 	};
 
 	V&		 argmin			()		{
