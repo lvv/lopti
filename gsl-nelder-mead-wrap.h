@@ -10,14 +10,26 @@ using std::cerr;
  
                  template<typename V>
 class gsl_of_wrap {  public:
-		typedef  typename V::value_type (*of_ptr_t)(V ) ;	
+		typedef  typename V::value_type (*of_ptr_t)(V) ;	
 		static of_ptr_t  of_ptr;
 
-	static void	init	(of_ptr_t of) 				{ of_ptr = of; }	
-	static double	eval	(const gsl_vector* gX, void * var)	{ V X;    X << gX;    return  (*of_ptr)(X); }	
-};
+	static void	init	(of_ptr_t of) 			{ of_ptr = of; }	
+	static double	eval	(const gsl_vector* gX, void* var=NULL)		{ V X;    X << gX;    return  (*of_ptr)(X); }	
+ };
 
-template<typename V>  typename V::value_type  (*gsl_of_wrap<V>::of_ptr)(V);
+                 template<typename V>
+class gsl_of2_wrap {  public:
+		typedef  typename V::value_type (*of2_ptr_t)(V, void*) ;	
+		static of2_ptr_t  of2_ptr;
+
+	static void	init	(of2_ptr_t of2) 				{ of2_ptr = of2; }	
+	static double	eval2	(const gsl_vector* gX, void * var)	{ V X;    X << gX;    return  (*of2_ptr)(X, var); }	
+ };
+
+
+template<typename V>  typename V::value_type  (*gsl_of_wrap<V>::of_ptr)(V); // this is in gsl_ow_wrap class, but we need to decl it 1 more time for compiler
+template<typename V>  typename V::value_type  (*gsl_of2_wrap<V>::of2_ptr)(V, void*);
+
 
                  template<typename V>
 class	minimizer { public:
@@ -35,18 +47,31 @@ class	minimizer { public:
 		double 				characteristic_size;
 		bool				found_;
 
-	minimizer		(v (*F)(V), V X)     
+
+	minimizer		(v (*of)(V), V X)     
 	:	
 		max_iter_(300),
 		T (gsl_multimin_fminimizer_nmsimplex)
 	{
-		gsl_of_wrap<V>::init(F);
+		gsl_of_wrap<V>::init(of);
 		minex_func.f = &gsl_of_wrap<V>::eval;
 		minex_func.n = X.size();
+		minex_func.params = NULL;
 		gX  = gsl_vector_alloc(X.size());
 		gX << X;
-	
+	};
 
+	minimizer		(v (*of2)(V, void*),  V X,  void* var)     
+	:	
+		max_iter_(300),
+		T (gsl_multimin_fminimizer_nmsimplex)
+	{
+		gsl_of2_wrap<V>::init(of2);
+		minex_func.f = &gsl_of2_wrap<V>::eval2;
+		minex_func.n = X.size();
+		minex_func.params = var;
+		gX  = gsl_vector_alloc(X.size());
+		gX << X;
 	};
 
 	~minimizer () { gsl_multimin_fminimizer_free(gsl_minimizer);  gsl_vector_free(gX);   gsl_vector_free(gS);  };
@@ -61,16 +86,13 @@ class	minimizer { public:
 	};
 
 	void 		max_iter		(int mx)	{ max_iter_ 	= mx;	 };
-	void 		gsl_var			(void* var )	{ minex_func.params = var; };
+	//void 		gsl_var			(void* var )	{ minex_func.params = var; };
 	void   		gsl_characteristic_size	(double cs)	{ characteristic_size = cs; };
-
 
 	v 	 	ymin			()		{  return gsl_minimizer->fval; };
 	v 	 	iter			()		{  return iter_; };
 
-
 	V&		argmin () {
-
 		int	test_status=GSL_CONTINUE;			// test_status:  GSL_SUCCESS==0; GSL_CONTINUE==-2; 
 
 		if (verbose_)  FMT("# Itr  %10t Y   %20t  X[0..]   Step\n");
