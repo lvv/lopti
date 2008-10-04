@@ -10,7 +10,7 @@ using std::cerr;
  
                  template<typename V>
 class gsl_of_wrap {  public:
-		typedef  typename V::value_type (*of_ptr_t)(V) ;	
+		typedef  typename V::value_type (*of_ptr_t)(V&) ;	
 		static of_ptr_t  of_ptr;
 
 	static void	init	(of_ptr_t of) 			{ of_ptr = of; }	
@@ -19,7 +19,7 @@ class gsl_of_wrap {  public:
 
                  template<typename V>
 class gsl_of2_wrap {  public:
-		typedef  typename V::value_type (*of2_ptr_t)(V, void*) ;	
+		typedef  typename V::value_type (*of2_ptr_t)(V&, void*) ;	
 		static of2_ptr_t  of2_ptr;
 
 	static void	init	(of2_ptr_t of2) 				{ of2_ptr = of2; }	
@@ -27,8 +27,8 @@ class gsl_of2_wrap {  public:
  };
 
 
-template<typename V>  typename V::value_type  (*gsl_of_wrap<V>::of_ptr)(V); // this is in gsl_ow_wrap class, but we need to decl it 1 more time for compiler
-template<typename V>  typename V::value_type  (*gsl_of2_wrap<V>::of2_ptr)(V, void*);
+template<typename V>  typename V::value_type  (*gsl_of_wrap<V>::of_ptr)(V&); // this is in gsl_ow_wrap class, but we need to decl it 1 more time for compiler
+template<typename V>  typename V::value_type  (*gsl_of2_wrap<V>::of2_ptr)(V&, void*);
 
 
                  template<typename V>
@@ -48,7 +48,7 @@ class	minimizer { public:
 		bool				found_;
 
 
-	minimizer		(v (*of)(V), V X)     
+	minimizer		(v (*of)(V&), V& X)     
 	:	
 		max_iter_(300),
 		T (gsl_multimin_fminimizer_nmsimplex)
@@ -61,7 +61,7 @@ class	minimizer { public:
 		gX << X;
 	};
 
-	minimizer		(v (*of2)(V, void*),  V X,  void* var)     
+	minimizer		(v (*of2)(V&, void*),  V& X,  void* var)     
 	:	
 		max_iter_(300),
 		T (gsl_multimin_fminimizer_nmsimplex)
