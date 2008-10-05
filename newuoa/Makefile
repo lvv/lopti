@@ -1,19 +1,28 @@
-newuoa: bigden.o biglag.o calfun.o main.o newuoa.o newuob.o trsapp.o update.o
-	gfortran -O -o newuoa bigden.o biglag.o calfun.o main.o newuoa.o newuob.o trsapp.o update.o
-bigden.o: bigden.f
-	gfortran -O  -c bigden.f
-biglag.o: biglag.f
-	gfortran -O  -c biglag.f
-calfun.o: calfun.f
-	gfortran -O  -c calfun.f
-main.o: main.f
-	gfortran -O  -c main.f
-trsapp.o: trsapp.f
-	gfortran -O  -c trsapp.f
-newuoa.o: newuoa.f
-	gfortran -O  -c newuoa.f
-newuob.o: newuob.f
-	gfortran -O  -c newuob.f
-update.o: update.f
-	gfortran -O  -c update.f
+CXXFLAGS = -I /home/lvv/NF/
 
+main: main.cc *.f
+	gfortran -c *.f
+	rm -f main.o t.o
+	$(CXX) $(CXXFLAGS) $< *.o -lgfortran -o $@
+
+#	$(CXX) $(CXXFLAGS) $< *.o -lf2c -lgfortran  -o $@
+
+c-main: main.c *.f
+	rm -f *.o 
+	gfortran -c *.f
+	rm -f main.o 
+	f2c main.f 
+	$(CC) $< *.o -lf2c -lgfortran  -o $@
+
+cc-main: main.cc *.f
+	rm -f *.o 
+	gfortran -c *.f
+	rm -f main.o 
+	$(CXX) $< *.o -lf2c -lgfortran  -o $@
+
+main.c: main.f
+	f2c -a -f main.f
+
+#main.cc: main.f
+#	f2c -a -f main.f -C++
+#	mv main.c main.cc
