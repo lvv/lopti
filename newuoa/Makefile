@@ -1,19 +1,19 @@
-main: bigden.o biglag.o calfun.o main.o newuoa.o newuob.o trsapp.o update.o
-	f77 -O -o newuoa bigden.o biglag.o calfun.o main.o newuoa.o newuob.o trsapp.o update.o
+newuoa: bigden.o biglag.o calfun.o main.o newuoa.o newuob.o trsapp.o update.o
+	gfortran -O -o newuoa bigden.o biglag.o calfun.o main.o newuoa.o newuob.o trsapp.o update.o
 bigden.o: bigden.f
-	f77 -O  -c bigden.f
+	gfortran -O  -c bigden.f
 biglag.o: biglag.f
-	f77 -O  -c biglag.f
+	gfortran -O  -c biglag.f
 calfun.o: calfun.f
-	f77 -O  -c calfun.f
+	gfortran -O  -c calfun.f
 main.o: main.f
-	f77 -O  -c main.f
+	gfortran -O  -c main.f
 trsapp.o: trsapp.f
-	f77 -O  -c trsapp.f
+	gfortran -O  -c trsapp.f
 newuoa.o: newuoa.f
-	f77 -O  -c newuoa.f
+	gfortran -O  -c newuoa.f
 newuob.o: newuob.f
-	f77 -O  -c newuob.f
+	gfortran -O  -c newuob.f
 update.o: update.f
-	f77 -O  -c update.f
+	gfortran -O  -c update.f
 
