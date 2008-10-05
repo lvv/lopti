@@ -1,0 +1,8 @@
+Package: powell
+Title: Powell's UObyQA algorithm
+Version: 1.0-0
+Author: Sundar Dorai-Raj <sdorairaj@gmail.com>, original Fortran from Mike Powell <mjdp@cam.ac.uk>
+Description: Optimizes a function using Powell's UObyQA algorithm.
+Maintainer: Sundar Dorai-Raj <sdorairaj@gmail.com>
+License: GPL 
+Packaged: Tue Aug 15 10:40:10 2006; sundard

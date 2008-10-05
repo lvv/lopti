@@ -1,0 +1,3 @@
+useDynLib(powell)
+
+export(powell, powell.control)

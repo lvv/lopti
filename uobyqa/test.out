@@ -1,0 +1,163 @@
+
+
+
+    ******************
+    Results with N = 2
+    ******************
+
+   New RHO = 0.6667E-02     Number of function values =     9
+   Least value of F =  0.262748996352814E-02         The corresponding X is:
+    0.208351       0.765641    
+
+   New RHO = 0.6667E-03     Number of function values =    16
+   Least value of F =  0.113775360765085E-04         The corresponding X is:
+    0.210263       0.786850    
+
+   New RHO = 0.6667E-04     Number of function values =    18
+   Least value of F =  0.125132874609749E-06         The corresponding X is:
+    0.211513       0.788834    
+
+   New RHO = 0.6667E-05     Number of function values =    20
+   Least value of F =  0.485419346110726E-09         The corresponding X is:
+    0.211334       0.788676    
+
+   New RHO = 0.6667E-06     Number of function values =    22
+   Least value of F =  0.320514309213036E-10         The corresponding X is:
+    0.211326       0.788678    
+
+   New RHO = 0.8165E-07     Number of function values =    23
+   Least value of F =  0.539308796908573E-17         The corresponding X is:
+    0.211325       0.788675    
+
+   New RHO = 0.1000E-07     Number of function values =    23
+   Least value of F =  0.539308796908573E-17         The corresponding X is:
+    0.211325       0.788675    
+
+   At the return from UOBYQA     Number of function values =    25
+   Least value of F =  0.410118467537045E-17         The corresponding X is:
+    0.211325       0.788675    
+
+
+    ******************
+    Results with N = 4
+    ******************
+
+   New RHO = 0.4000E-02     Number of function values =    34
+   Least value of F =  0.334051535003553E-02         The corresponding X is:
+    0.103884       0.382445       0.594092       0.886798    
+
+   New RHO = 0.4000E-03     Number of function values =    54
+   Least value of F =  0.647404749505319E-05         The corresponding X is:
+    0.102638       0.405780       0.593795       0.898025    
+
+   New RHO = 0.4000E-04     Number of function values =    57
+   Least value of F =  0.682517733932959E-07         The corresponding X is:
+    0.102742       0.406200       0.593874       0.897326    
+
+   New RHO = 0.4000E-05     Number of function values =    62
+   Least value of F =  0.785965086692466E-10         The corresponding X is:
+    0.102672       0.406204       0.593790       0.897325    
+
+   New RHO = 0.4000E-06     Number of function values =    66
+   Least value of F =  0.718025097310613E-11         The corresponding X is:
+    0.102673       0.406205       0.593796       0.897327    
+
+   New RHO = 0.6325E-07     Number of function values =    69
+   Least value of F =  0.295755162680314E-15         The corresponding X is:
+    0.102673       0.406204       0.593796       0.897327    
+
+   New RHO = 0.1000E-07     Number of function values =    71
+   Least value of F =  0.295755162680314E-15         The corresponding X is:
+    0.102673       0.406204       0.593796       0.897327    
+
+   At the return from UOBYQA     Number of function values =    73
+   Least value of F =  0.778916719390279E-19         The corresponding X is:
+    0.102673       0.406204       0.593796       0.897327    
+
+
+    ******************
+    Results with N = 6
+    ******************
+
+   New RHO = 0.2857E-02     Number of function values =    63
+   Least value of F =  0.192871035169654E-02         The corresponding X is:
+    0.753782E-01   0.279999       0.367898       0.624440       0.726043    
+    0.937711    
+
+   New RHO = 0.2857E-03     Number of function values =   101
+   Least value of F =  0.173067393118545E-05         The corresponding X is:
+    0.669225E-01   0.288515       0.365968       0.633000       0.710431    
+    0.932974    
+
+   New RHO = 0.2857E-04     Number of function values =   109
+   Least value of F =  0.200152752228009E-07         The corresponding X is:
+    0.668813E-01   0.288745       0.366672       0.633265       0.711284    
+    0.933093    
+
+   New RHO = 0.2857E-05     Number of function values =   118
+   Least value of F =  0.393805705795321E-09         The corresponding X is:
+    0.668816E-01   0.288746       0.366678       0.633320       0.711261    
+    0.933123    
+
+   New RHO = 0.2857E-06     Number of function values =   123
+   Least value of F =  0.177490674271669E-11         The corresponding X is:
+    0.668767E-01   0.288741       0.366682       0.633318       0.711259    
+    0.933123    
+
+   New RHO = 0.5345E-07     Number of function values =   128
+   Least value of F =  0.145871093490055E-13         The corresponding X is:
+    0.668766E-01   0.288741       0.366682       0.633318       0.711259    
+    0.933123    
+
+   New RHO = 0.1000E-07     Number of function values =   132
+   Least value of F =  0.886467911078008E-16         The corresponding X is:
+    0.668766E-01   0.288741       0.366682       0.633318       0.711259    
+    0.933123    
+
+   At the return from UOBYQA     Number of function values =   135
+   Least value of F =  0.312983815956736E-18         The corresponding X is:
+    0.668766E-01   0.288741       0.366682       0.633318       0.711259    
+    0.933123    
+
+
+    ******************
+    Results with N = 8
+    ******************
+
+   New RHO = 0.2222E-02     Number of function values =   129
+   Least value of F =  0.437335632933031E-02         The corresponding X is:
+    0.480830E-01   0.199749       0.261488       0.486656       0.502201    
+    0.726772       0.801140       0.948810    
+
+   New RHO = 0.2222E-03     Number of function values =   193
+   Least value of F =  0.351765609223688E-02         The corresponding X is:
+    0.432440E-01   0.192985       0.266640       0.500432       0.499824    
+    0.733889       0.806729       0.956740    
+
+   New RHO = 0.2222E-04     Number of function values =   203
+   Least value of F =  0.351687920002312E-02         The corresponding X is:
+    0.431645E-01   0.193108       0.266309       0.499997       0.499986    
+    0.733687       0.806886       0.956836    
+
+   New RHO = 0.2222E-05     Number of function values =   213
+   Least value of F =  0.351687382028025E-02         The corresponding X is:
+    0.431524E-01   0.193090       0.266330       0.499998       0.500002    
+    0.733674       0.806905       0.956845    
+
+   New RHO = 0.1491E-06     Number of function values =   227
+   Least value of F =  0.351687372623649E-02         The corresponding X is:
+    0.431527E-01   0.193091       0.266328       0.500000       0.500000    
+    0.733671       0.806909       0.956847    
+
+   New RHO = 0.1000E-07     Number of function values =   234
+   Least value of F =  0.351687372567995E-02         The corresponding X is:
+    0.431528E-01   0.193091       0.266329       0.500000       0.500000    
+    0.733671       0.806909       0.956847    
+
+   At the return from UOBYQA     Number of function values =   240
+   Least value of F =  0.351687372567797E-02         The corresponding X is:
+    0.431528E-01   0.193091       0.266329       0.500000       0.500000    
+    0.733671       0.806909       0.956847    
+
+Program completed
+Press Enter to Continue.
