@@ -1,24 +1,19 @@
 
+include  ../lvv/include.mk
+
 .DEFAULT_GOAL := t-condor
 	
-t-*     : lvv.h math.h check.h
-t-gz*  t-gunzip : LDFLAGS  += -lgzstream -lz
-
-LDFLAGS += -lgsl -lgslcblas -lcondor
+LDFLAGS += -lgsl -lgslcblas -L /usr/local/lib -lcondor
+CXXFLAGS += -I /home/lvv/NF/
 
 t-condor: CXXFLAGS +=   -I ..
 t-condor: LDFLAGS  +=   -L /usr/local/lib/ -lcondor  -lm 
-t-condor: t-condor.cc
 
+t-condor: t.cc condor-wrap.h
+	$(CXX) $(CXXFLAGS) -DOPTI=CONDOR  $< -o $@ $(LDFLAGS)
 
-#	make -f condor.mk
-
-t-cdf-model: t-cdf-model.cc *.h
-
-t-root: LDFLAGS  +=  -lgsl -lgslcblas -lm -L /usr/local/lib -lo2scl_base -lo2scl_other
-t-root: CXXFLAGS +=  -I/usr/local/include/o2scl
-
-allt: t-timer t-equal t-gzstream t-gzip
+t-nm: t.cc  gsl-nelder-mead-wrap.h
+	$(CXX) $(CXXFLAGS) -DOPTI=NM  $< -o $@ $(LDFLAGS)
 
 install:
 	cd /usr/local &&  git checkout lvvlib 
@@ -31,4 +26,4 @@ install:
 
 
 sync:
-	cp  condor-wrap.h gsl-nelder-mead-wrap.h Makefile t-condor.cc t-gsl.cc ../nf/lopti/
+	cp -v condor-wrap.h gsl-nelder-mead-wrap.h Makefile  t.cc ../nf/lopti-ss/

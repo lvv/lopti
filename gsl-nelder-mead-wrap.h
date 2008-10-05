@@ -1,34 +1,23 @@
 
 #include <stdlib.h>
-//#include <iostream>
-using std::cerr;
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_multimin.h>
 #include <lvv/lvv.h>
+	using std::cerr;
 
  
                  template<typename V>
 class gsl_of_wrap {  public:
-		typedef  typename V::value_type (*of_ptr_t)(V&) ;	
+		typedef  typename V::value_type (*of_ptr_t)(V&, void*) ;	
 		static of_ptr_t  of_ptr;
 
-	static void	init	(of_ptr_t of) 			{ of_ptr = of; }	
-	static double	eval	(const gsl_vector* gX, void* var=NULL)		{ V X;    X << gX;    return  (*of_ptr)(X); }	
- };
-
-                 template<typename V>
-class gsl_of2_wrap {  public:
-		typedef  typename V::value_type (*of2_ptr_t)(V&, void*) ;	
-		static of2_ptr_t  of2_ptr;
-
-	static void	init	(of2_ptr_t of2) 				{ of2_ptr = of2; }	
-	static double	eval2	(const gsl_vector* gX, void * var)	{ V X;    X << gX;    return  (*of2_ptr)(X, var); }	
+	static void	init	(of_ptr_t of) 				{ of_ptr = of; }	
+	static double	eval2	(const gsl_vector* gX, void * var)	{ V X;    X << gX;    return  (*of_ptr)(X, var); }	
  };
 
 
-template<typename V>  typename V::value_type  (*gsl_of_wrap<V>::of_ptr)(V&); // this is in gsl_ow_wrap class, but we need to decl it 1 more time for compiler
-template<typename V>  typename V::value_type  (*gsl_of2_wrap<V>::of2_ptr)(V&, void*);
+template<typename V>  typename V::value_type  (*gsl_of_wrap<V>::of_ptr)(V&, void*); // this is in gsl_ow_wrap class, but we need to decl it 1 more time for compiler
 
 
                  template<typename V>
@@ -48,26 +37,14 @@ class	minimizer { public:
 		bool				found_;
 
 
-	minimizer		(v (*of)(V&), V& X)     
+
+	minimizer		(v (*of)(V&, void*),  V& X,  void* var=NULL)     
 	:	
 		max_iter_(300),
 		T (gsl_multimin_fminimizer_nmsimplex)
 	{
 		gsl_of_wrap<V>::init(of);
-		minex_func.f = &gsl_of_wrap<V>::eval;
-		minex_func.n = X.size();
-		minex_func.params = NULL;
-		gX  = gsl_vector_alloc(X.size());
-		gX << X;
-	};
-
-	minimizer		(v (*of2)(V&, void*),  V& X,  void* var)     
-	:	
-		max_iter_(300),
-		T (gsl_multimin_fminimizer_nmsimplex)
-	{
-		gsl_of2_wrap<V>::init(of2);
-		minex_func.f = &gsl_of2_wrap<V>::eval2;
+		minex_func.f = &gsl_of_wrap<V>::eval2;
 		minex_func.n = X.size();
 		minex_func.params = var;
 		gX  = gsl_vector_alloc(X.size());

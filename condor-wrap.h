@@ -2,7 +2,6 @@
 	#define  OPTI_CONDOR
 	#undef CONDOR
 	
-	//#include <unistd.h>
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <cmath>
@@ -16,6 +15,9 @@
 		using CONDOR::CONDORSolver;
 
 	#include <lvv/lvv.h>
+		using std::cout;
+		using std::cerr;
+		using std::endl;
 	#include <lvv/array.h>
 		using lvv::array;
 
