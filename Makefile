@@ -7,7 +7,7 @@ t-gz*  t-gunzip : LDFLAGS  += -lgzstream -lz
 LDFLAGS += -lgsl -lgslcblas -lcondor
 
 t-condor: CXXFLAGS +=   -I ..
-t-condor: LDFLAGS  +=   -L /usr/local/lib/ -lcondor  -lm
+t-condor: LDFLAGS  +=   -L /usr/local/lib/ -lcondor  -lm 
 t-condor: t-condor.cc
 
 
@@ -30,4 +30,5 @@ install:
 	cd /usr/local &&  git merge lvvlib
 
 
-include ../lvv/include.mk
+sync:
+	cp  condor-wrap.h gsl-nelder-mead-wrap.h Makefile t-condor.cc t-gsl.cc ../nf/lopti/

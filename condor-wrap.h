@@ -1,11 +1,12 @@
 	
-	#define  OPT_CONDOR
+	#define  OPTI_CONDOR
+	#undef CONDOR
 	
-	#include <unistd.h>
+	//#include <unistd.h>
 	#include <stdio.h>
 	#include <stdlib.h>
-	#include <math.h>
-	#include <string.h>
+	#include <cmath>
+	#include <string>
 
 	#include <condor/Solver.h>
 	#include <condor/tools.h>
@@ -75,11 +76,7 @@ class	minimizer { public:
 			minimizer		(v (*of)(V&, void*), V& X, void* _var=NULL)        :max_iter_(500), c_rof_wrap(NULL)  { c_of_wrap = new of_wrap<V>(of, X, _var); };
 			~minimizer		()		{ delete   c_of_wrap; };
 
-	void		rescale			(V R)  {
-		cR.setSize(R.size());
-		cR << R;
-		c_rof_wrap = new CONDOR::CorrectScaleOF(2, c_of_wrap, cR);
-	};
+	void		rescale			(V& R) 		{ cR << R; c_rof_wrap = new CONDOR::CorrectScaleOF(2, c_of_wrap, cR); };
 
 	void		condor_rho_start	(v rho)		{ c_rho_start = rho; };
 	void		condor_rho_end		(v rho)		{ c_rho_end   = rho; };

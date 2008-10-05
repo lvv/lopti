@@ -14,16 +14,16 @@
 int main(int argc, char **argv) {
 	
 	array_t		X0 = {{ -1.2, 1 }};
-	array_t		R  = {{ 1, 1 }};
+	array_t		R  = {{ 2, 2 }};
 
 	minimizer<array_t>	mzr(of_rb, X0);
 	mzr.condor_rho_start	(1);
-	mzr.condor_rho_end	(1e-7);
+	mzr.condor_rho_end	(1e-4);
 	mzr.rescale		(R);
 	mzr.verbose		(true);
 	array_t	Xmin = mzr.argmin();
 	
-	MSG("Result: Xmin%g   y=%g   iter=%d \n") %Xmin  %(mzr.ymin())  %(mzr.iter());
+	MSG("# Result: Xmin%.10g   y=%.10g   iter=%d \n") %Xmin  %(mzr.ymin())  %(mzr.iter());
 
 	return 0;
  }
