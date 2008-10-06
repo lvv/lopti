@@ -1,11 +1,20 @@
-CXXFLAGS = -I /home/lvv/NF/
 
-main: main.cc *.f
-	gfortran -c *.f
-	rm -f main.o t.o
+include  /home/lvv/NF/lvv/include.mk
+
+CXXFLAGS += -ggdb3 -I /home/lvv/NF/
+FC = gfortran
+FCFLAGS = -frange-check -fbounds-check -O0 -ggdb3
+
+newuoa: newuoa.cc bigden.f  biglag.f  calfun.f  main.f  newuoa.f  newuob.f  trsapp.f  update.f
+	rm -f *.o
+	$(FC)  $(FCFLAGS) -c bigden.f  biglag.f  calfun.f   trsapp.f  update.f
 	$(CXX) $(CXXFLAGS) $< *.o -lgfortran -o $@
 
-#	$(CXX) $(CXXFLAGS) $< *.o -lf2c -lgfortran  -o $@
+#	./$@
+
+f-main: main.f  bigden.f  biglag.f  calfun.f  newuoa.f  newuob.f  trsapp.f  update.f
+	rm -f *.o 
+	$(FC)  $(FCFLAGS) bigden.f  biglag.f  calfun.f  main.f  newuoa.f  newuob.f  trsapp.f  update.f    -lgfortran  -o $@
 
 c-main: main.c *.f
 	rm -f *.o 

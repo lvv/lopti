@@ -1,0 +1,80 @@
+k	- iter number
+m	- (NPT) number of iterpolated points
+Y	- points chosen to interpolate
+Δ	- trust region radius  (Δ >= ϱ;  )
+ϱ 	- rho
+D	- step: X[k+1] = X[k]+D[k]
+	 	1/2 ϱ <  |D|  < Δ
+		
+		calculation for normal trust-region-iteration (with truncated conjugate gradient method):
+			|D[k+1]| > Δ[k]
+			D[k+1] = argmin <D> (Q(X[k] + D));  
+
+		if  |D| < 1/2 ϱ   then
+			X[k+1] too close to X[k] 
+			D is abandoned
+			need new ϱ  (?)
+			calculate alternative-iteration
+
+		if   F(X[k]) − F(X[k]+ D[k]) /  Q(X[k]) − Q(X[k]+ D[k]) > 0.1  then
+			calculate alternative-iteration
+
+		...
+			
+/***************************************************************************************************
+This subroutine seeks the least value of a function of many variables,
+by a trust region method that forms quadratic models by interpolation.
+There can be some freedom in the interpolation conditions, which is
+taken up by minimizing the Frobenius norm of the change to the second
+derivative of the quadratic model, beginning with a zero matrix. The
+arguments of the subroutine are as follows.
+
+N	- number of variables and must be at least two.
+NPT	- number of interpolation conditions. Must be in interval [N+2,(N+1)(N+2)/2].
+X	- have X0 on invocation , argmin on exit
+RHOBEG and RHOEND -  initial and final values of a trust
+  region radius, so both must be positive with RHOEND<=RHOBEG. Typically
+  RHOBEG should be about one tenth of the greatest expected change to a
+  variable, and RHOEND should indicate the accuracy that is required in
+  the final values of the variables.
+IPRINT	- should be set to 0, 1, 2 or 3, which controls the
+  amount of printing. Specifically, there is no output if IPRINT=0 and there is
+  output only at the return if IPRINT=1. Otherwise, each new value of RHO is
+  printed, with the best vector of variables so far and the corresponding value
+  of the objective function. Further, each new value of F with its variables
+  are output if IPRINT=3.
+
+MAXFUN	- must be set to an upper bound on the number of calls of CALFUN.
+
+W 	- will be used for working space. Its length must be at least (NPT+13)*(NPT+N)+3*N*(N+3)/2.
+
+CALFUN (N,X,F) 	- must be provided by the user. It must set F to the value of the objective function for the variables X(1),X(2),...,X(N).
+
+XBASE	- [N] 		hold a shift of origin that should reduce the contributions from rounding errors to values of the model and Lagrange functions.
+XOPT	- [N] 		displacement from XBASE of the vector of variables that provides the least calculated F so far.
+XNEW	- [N] 		displacement from XBASE of the vector of variables for the current calculation of F.
+FVAL	- [NPT]		values of F at the interpolation points. 
+GQ	- [N]		gradient of the quadratic model at XBASE.
+HQ	- [(N*(N+1)+1)/2] explicit second derivatives of the quadratic model.
+PQ	- [NPT]		parameters of the implicit second derivatives of the quadratic model.
+XPT	- [NPT,N]	interpolation point coordinates relative to XBASE. 
+NDIM	- 		first dimension of BMAT and has the value NPT+N.
+BMAT	- [NPT+N,N]	last N columns of H.
+ZMAT	- [NPTM, NPT] 	factorization of the leading NPT by NPT submatrix of H, this factorization being ZMAT times Diag(DZ) times ZMAT^T, where
+	  		the elements of DZ are plus or minus one, as specified by IDZ.
+D	- [N]	step from XOPT.
+VLAG	- [NPT+N]	values of the Lagrange functions at a new point X.  They are part of a product that requires VLAG to be of length NDIM.
+W	- will be used for working space. Its length must be at least 10*NDIM = 10*(NPT+N).
+*************************************************************************************************************************/
+
+NF 	- a point num,  index in XPT, FVAL
+FOPT	- best F
+KOPT	- index in FVAL of best F
+
+NFTEST	- max(MAXFUN,1)
+NP	N+1;
+NPTM	NPT-NP;
+NDIM	NPT+N;
+
+XIPT, XJPT	- added to XBASE to form new D
+
