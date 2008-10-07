@@ -26,12 +26,6 @@ extern "C" void  update_  (int* N, int* NPT, double* BMAT, double* ZMAT, int* ID
 extern "C" void  calfun_  (int* N, double* X, double* F);
 
 
-	template<typename T, int n, int m>
-void mat_flip(array<array<T, n,1>, m,1>& M) {
-	for (int i=M.ibegin(); i< M.iend(); i++) 
-		for (int j=(*M.begin()).ibegin();  j< (*M.begin()).iend();  j++) 
-			if (false && i>j)   swap( M[i][j], (*(array<array<T, m,1>, n,1>*)&M)[j][i] );
-}
 
 		template<int N, int NPT>
 void newuoa (array<double,N, 1>& X,  double RHOBEG,  double RHOEND,  int IPRINT,  int MAXFUN) {
@@ -258,13 +252,7 @@ gen_tr_100:
 	KNEW=0;
 	double CRVMIN;
 	double DSQ;
-		mat_flip<>(BMAT); 
-		mat_flip<>(ZMAT); 
-		mat_flip<>(XPT); 
 	trsapp_ (&_n, &_npt, (double*)&XOPT, (double*)&XPT, (double*)&GQ, (double*)&HQ, (double*)&PQ, &DELTA, (double*)&D, (double*)&W, &W[NP], &W[NP+N], &W[NP+2*N], &CRVMIN);
-		mat_flip<>(BMAT); 
-		mat_flip<>(ZMAT); 
-		mat_flip<>(XPT); 
 	DSQ=ZERO;
 	for (int I=1; I<=N; I++)   DSQ += pow2(D[I]);
 
@@ -371,13 +359,7 @@ shift_xbase_120:
 	double DSTEP;
 	double ALPHA;
 	if (KNEW > 0) {
-		mat_flip<>(BMAT); 
-		mat_flip<>(ZMAT); 
-		mat_flip<>(XPT); 
           	biglag_ (&_n, &_npt, (double*)&XOPT, (double*)&XPT, (double*)&BMAT, (double*)&ZMAT, &IDZ, &_ndim, &KNEW, &DSTEP, (double*)&D, &ALPHA, (double*)&VLAG, &VLAG[NPT+1], (double*)&W, &W[NP], &W[NP+N]);
-		mat_flip<>(BMAT); 
-		mat_flip<>(ZMAT); 
-		mat_flip<>(XPT); 
 	}
 
 	//  Calculate VLAG and BETA for the current choice of D. The first NPT
@@ -436,16 +418,10 @@ shift_xbase_120:
      	if (KNEW > 0)  {
      	    TEMP = ONE+ALPHA*BETA/pow2(VLAG[KNEW]);
      	    if (abs(TEMP) <= 0.8)
-		mat_flip<>(BMAT); 
-		mat_flip<>(ZMAT); 
-		mat_flip<>(XPT); 
      	        bigden_ (
 			&_n, &_npt, (double*)&XOPT, (double*)&XPT, (double*)&BMAT, (double*)&ZMAT, &IDZ, &_ndim, &KOPT,  &KNEW,
 			(double*)&D, (double*)&W, (double*)&VLAG, &BETA, (double*)&XNEW, &W[NDIM+1], &W[6*NDIM+1]
 		);
-		mat_flip<>(BMAT); 
-		mat_flip<>(ZMAT); 
-		mat_flip<>(XPT); 
      	}
 
 	//  Calculate the next value of the objective function.
@@ -579,11 +555,7 @@ eval_f_310:
 update_410:
 
 	//CALL UPDATE (N,NPT,BMAT,ZMAT,IDZ,NDIM,VLAG,BETA,KNEW,W)
-		mat_flip<>(BMAT); 
-		mat_flip<>(ZMAT); 
 	update_  (&_n, &_npt, (double*)&BMAT, (double*)&ZMAT, &IDZ, &_ndim, (double*)&VLAG, &BETA, &KNEW, (double*)&W);
-		mat_flip<>(BMAT); 
-		mat_flip<>(ZMAT); 
 
      	FVAL[KNEW]=F;
      	IH=0;
