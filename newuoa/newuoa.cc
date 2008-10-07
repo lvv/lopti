@@ -1,8 +1,15 @@
+// g/\]\[/s/\vBMAT *\[(.{-})\]\[(.{-})\]/BMAT(\2,\1)/g
+
+#define BMAT(i,j)  BMAT[j][i]
+#define ZMAT(i,j)  ZMAT[j][i]
+#define XPT(i,j)  XPT[j][i]
+
 #include        <cmath>
 	using   std::sqrt;  
 #include        <algorithm>
 	using   std::max;  
 	using   std::min;  
+	using   std::swap;  
 
 #include <lvv/lvv.h>
 #include <lvv/math.h>
@@ -17,6 +24,14 @@ extern "C" void  biglag_  (int* N, int* NPT, double* XOPT, double* XPT, double* 
 extern "C" void  bigden_  (int* N, int* NPT, double* XOPT, double* XPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, int* KOPT, int*  KNEW, double* D, double* W, double* VLAG, double* BETA, double* XNEW, double* /*W[NDIM+1]*/, double* /*W[6*NDIM+1]*/);
 extern "C" void  update_  (int* N, int* NPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, double* VLAG, double* BETA, int* KNEW, double* W);
 extern "C" void  calfun_  (int* N, double* X, double* F);
+
+
+	template<typename T, int n, int m>
+void mat_flip(array<array<T, n,1>, m,1>& M) {
+	for (int i=M.ibegin(); i< M.iend(); i++) 
+		for (int j=(*M.begin()).ibegin();  j< (*M.begin()).iend();  j++) 
+			if (false && i>j)   swap( M[i][j], (*(array<array<T, m,1>, n,1>*)&M)[j][i] );
+}
 
 		template<int N, int NPT>
 void newuoa (array<double,N, 1>& X,  double RHOBEG,  double RHOEND,  int IPRINT,  int MAXFUN) {
@@ -62,15 +77,15 @@ void newuoa (array<double,N, 1>& X,  double RHOBEG,  double RHOEND,  int IPRINT,
 
 	for(int J=1; J<=N;  J++)  {
 		XBASE[J]=X[J];
-		for (int K=1;  K<=NPT;  K++) 	XPT[K][J]  = ZERO;
-     		for (int I=1; I<=NDIM; I++) 	BMAT[I][J] = ZERO;
+		for (int K=1;  K<=NPT;  K++) 	XPT(J,K)  = ZERO;
+     		for (int I=1; I<=NDIM; I++) 	BMAT(J,I) = ZERO;
    	}
 
 	for(int IH=1; IH<=NH;  IH++) 	HQ[IH]=ZERO;
 
 	for(int K=1; K<=NPT; K++)  { 
 		PQ[K]=ZERO;
-		for(int J=1; J<=NPTM; J++)  ZMAT[K][J]=ZERO;
+		for(int J=1; J<=NPTM; J++)  ZMAT(J,K)=ZERO;
    	}
 
 	double  RHOSQ=RHOBEG*RHOBEG;
@@ -131,9 +146,9 @@ fill_xpt_50: //do {
 
 		if (NFM <= 2*N) {
 			if (NFM >= 1 && NFM <= N) {
-				XPT[NF][NFM] = RHOBEG;
+				XPT(NFM,NF) = RHOBEG;
 			} else if (NFM > N) {
-				XPT[NF][NFMM] = -RHOBEG;
+				XPT(NFMM,NF) = -RHOBEG;
 			}
 		} else {
 			ITEMP=(NFMM-1)/N;
@@ -150,14 +165,14 @@ fill_xpt_50: //do {
 			if (FVAL[IPT+NP] < FVAL[IPT+1]) XIPT=-XIPT;
 			XJPT=RHOBEG;
 			if (FVAL[JPT+NP] < FVAL[JPT+1]) XJPT=-XJPT;
-			XPT[NF][IPT]=XIPT;
-			XPT[NF][JPT]=XJPT;
+			XPT(IPT,NF)=XIPT;
+			XPT(JPT,NF)=XJPT;
 		}
 		
 		//     Calculate the next value of F, label 70 being reached immediately
 		//     after this calculation. The least function value so far and its index  are required.
 		
-		for (int J=1; J<=N; J++)  X[J]=XPT[NF][J]+XBASE[J];
+		for (int J=1; J<=N; J++)  X[J]=XPT(J,NF)+XBASE[J];
 
 		goto eval_f_310;
 
@@ -182,16 +197,16 @@ return_to_init_from_eval_70:
 			if (NFM >= 1  &&  NFM <= N)  {
 				GQ[NFM] = (F-FBEG)/RHOBEG;
 				if  (NPT < NF+N)  {
-				  	BMAT[1][NFM]       = -ONE/RHOBEG;
-				  	BMAT[NF][NFM]      = ONE/RHOBEG ;
-				  	BMAT[NPT+NFM][NFM] = -HALF*RHOSQ;
+				  	BMAT(NFM,1)       = -ONE/RHOBEG;
+				  	BMAT(NFM,NF)      = ONE/RHOBEG ;
+				  	BMAT(NFM,NPT+NFM) = -HALF*RHOSQ;
 				}
 			} else if (NFM > N) {
-				BMAT[NF-N][NFMM] = HALF/RHOBEG           ; 
-				BMAT[NF][NFMM]   = -HALF/RHOBEG          ; 
-				ZMAT[1][NFMM]    = -RECIQ-RECIQ          ; 
-				ZMAT[NF-N][NFMM] = RECIQ                 ; 
-				ZMAT[NF][NFMM]   = RECIQ                 ; 
+				BMAT(NFMM,NF-N) = HALF/RHOBEG           ; 
+				BMAT(NFMM,NF)   = -HALF/RHOBEG          ; 
+				ZMAT(NFMM,1)    = -RECIQ-RECIQ          ; 
+				ZMAT(NFMM,NF-N) = RECIQ                 ; 
+				ZMAT(NFMM,NF)   = RECIQ                 ; 
 				IH           = (NFMM*(NFMM+1))/2     ; 
 				double TEMP      = (FBEG-F)/RHOBEG       ; 
 				HQ[IH]           = (GQ[NFMM]-TEMP)/RHOBEG; 
@@ -205,10 +220,10 @@ return_to_init_from_eval_70:
 			IH=(IPT*(IPT-1))/2+JPT;
 			if (XIPT < ZERO) IPT = IPT+N;
 			if (XJPT < ZERO) JPT = JPT+N;
-			ZMAT[1][NFMM]     = RECIP;
-			ZMAT[NF][NFMM]    = RECIP;
-			ZMAT[IPT+1][NFMM] = -RECIP;
-			ZMAT[JPT+1][NFMM] = -RECIP;
+			ZMAT(NFMM,1)     = RECIP;
+			ZMAT(NFMM,NF)    = RECIP;
+			ZMAT(NFMM,IPT+1) = -RECIP;
+			ZMAT(NFMM,JPT+1) = -RECIP;
 			HQ[IH]            = (FBEG-FVAL[IPT+1]-FVAL[JPT+1]+F)/(XIPT*XJPT);
 		}
 
@@ -228,7 +243,7 @@ return_to_init_from_eval_70:
 	XOPTSQ = ZERO;
 	
 	for (int I=1; I<=N; I++)  {
-		XOPT[I] = XPT[KOPT][I]; 
+		XOPT[I] = XPT(I,KOPT); 
 		XOPTSQ  = XOPTSQ+pow2(XOPT[I]); 
 	}
 
@@ -243,7 +258,13 @@ gen_tr_100:
 	KNEW=0;
 	double CRVMIN;
 	double DSQ;
+		mat_flip<>(BMAT); 
+		mat_flip<>(ZMAT); 
+		mat_flip<>(XPT); 
 	trsapp_ (&_n, &_npt, (double*)&XOPT, (double*)&XPT, (double*)&GQ, (double*)&HQ, (double*)&PQ, &DELTA, (double*)&D, (double*)&W, &W[NP], &W[NP+N], &W[NP+2*N], &CRVMIN);
+		mat_flip<>(BMAT); 
+		mat_flip<>(ZMAT); 
+		mat_flip<>(XPT); 
 	DSQ=ZERO;
 	for (int I=1; I<=N; I++)   DSQ += pow2(D[I]);
 
@@ -271,17 +292,17 @@ shift_xbase_120:
 
         	for (int K=1;  K<=NPT;  K++) {
 			SUM=ZERO;
-			for (int  I=1;  I<=N;  I++)    	 SUM  +=  XPT[K][I] * XOPT[I];
+			for (int  I=1;  I<=N;  I++)    	 SUM  +=  XPT(I,K) * XOPT[I];
 			TEMP=PQ[K]*SUM;
 			SUM=SUM-HALF*XOPTSQ;
 			W[NPT+K]=SUM;
 			for (int I=1;  I<=N;  I++)  {
-				GQ[I]=GQ[I]+TEMP*XPT[K][I];
-				XPT[K][I]=XPT[K][I]-HALF*XOPT[I];
-				VLAG[I]=BMAT[K][I];
-				W[I]=SUM*XPT[K][I]+TEMPQ*XOPT[I];
+				GQ[I]=GQ[I]+TEMP*XPT(I,K);
+				XPT(I,K)=XPT(I,K)-HALF*XOPT[I];
+				VLAG[I]=BMAT(I,K);
+				W[I]=SUM*XPT(I,K)+TEMPQ*XOPT[I];
 				IP=NPT+I;
-				for (int J=1; J<=I; J++)   BMAT[IP][J]  +=  VLAG[I]*W[J]+W[I]*VLAG[J];
+				for (int J=1; J<=I; J++)   BMAT(J,IP)  +=  VLAG[I]*W[J]+W[I]*VLAG[J];
 			}
 		}
 
@@ -292,23 +313,23 @@ shift_xbase_120:
 			double SUMZ=ZERO;
 
 			for (int I=1; I<=NPT; I++)  {
-				SUMZ=SUMZ+ZMAT[I][K];
-		  		W[I]=W[NPT+I]*ZMAT[I][K];
+				SUMZ=SUMZ+ZMAT(K,I);
+		  		W[I]=W[NPT+I]*ZMAT(K,I);
 		  	}
 
 			for (int J=1; J<=N; J++)  {
 				SUM=TEMPQ*SUMZ*XOPT[J];
-				for (int I=1; I<=NPT;  I++)    SUM=SUM+W[I]*XPT[I][J];
+				for (int I=1; I<=NPT;  I++)    SUM=SUM+W[I]*XPT(J,I);
 				VLAG[J]=SUM;
 				if (K < IDZ)  SUM=-SUM;
-				for (int I=1; I<=NPT; I++) 	BMAT[I][J] +=  SUM*ZMAT[I][K];
+				for (int I=1; I<=NPT; I++) 	BMAT(J,I) +=  SUM*ZMAT(K,I);
 		  	}
 
 			for (int I=1; I<=N; I++)  {
 				IP=I+NPT;
 				TEMP=VLAG[I];
 				if (K < IDZ) TEMP=-TEMP;
-				for (int J=1; J<=I; J++) 	BMAT[IP][J] += TEMP*VLAG[J];
+				for (int J=1; J<=I; J++) 	BMAT(J,IP) += TEMP*VLAG[J];
 			}
 		}
 
@@ -321,8 +342,8 @@ shift_xbase_120:
 			W[J]=ZERO;
 
 			for (int K=1; K<=NPT; K++) {
-				W[J]=W[J]+PQ[K]*XPT[K][J];
-		  		XPT[K][J]=XPT[K][J]-HALF*XOPT[J];
+				W[J]=W[J]+PQ[K]*XPT(J,K);
+		  		XPT(J,K)=XPT(J,K)-HALF*XOPT[J];
 		  	}
 
 			for (int I=1; I<=J; I++)  {
@@ -330,7 +351,7 @@ shift_xbase_120:
 				if (I < J) GQ[J]=GQ[J]+HQ[IH]*XOPT[I];
 				GQ[I] += HQ[IH] * XOPT[J];
 				HQ[IH] += W[I]*XOPT[J]+XOPT[I]*W[J];
-		  		BMAT[NPT+I][J]=BMAT[NPT+J][I];
+		  		BMAT(J,NPT+I)=BMAT(I,NPT+J);
 		  	}
 	  	}
 
@@ -350,7 +371,13 @@ shift_xbase_120:
 	double DSTEP;
 	double ALPHA;
 	if (KNEW > 0) {
+		mat_flip<>(BMAT); 
+		mat_flip<>(ZMAT); 
+		mat_flip<>(XPT); 
           	biglag_ (&_n, &_npt, (double*)&XOPT, (double*)&XPT, (double*)&BMAT, (double*)&ZMAT, &IDZ, &_ndim, &KNEW, &DSTEP, (double*)&D, &ALPHA, (double*)&VLAG, &VLAG[NPT+1], (double*)&W, &W[NP], &W[NP+N]);
+		mat_flip<>(BMAT); 
+		mat_flip<>(ZMAT); 
+		mat_flip<>(XPT); 
 	}
 
 	//  Calculate VLAG and BETA for the current choice of D. The first NPT
@@ -361,9 +388,9 @@ shift_xbase_120:
 		double SUMB=ZERO;
 		SUM=ZERO;
 		for (int J=1; J<=N; J++) {
-			SUMA=SUMA+XPT[K][J]*D[J];
-			SUMB=SUMB+XPT[K][J]*XOPT[J];
-			SUM=SUM+BMAT[K][J]*D[J];
+			SUMA=SUMA+XPT(J,K)*D[J];
+			SUMB=SUMB+XPT(J,K)*XOPT[J];
+			SUM=SUM+BMAT(J,K)*D[J];
 		}
 		W[K]=SUMA*(HALF*SUMA+SUMB);
 	  	VLAG[K]=SUM;
@@ -372,7 +399,7 @@ shift_xbase_120:
      	BETA=ZERO;
      	for (int K=1; K<=NPTM; K++)  {
 		SUM=ZERO;
-		for (int I=1; I<=NPT; I++) SUM += ZMAT[I][K]*W[I];
+		for (int I=1; I<=NPT; I++) SUM += ZMAT(K,I)*W[I];
 
 		if (K < IDZ)  {
 		    BETA +=  SUM*SUM;
@@ -381,7 +408,7 @@ shift_xbase_120:
 		    BETA -= SUM*SUM;
 		}
 
-		for (int I=1; I<=NPT; I++) 	VLAG[I] += SUM*ZMAT[I][K];
+		for (int I=1; I<=NPT; I++) 	VLAG[I] += SUM*ZMAT(K,I);
 	}
 
      	BSUM = ZERO;
@@ -390,11 +417,11 @@ shift_xbase_120:
 
      	for (int J=1; J<=N; J++) {
 		SUM=ZERO;
-		for (int I=1; I<=NPT; I++)	SUM += W[I]*BMAT[I][J];
+		for (int I=1; I<=NPT; I++)	SUM += W[I]*BMAT(J,I);
 
 		BSUM += SUM*D[J];
 		JP=NPT+J;
-		for (int K=1; K<=N; K++) 	SUM += BMAT[JP][K]*D[K];
+		for (int K=1; K<=N; K++) 	SUM += BMAT(K,JP)*D[K];
 		VLAG[JP]=SUM;
 		BSUM += SUM*D[J];
 	  	DX += D[J]*XOPT[J];
@@ -409,10 +436,16 @@ shift_xbase_120:
      	if (KNEW > 0)  {
      	    TEMP = ONE+ALPHA*BETA/pow2(VLAG[KNEW]);
      	    if (abs(TEMP) <= 0.8)
+		mat_flip<>(BMAT); 
+		mat_flip<>(ZMAT); 
+		mat_flip<>(XPT); 
      	        bigden_ (
 			&_n, &_npt, (double*)&XOPT, (double*)&XPT, (double*)&BMAT, (double*)&ZMAT, &IDZ, &_ndim, &KOPT,  &KNEW,
 			(double*)&D, (double*)&W, (double*)&VLAG, &BETA, (double*)&XNEW, &W[NDIM+1], &W[6*NDIM+1]
 		);
+		mat_flip<>(BMAT); 
+		mat_flip<>(ZMAT); 
+		mat_flip<>(XPT); 
      	}
 
 	//  Calculate the next value of the objective function.
@@ -522,13 +555,13 @@ eval_f_310:
 		for (int J=1; J<=NPTM; J++) {
 			TEMP=ONE;
 			if (J < IDZ) TEMP=-ONE;
-		  	HDIAG += TEMP*pow2(ZMAT[K][J]);
+		  	HDIAG += TEMP*pow2(ZMAT(J,K));
 		}
 
 		TEMP=abs(BETA*HDIAG+pow2(VLAG[K]));
 		DISTSQ=ZERO;
 
-		for (int J=1; J<=N; J++) 	DISTSQ += pow2(XPT[K][J]-XOPT[J]);
+		for (int J=1; J<=N; J++) 	DISTSQ += pow2(XPT(J,K)-XOPT[J]);
 
 		if (DISTSQ > RHOSQ) TEMP *= pow3(DISTSQ/RHOSQ);
 		if (TEMP > DETRAT &&  K != KTEMP)  {
@@ -546,15 +579,19 @@ eval_f_310:
 update_410:
 
 	//CALL UPDATE (N,NPT,BMAT,ZMAT,IDZ,NDIM,VLAG,BETA,KNEW,W)
-	update_ (&_n, &_npt, (double*)&BMAT, (double*)&ZMAT, &IDZ, &_ndim, (double*)&VLAG, &BETA, &KNEW, (double*)&W);
+		mat_flip<>(BMAT); 
+		mat_flip<>(ZMAT); 
+	update_  (&_n, &_npt, (double*)&BMAT, (double*)&ZMAT, &IDZ, &_ndim, (double*)&VLAG, &BETA, &KNEW, (double*)&W);
+		mat_flip<>(BMAT); 
+		mat_flip<>(ZMAT); 
 
      	FVAL[KNEW]=F;
      	IH=0;
      	for (int I=1; I<=N; I++)  {
-		TEMP = PQ[KNEW]*XPT[KNEW][I];
+		TEMP = PQ[KNEW]*XPT(I,KNEW);
 		for (int J=1; J<=I; J++)  {
 			IH++;
-		  	HQ[IH] += TEMP*XPT[KNEW][J];
+		  	HQ[IH] += TEMP*XPT(J,KNEW);
 		}
 	}
 
@@ -564,17 +601,17 @@ update_410:
 	//  vector of the model. Also include the new interpolation point.
 
      	for (int J=1; J<=NPTM; J++)  {
-		TEMP = DIFF*ZMAT[KNEW][J];
+		TEMP = DIFF*ZMAT(J,KNEW);
 		if (J < IDZ) TEMP=-TEMP;
-		for (int K=1; K<=NPT; K++) 	PQ[K] += TEMP*ZMAT[K][J];
+		for (int K=1; K<=NPT; K++) 	PQ[K] += TEMP*ZMAT(J,K);
 	}
 
      	GQSQ=ZERO; 
 
      	for (int I=1; I<=N; I++) {
-		GQ[I] += DIFF*BMAT[KNEW][I];
+		GQ[I] += DIFF*BMAT(I,KNEW);
 		GQSQ  += pow2(GQ[I]);
-	  	XPT[KNEW][I] = XNEW[I];
+	  	XPT(I,KNEW) = XNEW[I];
 	}
 
 	//  If a trust region step makes a small change to the objective function,
@@ -593,7 +630,7 @@ update_410:
 
      			for (int I=1; I<=N; I++)  {
 				SUM=ZERO;
-				for (int K=1; K<=NPT; K++) 	SUM += BMAT[K][I]*VLAG[K];
+				for (int K=1; K<=NPT; K++) 	SUM += BMAT(I,K)*VLAG[K];
 				GISQ += SUM*SUM;
 	  			W[I] = SUM;
 	  		}
@@ -612,13 +649,13 @@ update_410:
 
      				for (int J=1; J<=NPTM; J++) {
 					W[J]=ZERO;
-					for (int K=1; K<=NPT; K++) 	W[J] += VLAG[K]*ZMAT[K][J];
+					for (int K=1; K<=NPT; K++) 	W[J] += VLAG[K]*ZMAT(J,K);
 	  				if (J < IDZ) W[J] =- W[J];
 	  			}
 
      				for (int K=1; K<=NPT; K++) {
 					PQ[K] = ZERO;
-					for (int J=1; J<=NPTM; J++)	PQ[K] += ZMAT[K][J]*W[J];
+					for (int J=1; J<=NPTM; J++)	PQ[K] += ZMAT(J,K)*W[J];
 				}
 
      				ITEST=0;
@@ -644,7 +681,7 @@ L460:	DISTSQ = 4.0*DELTA*DELTA;
 
      	for (int K=1; K<=NPT; K++)  {
 		SUM=ZERO;
-		for (int J=1; J<=N; J++)	SUM += pow2(XPT[K][J]-XOPT[J]);
+		for (int J=1; J<=N; J++)	SUM += pow2(XPT(J,K)-XOPT[J]);
 		if (SUM > DISTSQ)  {
 		    KNEW=K;
 		    DISTSQ=SUM;
