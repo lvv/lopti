@@ -1,20 +1,14 @@
-// g/\]\[/s/\vBMAT *\[(.{-})\]\[(.{-})\]/BMAT(\2,\1)/g
 
 // reverse
- #define BMAT(i,j)  BMAT[j][i]
-
-// stright
-//#define BMAT(i,j)  BMAT[i][j]
-
-#define ZMAT(i,j)  ZMAT[j][i]
-#define XPT(i,j)  XPT[j][i]
+#define		BMAT(i,j)	BMAT[j][i]
+#define		ZMAT(i,j)	ZMAT[j][i]
+#define		XPT(i,j)	XPT[j][i]
 
 #include        <cmath>
 	using   std::sqrt;  
 #include        <algorithm>
 	using   std::max;  
 	using   std::min;  
-	using   std::swap;  
 
 #include <lvv/lvv.h>
 #include <lvv/math.h>
@@ -35,14 +29,15 @@ extern "C" void  calfun_  (int* N, double* X, double* F);
 		template<int N, int NPT>
 void newuoa (array<double,N, 1>& X,  double RHOBEG,  double RHOEND,  int IPRINT,  int MAXFUN) {
 
-	if (IPRINT>=2) FMT("\nN =%d and NPT =%d   ----------------------------------------------------------")  % N  % NPT;
-	const int NP=N+1;
-	const int NPTM=NPT-NP;
+	if (IPRINT>=2) FMT("\nolduoa:  N =%d and NPT =%d   ----------------------------------------------------------")  % N  % NPT;
+
+	const int NP = N+1;
+	const int NPTM = NPT-NP;
 
 	if ((NPT < N+2) || ( NPT > ((N+2)*NP)/2))  { cout << "error: NPT is not in the required interval\n"; exit(33); }
 
 	// work space (former W)
-	const int NDIM=NPT+N;
+	const int NDIM = NPT+N;
 	//W[IXB], W(IXO), W(IXN), W(IXP), W(IFV), W(IGQ), W(IHQ), W(IPQ), W(IBMAT), W(IZMAT), NDIM, W(ID), W(IVL), W(IW)
 	//XBASE , XOPT  , XNEW  , XPT   , FVAL  , GQ    , HQ    , PQ    , BMAT    , ZMAT    , NDIM, D    , VLAG  , W)
 	array<double,N,1>		XBASE;
@@ -55,11 +50,8 @@ void newuoa (array<double,N, 1>& X,  double RHOBEG,  double RHOEND,  int IPRINT,
 	array<double,NDIM,1>		VLAG;
 	array<double,(N*NP)/2,1>	HQ;
 
-	//  DIMENSION X(*),XBASE(*),XOPT(*),XNEW(*),FVAL(*),  GQ(*),HQ(*),PQ(*),D(*),VLAG(*),W(*)
-	//  DIMENSION BMAT(NDIM,*),ZMAT(NPT,*),XPT(NPT,*)
 	array<array<double,NDIM,1>,N,1>	BMAT;
 	array<array<double,NPT,1>,N,1>	XPT;  
-	//array<array<double,N,1>,NDIM,1>	BMAT;
 	array<array<double,NPT,1>,NPTM,1>ZMAT;   
 		
 	array<double,1000,1>		W; //ws
@@ -115,28 +107,11 @@ void newuoa (array<double,N, 1>& X,  double RHOBEG,  double RHOEND,  int IPRINT,
 	int    _n     = N;
 	int    _npt   = NPT;
 
-
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	//  1st indent 
-	//  	s/\v^(.....) /\1^I/ 
-	//  1D arrays into []
-	//  	s/\v(\i+)\(([^,\(]{-})\)/\1[\2]/g
-	//  cycles
-	//  	s/\v^\s+DO\s+(\d+)\s+(\k+)=(.{-}),(.+);/ ^\1^^Ifor (int \2\3; \2<=\4; \2++)  {/
-	//  commnet
-	//	%s:^//$::
-	//	s:\v^//\s+:^I//  :
-	//  func
-	//  	s/\<DABS\>/abs/g
-	//  	s/\<DMAX1\>/max/g
-     	double	HALF   = 0.5          ; 
+     	double	HALF   = 0.5          ; 		// newuob start
      	double	ONE    = 1.0          ; 
      	double	TENTH  = 0.1          ; 
      	double	ZERO   = 0.0          ; 
-     	//int	NP++   ; 
      	int	NH     = (N*NP)/2     ; 
-     	//int	NPTM   = NPT-NP       ; 
      	int	NFTEST = max(MAXFUN,1); 
 
 	//  Set the initial elements of XPT, BMAT, HQ, PQ and ZMAT to zero.
@@ -154,10 +129,10 @@ void newuoa (array<double,N, 1>& X,  double RHOBEG,  double RHOEND,  int IPRINT,
 	 	for (int J=1; J<=NPTM; J++)  	ZMAT(K,J)=ZERO;
 	}
 
-     	double	RHOSQ=RHOBEG*RHOBEG;
-     	double	RECIP=ONE/RHOSQ;
-     	double	RECIQ=sqrt(HALF)/RHOSQ;
-     	int	NF=0;
+     	double	RHOSQ = RHOBEG*RHOBEG;
+     	double	RECIP = ONE/RHOSQ;
+     	double	RECIQ = sqrt(HALF)/RHOSQ;
+     	int	NF = 0;
 
 fill_xpt_50:
 
@@ -165,24 +140,24 @@ fill_xpt_50:
 	//  of function values so far. The coordinates of the displacement of the
 	//  next initial interpolation point from XBASE are set in XPT(NF,.).
 
-	int  NFM=NF;
-     	int  NFMM=NF-N;
+	int  NFM = NF;
+     	int  NFMM = NF-N;
      	NF++;
      	if (NFM <= 2*N)  {
      	    if (NFM >= 1  &&  NFM <= N)	XPT(NF,NFM)=RHOBEG;
      	    else if (NFM > N) 			XPT(NF,NFMM)=-RHOBEG;
 	} else {
      	    ITEMP=(NFMM-1)/N;
-     	    JPT=NFM-ITEMP*N-N;
-     	    IPT=JPT+ITEMP;
+     	    JPT = NFM-ITEMP*N-N;
+     	    IPT = JPT+ITEMP;
      	    if (IPT > N)  {
-     	        ITEMP=JPT;
-     	        JPT=IPT-N;
-     	        IPT=ITEMP;
+     	        ITEMP = JPT;
+     	        JPT = IPT-N;
+     	        IPT = ITEMP;
      	    }
-     	    XIPT=RHOBEG;
+     	    XIPT = RHOBEG;
      	    if (FVAL[IPT+NP] < FVAL[IPT+1]) XIPT=-XIPT;
-     	    XJPT=RHOBEG;
+     	    XJPT = RHOBEG;
      	    if (FVAL[JPT+NP] < FVAL[JPT+1]) XJPT=-XJPT;
      	    XPT(NF,IPT)=XIPT;
      	    XPT(NF,JPT)=XJPT;
@@ -201,12 +176,12 @@ return_to_init_from_eval_70:
    	FVAL[NF]=F;
 
      	if (NF == 1)  {
-     	    FBEG=F;
-     	    FOPT=F;
-     	    KOPT=1;
+     	    FBEG = F;
+     	    FOPT = F;
+     	    KOPT = 1;
      	} else if (F < FOPT)  {
-     	    FOPT=F;
-     	    KOPT=NF;
+     	    FOPT = F;
+     	    KOPT = NF;
      	}
 
 	//  Set the nonzero initial elements of BMAT and the quadratic model in
@@ -239,8 +214,8 @@ return_to_init_from_eval_70:
 
      	} else {
      		IH=(IPT*(IPT-1))/2+JPT;
-     		if (XIPT < ZERO) IPT=IPT+N;
-     		if (XJPT < ZERO) JPT=JPT+N;
+     		if (XIPT < ZERO) IPT = IPT+N;
+     		if (XJPT < ZERO) JPT = JPT+N;
      		ZMAT(1,NFMM)=RECIP;
      		ZMAT(NF,NFMM)=RECIP;
      		ZMAT(IPT+1,NFMM)=-RECIP;
@@ -252,41 +227,41 @@ return_to_init_from_eval_70:
 
 	//  Begin the iterative procedure, because the initial model is complete.
 
-     	RHO=RHOBEG;
-     	DELTA=RHO;
-     	IDZ=1;
-     	DIFFA=ZERO;
-     	DIFFB=ZERO;
-     	ITEST=0;
-     	XOPTSQ=ZERO;
+     	RHO = RHOBEG;
+     	DELTA = RHO;
+     	IDZ = 1;
+     	DIFFA = ZERO;
+     	DIFFB = ZERO;
+     	ITEST = 0;
+     	XOPTSQ = ZERO;
 
  	for (int I=1; I<=N; I++)  {
 		XOPT[I]=XPT(KOPT,I);
-	   	XOPTSQ=XOPTSQ+pow2(XOPT[I]);
+	   	XOPTSQ = XOPTSQ+pow2(XOPT[I]);
 	}
 
 begin_iter_90:
 
-	NFSAV=NF;
+	NFSAV = NF;
 
 	//  Generate the next trust region step and test its length. Set KNEW
 	//  to -1 if the purpose of the next F will be to improve the model.
 
 gen_tr_100:
 
-  	KNEW=0;
+  	KNEW = 0;
 	trsapp_ (&_n, &_npt, (double*)&XOPT, (double*)&XPT, (double*)&GQ, (double*)&HQ, (double*)&PQ, &DELTA,
 		 	(double*)&D, (double*)&W, &W[NP], &W[NP+N], &W[NP+2*N], &CRVMIN);  
-     	DSQ=ZERO;
+     	DSQ = ZERO;
  	for (int I=1; I<=N; I++)  DSQ=DSQ+pow2(D[I]);
-     	DNORM=min(DELTA,sqrt(DSQ));
+     	DNORM = min(DELTA,sqrt(DSQ));
      	if (DNORM < HALF*RHO)  {
      	    KNEW=-1;
-     	    DELTA=TENTH*DELTA;
+     	    DELTA = TENTH*DELTA;
      	    RATIO=-1.0;
-     	    if (DELTA <= 1.5*RHO) DELTA=RHO;
+     	    if (DELTA <= 1.5*RHO) DELTA = RHO;
      	    if (NF <= NFSAV+2) goto L460;
-     	    TEMP=0.125*CRVMIN*RHO*RHO;
+     	    TEMP = 0.125*CRVMIN*RHO*RHO;
      	    if (TEMP <= max(DIFFA, max(DIFFB,DIFFC))) goto L460;
      	    goto new_rho_490;
      	}
@@ -296,20 +271,20 @@ shift_xbase_120:
 	//  to BMAT that do not depend on ZMAT.
 
   	if (DSQ <= 1.0 - 3*XOPTSQ)  {
-		TEMPQ=0.25*XOPTSQ;
+		TEMPQ = 0.25*XOPTSQ;
 
  		for (int K=1; K<=NPT; K++)  {
-			SUM=ZERO;
+			SUM = ZERO;
 	 		for (int I=1; I<=N; I++)  	SUM=SUM+XPT(K,I)*XOPT[I];
-			TEMP=PQ[K]*SUM;
-			SUM=SUM-HALF*XOPTSQ;
+			TEMP = PQ[K]*SUM;
+			SUM = SUM-HALF*XOPTSQ;
 			W[NPT+K]=SUM;
 	 		for (int I=1; I<=N; I++)  {
 				GQ[I]=GQ[I]+TEMP*XPT(K,I);
 				XPT(K,I)=XPT(K,I)-HALF*XOPT[I];
 				VLAG[I]=BMAT(K,I);
 				W[I]=SUM*XPT(K,I)+TEMPQ*XOPT[I];
-				IP=NPT+I;
+				IP = NPT+I;
 		 		for (int J=1; J<=I; J++)  	BMAT(IP,J)=BMAT(IP,J)+VLAG[I]*W[J]+W[I]*VLAG[J];
 		 	}
 		}
@@ -317,15 +292,15 @@ shift_xbase_120:
 		//  Then the revisions of BMAT that depend on ZMAT are calculated.
 
  		for (int K=1; K<=NPTM; K++)  {
-			SUMZ=ZERO;
+			SUMZ = ZERO;
 
 	 		for (int I=1; I<=NPT; I++)  {
-				SUMZ=SUMZ+ZMAT(I,K);
+				SUMZ = SUMZ+ZMAT(I,K);
 		  		W[I]=W[NPT+I]*ZMAT(I,K);
 		  	}
 
 	 		for (int J=1; J<=N; J++)  {
-				SUM=TEMPQ*SUMZ*XOPT[J];
+				SUM = TEMPQ*SUMZ*XOPT[J];
 		 		for (int I=1; I<=NPT; I++)	SUM += W[I]*XPT(I,J);
 				VLAG[J]=SUM;
 				if (K < IDZ) SUM=-SUM;
@@ -333,8 +308,8 @@ shift_xbase_120:
 		 	}
 
 	 		for (int I=1; I<=N; I++)  {
-				IP=I+NPT;
-				TEMP=VLAG[I];
+				IP = I+NPT;
+				TEMP = VLAG[I];
 				if (K < IDZ) TEMP=-TEMP;
 		 		for (int J=1; J<=I; J++)  	BMAT(IP,J)=BMAT(IP,J)+TEMP*VLAG[J];
 		 	}
@@ -343,7 +318,7 @@ shift_xbase_120:
 		//  The following instructions complete the shift of XBASE, including
 		//  the changes to the parameters of the quadratic model.
 
-		IH=0;
+		IH = 0;
 
  		for (int J=1; J<=N; J++)  {
 			W[J]=ZERO;
@@ -367,7 +342,7 @@ shift_xbase_120:
 	  		XOPT[J]=ZERO;
 	  	}
 
-		XOPTSQ=ZERO;
+		XOPTSQ = ZERO;
      	}
 
 	//  Pick the model step if KNEW is positive. A different choice of D
@@ -383,9 +358,9 @@ shift_xbase_120:
 	//  components of W_check will be held in W.
 
  	for (int K=1; K<=NPT; K++)  {
-		SUMA=ZERO;
-		SUMB=ZERO;
-		SUM=ZERO;
+		SUMA = ZERO;
+		SUMB = ZERO;
+		SUM = ZERO;
 	 	for (int J=1; J<=N; J++)  {
 			SUMA += XPT(K,J)*D[J];
 			SUMB += XPT(K,J)*XOPT[J];
@@ -395,36 +370,36 @@ shift_xbase_120:
 	  	VLAG[K]=SUM;
 	}
 
-     	BETA=ZERO;
+     	BETA = ZERO;
 
  	for (int K=1; K<=NPTM; K++)  {
-		SUM=ZERO;
+		SUM = ZERO;
 	 	for (int I=1; I<=NPT; I++)  	SUM=SUM+ZMAT(I,K)*W[I];
 
 		if (K < IDZ)  {
-		    BETA=BETA+SUM*SUM;
+		    BETA = BETA+SUM*SUM;
 		    SUM=-SUM;
 		} else {
-		    BETA=BETA-SUM*SUM;
+		    BETA = BETA-SUM*SUM;
 		}
 	 	for (int I=1; I<=NPT; I++)  	VLAG[I] += SUM*ZMAT(I,K);
 	}
 
-     	BSUM=ZERO;
-     	DX=ZERO;
+     	BSUM = ZERO;
+     	DX = ZERO;
 
  	for (int J=1; J<=N; J++)  {
-		SUM=ZERO;
+		SUM = ZERO;
 	 	for (int I=1; I<=NPT; I++)  	SUM=SUM+W[I]*BMAT(I,J);
-		BSUM=BSUM+SUM*D[J];
-		int JP=NPT+J;
+		BSUM = BSUM+SUM*D[J];
+		int JP = NPT+J;
 	 	for (int K=1; K<=N; K++)  	SUM=SUM+BMAT(JP,K)*D[K];
 		VLAG[JP]=SUM;
-		BSUM=BSUM+SUM*D[J];
-	  	DX=DX+D[J]*XOPT[J];
+		BSUM = BSUM+SUM*D[J];
+	  	DX = DX+D[J]*XOPT[J];
 	}
 
-     	BETA=DX*DX+DSQ*(XOPTSQ+DX+DX+HALF*DSQ)+BETA-BSUM;
+     	BETA = DX*DX+DSQ*(XOPTSQ+DX+DX+HALF*DSQ)+BETA-BSUM;
      	VLAG[KOPT] += ONE;
 
 	//  If KNEW is positive and if the cancellation in DENOM is unacceptable,
@@ -432,7 +407,7 @@ shift_xbase_120:
 	//  working space.
 
      	if (KNEW > 0)  {
-     	    TEMP=ONE+ALPHA*BETA/pow2(VLAG[KNEW]);
+     	    TEMP = ONE+ALPHA*BETA/pow2(VLAG[KNEW]);
      	    if (abs(TEMP) <= 0.8)  {
      	        //CALL BIGDEN (N,NPT,XOPT,XPT,BMAT,ZMAT,IDZ,NDIM,KOPT,KNEW,D,W,VLAG,BETA,XNEW,W[NDIM+1],W[6*NDIM+1])
 		bigden_( &_n, &_npt, (double*)&XOPT, (double*)&XPT, (double*)&BMAT, (double*)&ZMAT, &IDZ, &_ndim, &KOPT,  &KNEW,
@@ -448,12 +423,12 @@ shift_xbase_120:
 	  	X[I]=XBASE[I]+XNEW[I];
 	}
 
-     	NF=NF+1;
+     	NF = NF+1;
 
 eval_f_310:
 
   	if (NF > NFTEST)  {
-		NF=NF-1;
+		NF = NF-1;
 		if (IPRINT > 0) FMT("\n    error:  CALFUN has been called MAXFUN times.");
      	    goto exit_530;
      	}
@@ -469,42 +444,42 @@ eval_f_310:
 	//  Use the quadratic model to predict the change in F due to the step D,
 	//  and set DIFF to the error of this prediction.
 
-     	VQUAD=ZERO;
-     	IH=0;
+     	VQUAD = ZERO;
+     	IH = 0;
 
  	for (int J=1; J<=N; J++)  {
-		VQUAD=VQUAD+D[J]*GQ[J];
+		VQUAD = VQUAD+D[J]*GQ[J];
 	 	for (int I=1; I<=J; I++)  {
-			IH=IH+1;
-			TEMP=D[I]*XNEW[J]+D[J]*XOPT[I];
-			if (I == J) TEMP=HALF*TEMP;
-		  	VQUAD=VQUAD+TEMP*HQ[IH];
+			IH = IH+1;
+			TEMP = D[I]*XNEW[J]+D[J]*XOPT[I];
+			if (I == J) TEMP = HALF*TEMP;
+		  	VQUAD = VQUAD+TEMP*HQ[IH];
 		}
 	}
 
  	for (int K=1; K<=NPT; K++)  	VQUAD=VQUAD+PQ[K]*W[K];
-     	DIFF=F-FOPT-VQUAD;
-     	DIFFC=DIFFB;
-     	DIFFB=DIFFA;
-     	DIFFA=abs(DIFF);
-     	if (DNORM > RHO) NFSAV=NF;
+     	DIFF = F-FOPT-VQUAD;
+     	DIFFC = DIFFB;
+     	DIFFB = DIFFA;
+     	DIFFA = abs(DIFF);
+     	if (DNORM > RHO) NFSAV = NF;
 
 	//  Update FOPT and XOPT if the new F is the least value of the objective
 	//  function so far. The branch when KNEW is positive occurs if D is not
 	//  a trust region step.
 
-     	FSAVE=FOPT;
+     	FSAVE = FOPT;
 
      	if (F < FOPT)  {
-     		FOPT=F;
-     		XOPTSQ=ZERO;
+     		FOPT = F;
+     		XOPTSQ = ZERO;
  		for (int I=1; I<=N; I++)  {
 			XOPT[I]=XNEW[I];
-		  	XOPTSQ=XOPTSQ+pow2(XOPT[I]);
+		  	XOPTSQ = XOPTSQ+pow2(XOPT[I]);
 		}
      	}
 
-     	KSAVE=KNEW;
+     	KSAVE = KNEW;
 
      	if (KNEW > 0) goto update_410;
 
@@ -517,43 +492,43 @@ eval_f_310:
 
      	RATIO=(F-FSAVE)/VQUAD;
 
-     	if 	(RATIO <= TENTH)	DELTA=HALF*DNORM;
-     	else if (RATIO <= 0.7)		DELTA=max(HALF*DELTA,DNORM);
-     	else				DELTA=max(HALF*DELTA,DNORM+DNORM);
+     	if 	(RATIO <= TENTH)	DELTA = HALF*DNORM;
+     	else if (RATIO <= 0.7)		DELTA = max(HALF*DELTA,DNORM);
+     	else				DELTA = max(HALF*DELTA,DNORM+DNORM);
 
-     	if (DELTA <= 1.5*RHO)		DELTA=RHO;
+     	if (DELTA <= 1.5*RHO)		DELTA = RHO;
 
 	//  Set KNEW to the index of the next interpolation point to be deleted.
 
-     	RHOSQ=pow2(max(TENTH*DELTA,RHO));
-     	KTEMP=0;
-     	DETRAT=ZERO;
+     	RHOSQ = pow2(max(TENTH*DELTA,RHO));
+     	KTEMP = 0;
+     	DETRAT = ZERO;
 
      	if (F >= FSAVE) { 
-		KTEMP=KOPT;
-		DETRAT=ONE;
+		KTEMP = KOPT;
+		DETRAT = ONE;
      	}
 
  	for (int K=1; K<=NPT; K++)  {
 
-		double HDIAG=ZERO;
+		double HDIAG = ZERO;
 
 	 	for (int J=1; J<=NPTM; J++)  {
-			TEMP=ONE;
+			TEMP = ONE;
 			if (J < IDZ) TEMP=-ONE;
-		  	HDIAG=HDIAG+TEMP*pow2(ZMAT(K,J));
+		  	HDIAG = HDIAG+TEMP*pow2(ZMAT(K,J));
 		}
 
-		TEMP=abs(BETA*HDIAG+pow2(VLAG[K]));
-		DISTSQ=ZERO;
+		TEMP = abs(BETA*HDIAG+pow2(VLAG[K]));
+		DISTSQ = ZERO;
 
 	 	for (int J=1; J<=N; J++)  	DISTSQ=DISTSQ+pow2((XPT(K,J)-XOPT[J]));
 
-		if (DISTSQ > RHOSQ)		TEMP=TEMP*pow3(DISTSQ/RHOSQ);
+		if (DISTSQ > RHOSQ)		TEMP = TEMP*pow3(DISTSQ/RHOSQ);
 
 		if (TEMP > DETRAT  &&  K != KTEMP)  {
-		    DETRAT=TEMP;
-		    KNEW=K;
+		    DETRAT = TEMP;
+		    KNEW = K;
 		}
 	}
 
@@ -569,12 +544,12 @@ update_410:
 	update_  (&_n, &_npt, (double*)&BMAT, (double*)&ZMAT, &IDZ, &_ndim, (double*)&VLAG, &BETA, &KNEW, (double*)&W);
 
      	FVAL[KNEW]=F;
-     	IH=0;
+     	IH = 0;
 
  	for (int I=1; I<=N; I++)  {
-		TEMP=PQ[KNEW]*XPT(KNEW,I);
+		TEMP = PQ[KNEW]*XPT(KNEW,I);
 	 	for (int J=1; J<=I; J++)  {
-			IH=IH+1;
+			IH = IH+1;
 		  	HQ[IH]=HQ[IH]+TEMP*XPT(KNEW,J);
 		}
 	}
@@ -585,15 +560,15 @@ update_410:
 	//  vector of the model. Also include the new interpolation point.
 
  	for (int J=1; J<=NPTM; J++)  {
-		TEMP=DIFF*ZMAT(KNEW,J);
+		TEMP = DIFF*ZMAT(KNEW,J);
 		if (J < IDZ) 			TEMP=-TEMP;
 	 	for (int K=1; K<=NPT; K++)  	PQ[K]=PQ[K]+TEMP*ZMAT(K,J);
 	}
 
-     	GQSQ=ZERO;
+     	GQSQ = ZERO;
  	for (int I=1; I<=N; I++)  {
 		GQ[I]=GQ[I]+DIFF*BMAT(KNEW,I);
-		GQSQ=GQSQ+pow2(GQ[I]);
+		GQSQ = GQSQ+pow2(GQ[I]);
 	  	XPT(KNEW,I)=XNEW[I];
 	}
 
@@ -603,23 +578,23 @@ update_410:
 
      	if (KSAVE == 0  &&  DELTA == RHO)  {
      		if (abs(RATIO) > 0.01)  {
-     			ITEST=0;
+     			ITEST = 0;
      		} else {
 			for (int K=1; K<=NPT; K++)  	VLAG[K]=FVAL[K]-FVAL[KOPT];
-     			double GISQ=ZERO;
+     			double GISQ = ZERO;
 
  			for (int I=1; I<=N; I++)  {
-				SUM=ZERO;
+				SUM = ZERO;
 	 			for (int K=1; K<=NPT; K++)  	SUM=SUM+BMAT(K,I)*VLAG[K];
-				GISQ=GISQ+SUM*SUM;
+				GISQ = GISQ+SUM*SUM;
 	  			W[I]=SUM;
 	  		}
 
 			//  Test whether to replace the new quadratic model by the least Frobenius
 			//  norm interpolant, making the replacement if the test is satisfied.
 
-     			ITEST=ITEST+1;
-     			if (GQSQ < 100*GISQ) ITEST=0;
+     			ITEST = ITEST+1;
+     			if (GQSQ < 100*GISQ) ITEST = 0;
 
      			if (ITEST >= 3)  {
  				for (int I=1; I<=N; I++)  	GQ[I]=W[I];
@@ -636,12 +611,12 @@ update_410:
 	 				for (int J=1; J<=NPTM; J++)  	PQ[K]=PQ[K]+ZMAT(K,J)*W[J];
 	  			}
 
-				ITEST=0;
+				ITEST = 0;
      			}
      		}
      	}
 
-     	if (F < FSAVE)		KOPT=KNEW;
+     	if (F < FSAVE)		KOPT = KNEW;
 
 	//  If a trust region step has provided a sufficient decrease in F, then
 	//  branch for another trust region calculation. The case KSAVE>0 occurs
@@ -653,19 +628,19 @@ update_410:
 	//  Alternatively, find out if the interpolation points are close enough
 	//  to the best point so far.
 
-     	KNEW=0;
+     	KNEW = 0;
 
   L460:
 
-  	DISTSQ=4.0*DELTA*DELTA;
+  	DISTSQ = 4.0*DELTA*DELTA;
 
  	for (int K=1; K<=NPT; K++)  {
-		SUM=ZERO;
+		SUM = ZERO;
 	 	for (int J=1; J<=N; J++)  	SUM += pow2(XPT(K,J)-XOPT[J]);
 
 		if (SUM > DISTSQ)  { 
-		    KNEW=K;
-		    DISTSQ=SUM;
+		    KNEW = K;
+		    DISTSQ = SUM;
 		}
 	}
 
@@ -673,8 +648,8 @@ update_410:
 	//  iteration, which will generate a "model step".
 
      	if (KNEW > 0)  {
-     	    DSTEP=max(min(TENTH*sqrt(DISTSQ),HALF*DELTA),RHO);
-     	    DSQ=DSTEP*DSTEP;
+     	    DSTEP = max(min(TENTH*sqrt(DISTSQ),HALF*DELTA),RHO);
+     	    DSQ = DSTEP*DSTEP;
      	    goto shift_xbase_120;
      	}
 
@@ -689,14 +664,14 @@ new_rho_490:
 
   	if (RHO > RHOEND)  { 
 
-		DELTA=HALF*RHO;
-		RATIO=RHO/RHOEND;
+		DELTA = HALF*RHO;
+		RATIO = RHO/RHOEND;
 		
-		if	(RATIO <= 16.0)	RHO=RHOEND;
-		else if	(RATIO <= 250.0)	RHO=sqrt(RATIO)*RHOEND;
-		else				RHO=TENTH*RHO;
+		if	(RATIO <= 16.0)	RHO = RHOEND;
+		else if	(RATIO <= 250.0)	RHO = sqrt(RATIO)*RHOEND;
+		else				RHO = TENTH*RHO;
 		
-		DELTA=max(DELTA,RHO);
+		DELTA = max(DELTA,RHO);
 
 		if (IPRINT >= 2) {
 
@@ -718,7 +693,7 @@ new_rho_490:
 
 	if (FOPT <= F)  {
 	 	for (int I=1; I<=N; I++)  	X[I]=XBASE[I]+XOPT[I];
-		F=FOPT;
+		F = FOPT;
 	}
 
 	if (IPRINT >= 1)  FMT("\n \t RETURNED:  NF =%d     F =%.15g    X is: \n \t %.15g\n\n")  %NF %F  %X;
@@ -731,56 +706,56 @@ int main() {
 	
 	/*
 	for (int N=2;  N <= 8;  N+=2)  {
-                int NPT=2*N+1;
+                int NPT = 2*N+1;
 
 		for (int I=1; I<=N; I++) X[I]=I/double(N+1);
 
-                double RHOBEG=0.2e0 * X[1];
+                double RHOBEG = 0.2e0 * X[1];
 
                 FMT("Results with N =%d and NPT =%d")  % N  % NPT;
 
               //CALL NEWUOA (N,NPT,X,RHOBEG,RHOEND,IPRINT,MAXFUN,W)
               newuoa (N, NPT, (double*)&X, RHOBEG, RHOEND, IPRINT, MAXFUN);
 	}*/
-	int IPRINT=2;
-	int MAXFUN=5000;
-	double RHOEND=1.0e-6;
+	int IPRINT = 2;
+	int MAXFUN = 5000;
+	double RHOEND = 1.0e-6;
 	{
-		const int N=2;
-		const int NPT=2*N+1;
+		const int N = 2;
+		const int NPT = 2*N+1;
 		array<double,N, 1> X;
 		for (int I=1; I<=N; I++) X[I]=I/double(N+1);
-		double RHOBEG=0.2 * X[1];
+		double RHOBEG = 0.2 * X[1];
 		FMT("Results with N =%d and NPT =%d")  % N  % NPT;
 		newuoa<N, NPT>(X, RHOBEG, RHOEND, IPRINT, MAXFUN);
 	}
 
 	{
-		const int N=4;
-		const int NPT=2*N+1;
+		const int N = 4;
+		const int NPT = 2*N+1;
 		array<double,N, 1> X;
 		for (int I=1; I<=N; I++) X[I]=I/double(N+1);
-		double RHOBEG=0.2 * X[1];
+		double RHOBEG = 0.2 * X[1];
 		FMT("Results with N =%d and NPT =%d")  % N  % NPT;
 		newuoa<N, NPT>(X, RHOBEG, RHOEND, IPRINT, MAXFUN);
 	}
 
 	{
-		const int N=6;
-		const int NPT=2*N+1;
+		const int N = 6;
+		const int NPT = 2*N+1;
 		array<double,N, 1> X;
 		for (int I=1; I<=N; I++) X[I]=I/double(N+1);
-		double RHOBEG=0.2 * X[1];
+		double RHOBEG = 0.2 * X[1];
 		FMT("Results with N =%d and NPT =%d")  % N  % NPT;
 		newuoa<N, NPT>(X, RHOBEG, RHOEND, IPRINT, MAXFUN);
 	}
 
 	{
-		const int N=8;
-		const int NPT=2*N+1;
+		const int N = 8;
+		const int NPT = 2*N+1;
 		array<double,N, 1> X;
 		for (int I=1; I<=N; I++) X[I]=I/double(N+1);
-		double RHOBEG=0.2 * X[1];
+		double RHOBEG = 0.2 * X[1];
 		newuoa<N, NPT>(X, RHOBEG, RHOEND, IPRINT, MAXFUN);
 	}
 return 0 ;}

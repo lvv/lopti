@@ -5,6 +5,11 @@ CXXFLAGS += -ggdb3 -I /home/lvv/NF/
 FC = gfortran
 FCFLAGS = -frange-check -fbounds-check -O0 -ggdb3
 
+olduoa: olduoa.cc bigden.f  biglag.f  calfun.f  main.f  newuoa.f  newuob.f  trsapp.f  update.f
+	rm -f *.o
+	$(FC)  $(FCFLAGS) -c bigden.f  biglag.f  calfun.f   trsapp.f  update.f
+	$(CXX) $(CXXFLAGS) $< *.o -lgfortran -o $@
+
 newuoa: newuoa.cc bigden.f  biglag.f  calfun.f  main.f  newuoa.f  newuob.f  trsapp.f  update.f
 	rm -f *.o
 	$(FC)  $(FCFLAGS) -c bigden.f  biglag.f  calfun.f   trsapp.f  update.f
