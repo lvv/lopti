@@ -1,5 +1,5 @@
 
-// reverse
+// reverse indexes for fortran compat
 #define		BMAT(i,j)	BMAT[j][i]
 #define		ZMAT(i,j)	ZMAT[j][i]
 #define		XPT(i,j)	XPT[j][i]
@@ -23,25 +23,73 @@ extern "C" void  biglag_  (int* N, int* NPT, double* XOPT, double* XPT, double* 
 extern "C" void  bigden_  (int* N, int* NPT, double* XOPT, double* XPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, int* KOPT, int*  KNEW, double* D, double* W, double* VLAG, double* BETA, double* XNEW, double* /*W[NDIM+1]*/, double* /*W[6*NDIM+1]*/);
 extern "C" void  update_  (int* N, int* NPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, double* VLAG, double* BETA, int* KNEW, double* W);
 //extern "C" void  calfun_  (int* N, double* X, double* F);
+/*
+                 template<typename V,NPT>
+class	minimizer { public:
+		typedef  typename V::value_type v;
+		int				max_iter_;
+		//bool				verbose_;
+		v 				c_rho_start;	// r(rho) start
+		v 				c_rho_end;	// r end
+		of_wrap<V>*			c_of_wrap;	// condor object func wrap	
+		//CONDOR::ObjectiveFunction*	c_of_wrap;		
+		CONDOR::ObjectiveFunction*	c_rof_wrap;	// condor object func rescaled wrap	
+		CONDOR::Vector			cX;		// param in condor format
+		CONDOR::Vector			cR;		// rescale divider
+		V				Xmin;
 
+			minimizer		(v (*of)(V&, void*), V& X, void* _var=NULL)        :max_iter_(500), c_rof_wrap(NULL)  { c_of_wrap = new of_wrap<V>(of, X, _var); };
+			~minimizer		()		{ delete   c_of_wrap; };
 
-		template<int N, int NPT> void
+	void		rescale			(V& R) 		{ cR << R; c_rof_wrap = new CONDOR::CorrectScaleOF(2, c_of_wrap, cR); };
+
+	void		condor_rho_start	(v rho)		{ c_rho_start = rho; };
+	void		condor_rho_end		(v rho)		{ c_rho_end   = rho; };
+	void		max_iter		(int mx)	{ max_iter_   = mx;  };
+	v 	 	ymin			()		{  return c_of_wrap->valueBest; };
+	v 	 	iter			()		{  return c_of_wrap->getNFE(); };
+
+	void 	 verbose		(bool flag)	{
+		#define  GP_F "splot [-2:1.5][-0.5:2] log(100 * (y - x*x)**2 + (1 - x)**2),  "
+		cout << "# :gnuplot: set view 0,0,1.7;   set font \"arial,6\"; set dgrid3d;  set key off;"
+			"  set contour surface;  set cntrparam levels 20;  set isosample 40;"
+			GP_F "\"pipe\" using 3:4:2:1 with labels; \n";
+
+		c_of_wrap->verbose =flag;
+	};
+
+	V&		 argmin			()		{
+						assert(c_of_wrap);
+		globalPrintLevel = 10;		// off
+		CONDOR::CONDORSolver(c_rho_start, c_rho_end, max_iter_,  c_rof_wrap == NULL ? c_of_wrap : c_rof_wrap);
+		Xmin << (c_of_wrap->xBest);
+						//c_of_wrap->printStats();
+		return Xmin;
+	};
+};
+*/
+
+//		template<int N, int NPT> void
+		template<typename V, int NPT> void
+//minimizer<V,NPT>::argmin (
 newuoa (
-	//double  (*of<array<double,N,1>&>) (array<double,N,1>&, void*),  
-	double  (*of) (array<double,N,1>&, void*),  
-	array<double,N, 1>&	X, 
+	//double  (*of) (array<double,N,1>&, void*),  
+	typename V::value_type  (*of) (V&, void*),  
+	//array<double,N, 1>&	X, 
+	V&	X, 
 	double			RHOBEG, 
 	double			RHOEND, 
 	int			IPRINT, 
 	int			MAXFUN
 ) {
 
-	if (IPRINT>=2) FMT("olduoa:  N =%d and NPT =%d   ----------------------------------------------------------\n")  % N  % NPT;
 
+	const int N = V::sz;
 	const int NP = N+1;
 	const int NPTM = NPT-NP;
 
 	if ((NPT < N+2) || ( NPT > ((N+2)*NP)/2))  { cout << "error: NPT is not in the required interval\n"; exit(33); }
+	if (IPRINT>=2) FMT("olduoa:  N =%d and NPT =%d   ----------------------------------------------------------\n")  % N  % NPT;
 
 	const int NDIM = NPT+N;
 	array<double,N,1>		XBASE;
@@ -750,33 +798,41 @@ int main() {
 	int    IPRINT = 2;
 	int    MAXFUN = 5000;
 	double RHOEND = 1.0e-6;
-	///*
+	/*
 	{
-		const int N = 2; const int NPT = 2*N+1; array<double,N, 1> X;
+		const int N = 2; const int NPT = 2*N+1;
+		typedef array<double,N, 1> vector;
+		vector X;
 		for (int I=1; I<=N; I++) X[I] = I/double(N+1);
 		double RHOBEG = 0.2 * X[1];
-		newuoa<N, NPT>(&of_chebyquad, X, RHOBEG, RHOEND, IPRINT, MAXFUN);
+		newuoa<vector NPT>(&of_chebyquad, X, RHOBEG, RHOEND, IPRINT, MAXFUN);
 	}
 
 	{
-		const int N = 4; const int NPT = 2*N+1; array<double,N, 1> X;
+		const int N = 4; const int NPT = 2*N+1;
+		typedef array<double,N, 1> vector;
+		vector X;
 		for (int I=1; I<=N; I++) X[I] = I/double(N+1);
 		double RHOBEG = 0.2 * X[1];
-		newuoa<N, NPT>(&of_chebyquad, X, RHOBEG, RHOEND, IPRINT, MAXFUN);
+		newuoa<vector, NPT>(&of_chebyquad, X, RHOBEG, RHOEND, IPRINT, MAXFUN);
 	}
 
 	{
-		const int N = 6; const int NPT = 2*N+1; array<double,N, 1> X;
+		const int N = 6; const int NPT = 2*N+1;
+		typedef array<double,N, 1> vector;
+		vector X;
 		for (int I=1; I<=N; I++) X[I] = I/double(N+1);
 		double RHOBEG = 0.2 * X[1];
-		newuoa<N, NPT>(&of_chebyquad, X, RHOBEG, RHOEND, IPRINT, MAXFUN);
+		newuoa<vector, NPT>(&of_chebyquad, X, RHOBEG, RHOEND, IPRINT, MAXFUN);
 	}
-	//*/
+	*/
 	{
-		const int N = 8; const int NPT = 2*N+1; array<double,N, 1> X;
+		const int N = 8; const int NPT = 2*N+1;
+		typedef array<double,N, 1> vector;
+		vector X;
 		for (int I=1; I<=N; I++) X[I] = I/double(N+1);
 		double RHOBEG = 0.2 * X[1];
-		newuoa<N, NPT>(&of_chebyquad, X, RHOBEG, RHOEND, IPRINT, MAXFUN);
+		newuoa<vector, NPT>(&of_chebyquad, X, RHOBEG, RHOEND, IPRINT, MAXFUN);
 	}
 
 return 0 ;}
