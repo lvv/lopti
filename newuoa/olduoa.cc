@@ -25,6 +25,42 @@ extern "C" void  update_  (int* N, int* NPT, double* BMAT, double* ZMAT, int* ID
 extern "C" void  calfun_  (int* N, double* X, double* F);
 
 
+		template<typename V>  typename V::value_type
+of_chebyquad(V& X, void* var)   {
+	// The Chebyquad test problem (Fletcher, 1965) 
+	
+	const int N = V::size();
+	typedef  typename V::value_type v;
+	//array<array<v,N+1>,1>N,1> Y;
+	//typename v* Y = new typename v[N+1][N];
+	v Y[10][10];
+
+     	for (int J=1; J<=N; J++)  {
+		Y[1][J] = 1.0;
+		Y[2][J] = 2.0*X[J]-1.0;
+	}
+
+     	for (int I=2; I<=N; I++) 
+		for (int J=1; J<=N; J++)
+			Y[I+1][J]=2.0*Y[2][J]*Y[I][J]-Y[I-1][J];
+
+     	v 	F  = 0.0;
+     	int	NP = N+1;
+     	int	IW = 1;
+
+     	for (int I=1; I<=NP; I++)  {
+		v  SUM=0.0;
+		for (int J=1; J<=N; J++) 	SUM += Y[I][J];
+		SUM = SUM/N;
+		if (IW > 0)  SUM += 1.0/(I*I-2*I);
+		IW=-IW;
+	   	F += SUM*SUM;
+	}
+
+	return F;
+}
+
+template<typename V>  typename V::value_type of_rb(V& X, void* var)   {  return 100*pow2(X[1]-pow2(X[0]))+pow2(1-X[0]);  };
 
 		template<int N, int NPT>
 void newuoa (array<double,N, 1>& X,  double RHOBEG,  double RHOEND,  int IPRINT,  int MAXFUN) {
@@ -435,6 +471,7 @@ eval_f_310:
 
 	// CALL CALFUN (N,X,F)
 	calfun_ (&_n, (double*)&X, &F);
+	//of(X, &F);
 
 	if (IPRINT == 3) FMT ("\n       Function number %d    F =%18.10g    The corresponding X is:  %18.10g \n")  %NF  %F  %X;
 
@@ -721,39 +758,28 @@ int main() {
 	int MAXFUN = 5000;
 	double RHOEND = 1.0e-6;
 	{
-		const int N = 2;
-		const int NPT = 2*N+1;
-		array<double,N, 1> X;
+		const int N = 2; const int NPT = 2*N+1; array<double,N, 1> X;
 		for (int I=1; I<=N; I++) X[I]=I/double(N+1);
 		double RHOBEG = 0.2 * X[1];
-		FMT("Results with N =%d and NPT =%d")  % N  % NPT;
 		newuoa<N, NPT>(X, RHOBEG, RHOEND, IPRINT, MAXFUN);
 	}
 
 	{
-		const int N = 4;
-		const int NPT = 2*N+1;
-		array<double,N, 1> X;
+		const int N = 4; const int NPT = 2*N+1; array<double,N, 1> X;
 		for (int I=1; I<=N; I++) X[I]=I/double(N+1);
 		double RHOBEG = 0.2 * X[1];
-		FMT("Results with N =%d and NPT =%d")  % N  % NPT;
 		newuoa<N, NPT>(X, RHOBEG, RHOEND, IPRINT, MAXFUN);
 	}
 
 	{
-		const int N = 6;
-		const int NPT = 2*N+1;
-		array<double,N, 1> X;
+		const int N = 6; const int NPT = 2*N+1; array<double,N, 1> X;
 		for (int I=1; I<=N; I++) X[I]=I/double(N+1);
 		double RHOBEG = 0.2 * X[1];
-		FMT("Results with N =%d and NPT =%d")  % N  % NPT;
 		newuoa<N, NPT>(X, RHOBEG, RHOEND, IPRINT, MAXFUN);
 	}
 
 	{
-		const int N = 8;
-		const int NPT = 2*N+1;
-		array<double,N, 1> X;
+		const int N = 8; const int NPT = 2*N+1; array<double,N, 1> X;
 		for (int I=1; I<=N; I++) X[I]=I/double(N+1);
 		double RHOBEG = 0.2 * X[1];
 		newuoa<N, NPT>(X, RHOBEG, RHOEND, IPRINT, MAXFUN);
