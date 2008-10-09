@@ -104,7 +104,8 @@ int main() {
 		typedef array<double,N, 1> vector;
 		vector		X= {{ -1.2, 1 }};
 
-		newuoa_wrap<vector, 2*N+1>	mzr(&of_rosenberg, X);
+		//newuoa_wrap<vector, 2*N+1>	mzr(&of_rosenberg, X);
+		newuoa_wrap<vector>	mzr(&of_rosenberg, X);
 		mzr.rho_begin		(0.5);
 		mzr.rho_end		(1e-4);
 		mzr.verbose		(true);

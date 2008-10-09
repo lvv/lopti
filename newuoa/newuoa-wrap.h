@@ -7,17 +7,17 @@
 #define		XPT(i,j)	XPT[j][i]
 
 #include        <cmath>
-	using   std::sqrt;  
+		using   std::sqrt;  
 #include        <algorithm>
-	using   std::max;  
-	using   std::min;  
+		using   std::max;  
+		using   std::min;  
 
-#include <lvv/math.h>
-	using lvv::pow2;
-	using lvv::pow3;
-	using lvv::abs;
-#include <lvv/array.h>
-	using lvv::array;
+#include	<lvv/math.h>
+		using lvv::pow2;
+		using lvv::pow3;
+		using lvv::abs;
+#include	<lvv/array.h>
+		using lvv::array;
 
 extern "C" void  trsapp_  (int* N, int* NPT, double* XOPT, double* XPT, double* GQ, double* HQ, double* PQ, double* DELTA, double* D, double* W, double* /*W[NP]*/, double* /*W[NP+N]*/, double* /*W[NP+2*N]*/, double* CRVMIN);
 extern "C" void  biglag_  (int* N, int* NPT, double* XOPT, double* XPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, int* KNEW, double* DSTEP, double* D, double* ALPHA, double* VLAG, double* /*VLAG[NPT+1]*/, double* W, double* /*W[NP]*/, double* /*W[NP+N]*/);
@@ -26,8 +26,7 @@ extern "C" void  update_  (int* N, int* NPT, double* BMAT, double* ZMAT, int* ID
 
 
 
-		template<typename V, int NPT>
-//class newuoa_wrap: public minimizer<V>, public trust_region<V> { public:
+		template<typename V, int NPT=2*V::sz+1>
 class newuoa_wrap:  public trust_region_minimizer<V> { public:
 	typedef  typename V::value_type fp_t;
 	typedef  fp_t (*of_ptr_t)(V&, void*); 
@@ -41,28 +40,30 @@ class newuoa_wrap:  public trust_region_minimizer<V> { public:
 	using trust_region_minimizer<V>::rho_begin_;
 	using trust_region_minimizer<V>::rho_end_;
 
-	newuoa_wrap		(of_ptr_t of, V& _X):   trust_region_minimizer<V>(of, _X)  {};
-	//newuoa_wrap		(of_ptr_t of, V& _X):   minimizer<V>(of, _X)  {};
-	virtual V&		 argmin			();
+	explicit 	newuoa_wrap		(of_ptr_t of, V& _X):   trust_region_minimizer<V>(of, _X)  {};
+	virtual V&	argmin			();
 };
 
 		template<typename V, int NPT> 	V&
 newuoa_wrap<V,NPT>::argmin () {
 						assert(!isnan(rho_begin_) && " rho_begin definition ");
 						assert(!isnan(rho_end_)   && " rho_end   definition ");
+						assert(V::ibg == 1        && " 1st vector index == 1 "); //  newuoa have index:  [1:N]
 	const int N = V::sz;
 	const int NP = N+1;
 	const int NPTM = NPT-NP;
+	const int NDIM = NPT+N;
 
 	if ((NPT < N+2) || ( NPT > ((N+2)*NP)/2))  { cout << "error: NPT is not in the required interval\n"; exit(33); }
 	if (verbose_) FMT("olduoa:  N =%d and NPT =%d   ----------------------------------------------------------\n")  % N  % NPT;
 
-	const int NDIM = NPT+N;
-	array<double,N,1>		XBASE;
-	array<double,N,1>		XOPT; 
-	array<double,N,1>		XNEW;
-	array<double,N,1>		GQ;
-	array<double,N,1>		D;
+	//array<double,N,1>		XBASE;
+	//V&	XBASE = *new V;
+	V		XBASE;
+	V		XOPT; 
+	V		XNEW;
+	V		GQ;
+	V		D;
 	array<double,NPT,1>		FVAL;
 	array<double,NPT,1>		PQ;
 	array<double,NDIM,1>		VLAG;
