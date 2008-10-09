@@ -18,6 +18,8 @@
 		using lvv::abs;
 #include	<lvv/array.h>
 		using lvv::array;
+		using lvv::vector;
+		using lvv::matrix;
 
 extern "C" void  trsapp_  (int* N, int* NPT, double* XOPT, double* XPT, double* GQ, double* HQ, double* PQ, double* DELTA, double* D, double* W, double* /*W[NP]*/, double* /*W[NP+N]*/, double* /*W[NP+2*N]*/, double* CRVMIN);
 extern "C" void  biglag_  (int* N, int* NPT, double* XOPT, double* XPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, int* KNEW, double* DSTEP, double* D, double* ALPHA, double* VLAG, double* /*VLAG[NPT+1]*/, double* W, double* /*W[NP]*/, double* /*W[NP+N]*/);
@@ -64,14 +66,14 @@ newuoa_wrap<V,NPT>::argmin () {
 	V		XNEW;
 	V		GQ;
 	V		D;
-	array<double,NPT,1>		FVAL;
-	array<double,NPT,1>		PQ;
-	array<double,NDIM,1>		VLAG;
-	array<double,(N*NP)/2,1>	HQ;
+	vector<double,NPT>		FVAL;
+	vector<double,NPT>		PQ;
+	vector<double,NDIM>		VLAG;
+	vector<double,(N*NP)/2>		HQ;
 
-	array<array<double,NDIM,1>,N,1>	BMAT;
-	array<array<double,NPT,1>,N,1>	XPT;  
-	array<array<double,NPT,1>,NPTM,1>ZMAT;   
+	matrix<double,NDIM,N>		BMAT;
+	matrix<double,NPT,N>		XPT;  
+	matrix<double,NPT,NPTM>		ZMAT;   
 		
 	array<double,1000,1>		W; //ws
 

@@ -3,9 +3,9 @@
 of_chebyquad		(V& X, void* var)   {			// The Chebyquad test problem (Fletcher, 1965) 
 	
 	const int N = V::size();
-	typedef  typename V::value_type v;
+	typedef  typename V::value_type fp_t;
 
-	array<array<v,V::sz,1>, V::sz+1,1> Y;
+	array<array<fp_t,V::sz,1>, V::sz+1,1> Y;
 
      	for (int J=1; J<=N; J++)  {
 		Y[1][J] = 1.0;
@@ -16,12 +16,12 @@ of_chebyquad		(V& X, void* var)   {			// The Chebyquad test problem (Fletcher, 1
 		for (int J=1; J<=N; J++)
 			Y[I+1][J]=2.0*Y[2][J]*Y[I][J]-Y[I-1][J];
 
-     	v 	F  = 0.0;
+     	fp_t 	F  = 0.0;
      	int	NP = N+1;
      	int	IW = 1;
 
      	for (int I=1; I<=NP; I++)  {
-		v  SUM=0.0;
+		fp_t  SUM=0.0;
 		for (int J=1; J<=N; J++) 	SUM += Y[I][J];
 		SUM = SUM/N;
 		if (IW > 0)  SUM += 1.0/(I*I-2*I);
