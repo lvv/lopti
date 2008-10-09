@@ -33,7 +33,7 @@ class	of_wrap  : public CONDOR::ObjectiveFunction { public:
 			int eval_cnt;
 			bool verbose;
 
-	of_wrap (v of(V&, void*), V X0, void* var) {
+	of_wrap (v of(V&, void*), V X0, void* var) {  			// we use this CTOR to construct
 		strcpy(name,"condor_of_wrap");
 		xOptimal.setSize(X0.size());
 		xStart.  setSize(X0.size());
@@ -44,7 +44,7 @@ class	of_wrap  : public CONDOR::ObjectiveFunction { public:
 		verbose = false;
 	};
 
-	double  eval (CONDOR::Vector cX, int *nerror=NULL) {
+	double  eval (CONDOR::Vector cX, int *nerror=NULL) {  		// condor use this to eval
 		V X;	
 		X << cX;
 		v y = of(X, var);

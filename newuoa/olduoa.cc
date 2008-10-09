@@ -1,4 +1,6 @@
 
+#include <lvv/lvv.h>
+/////////////////////////////////////////////////////////////////////////////////////////////////	NEWUOA-WRAP.CC
 // reverse indexes for fortran compat
 #define		BMAT(i,j)	BMAT[j][i]
 #define		ZMAT(i,j)	ZMAT[j][i]
@@ -10,7 +12,6 @@
 	using   std::max;  
 	using   std::min;  
 
-#include <lvv/lvv.h>
 #include <lvv/math.h>
 	using lvv::pow2;
 	using lvv::pow3;
@@ -22,74 +23,72 @@ extern "C" void  trsapp_  (int* N, int* NPT, double* XOPT, double* XPT, double* 
 extern "C" void  biglag_  (int* N, int* NPT, double* XOPT, double* XPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, int* KNEW, double* DSTEP, double* D, double* ALPHA, double* VLAG, double* /*VLAG[NPT+1]*/, double* W, double* /*W[NP]*/, double* /*W[NP+N]*/);
 extern "C" void  bigden_  (int* N, int* NPT, double* XOPT, double* XPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, int* KOPT, int*  KNEW, double* D, double* W, double* VLAG, double* BETA, double* XNEW, double* /*W[NDIM+1]*/, double* /*W[6*NDIM+1]*/);
 extern "C" void  update_  (int* N, int* NPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, double* VLAG, double* BETA, int* KNEW, double* W);
-//extern "C" void  calfun_  (int* N, double* X, double* F);
-/*
-                 template<typename V,NPT>
-class	minimizer { public:
+
+
+                 template<typename V>
+class	minimizer { 
+
+	public:
 		typedef  typename V::value_type v;
+		typedef  v (*of_ptr_t)(V&, void*);
 		int				max_iter_;
-		//bool				verbose_;
-		v 				c_rho_start;	// r(rho) start
-		v 				c_rho_end;	// r end
-		of_wrap<V>*			c_of_wrap;	// condor object func wrap	
-		//CONDOR::ObjectiveFunction*	c_of_wrap;		
-		CONDOR::ObjectiveFunction*	c_rof_wrap;	// condor object func rescaled wrap	
-		CONDOR::Vector			cX;		// param in condor format
-		CONDOR::Vector			cR;		// rescale divider
+		bool				verbose_;
+		v 				rho_begin_;	// r(rho) start
+		v 				rho_end_;	// r end
+		V				X;
 		V				Xmin;
+		v				ymin_;
+		int				iter_;
+		of_ptr_t			of_;
 
-			minimizer		(v (*of)(V&, void*), V& X, void* _var=NULL)        :max_iter_(500), c_rof_wrap(NULL)  { c_of_wrap = new of_wrap<V>(of, X, _var); };
-			~minimizer		()		{ delete   c_of_wrap; };
+	minimizer		(of_ptr_t of,  V& _X)        :max_iter_(500), X(_X), of_(of)  {};
+	virtual 		~minimizer		()		{};  // it it here so that approprite polimorfic DTOR called 
 
-	void		rescale			(V& R) 		{ cR << R; c_rof_wrap = new CONDOR::CorrectScaleOF(2, c_of_wrap, cR); };
+	virtual void		rho_begin		(v rho)		{ rho_begin_ = rho; };
+	virtual void		rho_end			(v rho)		{ rho_end_   = rho; };
+	virtual void		max_iter		(int mx)	{ max_iter_   = mx;  };
+	virtual v 	 	ymin			()		{  return ymin_; };
+	virtual v 	 	iter			()		{  return iter_; };
 
-	void		condor_rho_start	(v rho)		{ c_rho_start = rho; };
-	void		condor_rho_end		(v rho)		{ c_rho_end   = rho; };
-	void		max_iter		(int mx)	{ max_iter_   = mx;  };
-	v 	 	ymin			()		{  return c_of_wrap->valueBest; };
-	v 	 	iter			()		{  return c_of_wrap->getNFE(); };
-
-	void 	 verbose		(bool flag)	{
+	virtual void 	 verbose		(bool flag)	{
 		#define  GP_F "splot [-2:1.5][-0.5:2] log(100 * (y - x*x)**2 + (1 - x)**2),  "
 		cout << "# :gnuplot: set view 0,0,1.7;   set font \"arial,6\"; set dgrid3d;  set key off;"
 			"  set contour surface;  set cntrparam levels 20;  set isosample 40;"
 			GP_F "\"pipe\" using 3:4:2:1 with labels; \n";
 
-		c_of_wrap->verbose =flag;
+		verbose_ = flag;
 	};
 
-	V&		 argmin			()		{
-						assert(c_of_wrap);
-		globalPrintLevel = 10;		// off
-		CONDOR::CONDORSolver(c_rho_start, c_rho_end, max_iter_,  c_rof_wrap == NULL ? c_of_wrap : c_rof_wrap);
-		Xmin << (c_of_wrap->xBest);
-						//c_of_wrap->printStats();
-		return Xmin;
-	};
+	virtual V&		 argmin() = 0;
 };
-*/
 
-//		template<int N, int NPT> void
-		template<typename V, int NPT> void
-//minimizer<V,NPT>::argmin (
-newuoa (
-	//double  (*of) (array<double,N,1>&, void*),  
-	typename V::value_type  (*of) (V&, void*),  
-	//array<double,N, 1>&	X, 
-	V&	X, 
-	double			RHOBEG, 
-	double			RHOEND, 
-	int			IPRINT, 
-	int			MAXFUN
-) {
 
+		template<typename V, int NPT>
+class newuoa_wrap: public minimizer<V> { public:
+	typedef  typename V::value_type v;
+	typedef  v (*of_ptr_t)(V&, void*); 
+	using minimizer<V>::X;
+	using minimizer<V>::rho_begin_;
+	using minimizer<V>::rho_end_;
+	using minimizer<V>::max_iter_;
+	using minimizer<V>::verbose_;
+	using minimizer<V>::of_;
+	using minimizer<V>::verbose_;
+	using minimizer<V>::ymin_;
+
+	newuoa_wrap		(of_ptr_t of, V& _X):   minimizer<V>(of, _X)  {};
+	virtual V&		 argmin			();
+};
+
+		template<typename V, int NPT> 	V&
+newuoa_wrap<V,NPT>::argmin () {
 
 	const int N = V::sz;
 	const int NP = N+1;
 	const int NPTM = NPT-NP;
 
 	if ((NPT < N+2) || ( NPT > ((N+2)*NP)/2))  { cout << "error: NPT is not in the required interval\n"; exit(33); }
-	if (IPRINT>=2) FMT("olduoa:  N =%d and NPT =%d   ----------------------------------------------------------\n")  % N  % NPT;
+	if (verbose_) FMT("olduoa:  N =%d and NPT =%d   ----------------------------------------------------------\n")  % N  % NPT;
 
 	const int NDIM = NPT+N;
 	array<double,N,1>		XBASE;
@@ -163,7 +162,7 @@ newuoa (
      	double	TENTH  = 0.1          ; 
      	double	ZERO   = 0.0          ; 
      	int	NH     = (N*NP)/2     ; 
-     	int	NFTEST = max(MAXFUN,1); 
+
 
 	//  Set the initial elements of XPT, BMAT, HQ, PQ and ZMAT to zero.
 
@@ -180,23 +179,23 @@ newuoa (
 	 	for (int J=1; J<=NPTM; J++)  	ZMAT(K,J) = ZERO;
 	}
 
-     	double	RHOSQ = RHOBEG*RHOBEG;
+     	double	RHOSQ = rho_begin_*rho_begin_;
      	double	RECIP = ONE/RHOSQ;
      	double	RECIQ = sqrt(HALF)/RHOSQ;
-     	int	NF = 0;
+     	int	iter_ = 0;
 
 fill_xpt_50:
 
-	//  Begin the initialization procedure. NF becomes one more than the number
+	//  Begin the initialization procedure. iter_ becomes one more than the number
 	//  of function values so far. The coordinates of the displacement of the
-	//  next initial interpolation point from XBASE are set in XPT(NF,.).
+	//  next initial interpolation point from XBASE are set in XPT(iter_,.).
 
-	int  NFM = NF;
-     	int  NFMM = NF-N;
-     	NF++;
+	int  NFM = iter_;
+     	int  NFMM = iter_-N;
+     	iter_++;
      	if (NFM <= 2*N)  {
-     	    if (NFM >= 1  &&  NFM <= N)	XPT(NF,NFM) = RHOBEG;
-     	    else if (NFM > N) 			XPT(NF,NFMM) = -RHOBEG;
+     	    if (NFM >= 1  &&  NFM <= N)	XPT(iter_,NFM) = rho_begin_;
+     	    else if (NFM > N) 			XPT(iter_,NFMM) = -rho_begin_;
 	} else {
      	    ITEMP = (NFMM-1)/N;
      	    JPT = NFM-ITEMP*N-N;
@@ -206,57 +205,57 @@ fill_xpt_50:
      	        JPT = IPT-N;
      	        IPT = ITEMP;
      	    }
-     	    XIPT = RHOBEG;
+     	    XIPT = rho_begin_;
      	    if (FVAL[IPT+NP] < FVAL[IPT+1]) XIPT = -XIPT;
-     	    XJPT = RHOBEG;
+     	    XJPT = rho_begin_;
      	    if (FVAL[JPT+NP] < FVAL[JPT+1]) XJPT = -XJPT;
-     	    XPT(NF,IPT) = XIPT;
-     	    XPT(NF,JPT) = XJPT;
+     	    XPT(iter_,IPT) = XIPT;
+     	    XPT(iter_,JPT) = XJPT;
      	}
 
 	//  Calculate the next value of F, label 70 being reached immediately
 	//  after this calculation. The least function value so far and its index
 	//  are required.
 
- 	for (int J=1; J<=N; J++)  	X[J] = XPT(NF,J)+XBASE[J];
+ 	for (int J=1; J<=N; J++)  	X[J] = XPT(iter_,J)+XBASE[J];
 
      	goto eval_f_310;
 
 return_to_init_from_eval_70:
 
-   	FVAL[NF] = F;
+   	FVAL[iter_] = F;
 
-     	if (NF == 1)  {
+     	if (iter_ == 1)  {
      	    FBEG = F;
      	    FOPT = F;
      	    KOPT = 1;
      	} else if (F < FOPT)  {
      	    FOPT = F;
-     	    KOPT = NF;
+     	    KOPT = iter_;
      	}
 
 	//  Set the nonzero initial elements of BMAT and the quadratic model in
-	//  the cases when NF is at most 2*N+1.
+	//  the cases when iter_ is at most 2*N+1.
 
      	if (NFM <= 2*N)  {
 
      		if (NFM >= 1  &&  NFM <= N)  {
-     		    GQ[NFM] = (F-FBEG)/RHOBEG;
-     		    if (NPT < NF+N)  {
-     		        BMAT(1,NFM) = -ONE/RHOBEG;
-     		        BMAT(NF,NFM) = ONE/RHOBEG;
+     		    GQ[NFM] = (F-FBEG)/rho_begin_;
+     		    if (NPT < iter_+N)  {
+     		        BMAT(1,NFM) = -ONE/rho_begin_;
+     		        BMAT(iter_,NFM) = ONE/rho_begin_;
      		        BMAT(NPT+NFM,NFM) = -HALF*RHOSQ;
      		    }
 
      		} else if (NFM > N)  {
-     		    BMAT(NF-N,NFMM) = HALF/RHOBEG;
-     		    BMAT(NF,NFMM) = -HALF/RHOBEG;
+     		    BMAT(iter_-N,NFMM) = HALF/rho_begin_;
+     		    BMAT(iter_,NFMM) = -HALF/rho_begin_;
      		    ZMAT(1,NFMM) = -RECIQ-RECIQ;
-     		    ZMAT(NF-N,NFMM) = RECIQ;
-     		    ZMAT(NF,NFMM) = RECIQ;
+     		    ZMAT(iter_-N,NFMM) = RECIQ;
+     		    ZMAT(iter_,NFMM) = RECIQ;
      		    IH = (NFMM*(NFMM+1))/2;
-     		    TEMP = (FBEG-F)/RHOBEG;
-     		    HQ[IH] = (GQ[NFMM]-TEMP)/RHOBEG;
+     		    TEMP = (FBEG-F)/rho_begin_;
+     		    HQ[IH] = (GQ[NFMM]-TEMP)/rho_begin_;
      		    GQ[NFMM] = HALF*(GQ[NFMM]+TEMP);
      		}
 
@@ -268,17 +267,17 @@ return_to_init_from_eval_70:
      		if (XIPT < ZERO) IPT = IPT+N;
      		if (XJPT < ZERO) JPT = JPT+N;
      		ZMAT(1,NFMM) = RECIP;
-     		ZMAT(NF,NFMM) = RECIP;
+     		ZMAT(iter_,NFMM) = RECIP;
      		ZMAT(IPT+1,NFMM) = -RECIP;
      		ZMAT(JPT+1,NFMM) = -RECIP;
      		HQ[IH] = (FBEG-FVAL[IPT+1]-FVAL[JPT+1]+F)/(XIPT*XJPT);
      	}
 
-     	if (NF < NPT) goto fill_xpt_50;
+     	if (iter_ < NPT) goto fill_xpt_50;
 
 	//  Begin the iterative procedure, because the initial model is complete.
 
-     	RHO = RHOBEG;
+     	RHO = rho_begin_;
      	DELTA = RHO;
      	IDZ = 1;
      	DIFFA = ZERO;
@@ -293,7 +292,7 @@ return_to_init_from_eval_70:
 
 begin_iter_90:
 
-	NFSAV = NF;
+	NFSAV = iter_;
 
 	//  Generate the next trust region step and test its length. Set KNEW
 	//  to -1 if the purpose of the next F will be to improve the model.
@@ -311,7 +310,7 @@ gen_tr_100:
      	    DELTA = TENTH*DELTA;
      	    RATIO = -1.0;
      	    if (DELTA <= 1.5*RHO) DELTA = RHO;
-     	    if (NF <= NFSAV+2) goto L460;
+     	    if (iter_ <= NFSAV+2) goto L460;
      	    TEMP = 0.125*CRVMIN*RHO*RHO;
      	    if (TEMP <= max(DIFFA, max(DIFFB,DIFFC))) goto L460;
      	    goto new_rho_490;
@@ -474,23 +473,23 @@ shift_xbase_120:
 	  	X[I] = XBASE[I]+XNEW[I];
 	}
 
-     	NF = NF+1;
+     	iter_ = iter_+1;
 
 eval_f_310:
 
-  	if (NF > NFTEST)  {
-		NF = NF-1;
-		if (IPRINT > 0) FMT("\n    error:  CALFUN has been called MAXFUN times.");
+  	if (iter_ > max_iter_)  {
+		iter_ = iter_-1;
+		if (verbose_) FMT("\n    error:  CALFUN has been called max_iter_ times.");
      	    goto exit_530;
      	}
 
 	// CALL CALFUN (N,X,F)
 	// calfun_ (&_n, (double*)&X, &F);
-	F = (*of)(X, NULL);
+	F = (*of_)(X, NULL);
 
-	if (IPRINT == 3) FMT ("\n       Function number %d    F =%18.10g    The corresponding X is:  %18.10g \n")  %NF  %F  %X;
+	if (verbose_) FMT ("%d \t %18.10g  \t  %18.10g \n")  %iter_  %F  %X;
 
-	if (NF <= NPT) goto return_to_init_from_eval_70;
+	if (iter_ <= NPT) goto return_to_init_from_eval_70;
 	if (KNEW == -1) goto exit_530;
 
 	//  Use the quadratic model to predict the change in F due to the step D,
@@ -516,7 +515,7 @@ eval_f_310:
      	DIFFB = DIFFA;
      	DIFFA = abs(DIFF);
 
-     	if (DNORM > RHO) NFSAV = NF;
+     	if (DNORM > RHO) NFSAV = iter_;
 
 	//  Update FOPT and XOPT if the new F is the least value of the objective
 	//  function so far. The branch when KNEW is positive occurs if D is not
@@ -540,7 +539,7 @@ eval_f_310:
 	//  Pick the next value of DELTA after a trust region step.
 
      	if (VQUAD >= ZERO)  {
-		if (IPRINT > 0)     FMT ("\n        error: trust region step has failed to reduce Q.");
+		if (verbose_)     FMT ("\n        error: trust region step has failed to reduce Q.");
 		goto exit_530;
      	}
 
@@ -716,24 +715,18 @@ new_rho_490:
 	//  The calculations with the current value of RHO are complete. Pick the
 	//  next values of RHO and DELTA.
 
-  	if (RHO > RHOEND)  { 
+  	if (RHO > rho_end_)  { 
 
 		DELTA = HALF*RHO;
-		RATIO = RHO/RHOEND;
+		RATIO = RHO/rho_end_;
 		
-		if	(RATIO <= 16.0)	RHO = RHOEND;
-		else if	(RATIO <= 250.0)	RHO = sqrt(RATIO)*RHOEND;
+		if	(RATIO <= 16.0)	RHO = rho_end_;
+		else if	(RATIO <= 250.0)	RHO = sqrt(RATIO)*rho_end_;
 		else				RHO = TENTH*RHO;
 		
 		DELTA = max(DELTA,RHO);
 
-		if (IPRINT >= 2) {
-
-			if (IPRINT >= 3)	cout << "      ";                                                                                                 
-
-			FMT("-- (%d) RHO =%9.6g \t F =%9.6g   X%.8g \n")   %NF  %RHO  %FOPT  %X;
-		}
-
+		if (verbose_) FMT("-- (%d) RHO =%9.6g \t F =%9.6g   X%.8g \n")   %iter_  %RHO  %FOPT  %X;
 		goto  begin_iter_90; 
      	}
 
@@ -749,11 +742,12 @@ new_rho_490:
 		F = FOPT;
 	}
 
-	if (IPRINT >= 1)  FMT("-- (%d) RETURNED: \t F =%.15g    X is: %.15g\n\n")  %NF %F  %X;
-
+	if (verbose_)  FMT("-- (%d) RETURNED: \t F =%.15g    X is: %.15g\n\n")  %iter_ %F  %X;
+	ymin_ = F;
+	return X;
 }; // newuoa
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////  T-NEWUOA.CC
 
 			template<typename V>  typename V::value_type
 of_chebyquad		(V& X, void* var)   {			// The Chebyquad test problem (Fletcher, 1965) 
@@ -789,16 +783,16 @@ of_chebyquad		(V& X, void* var)   {			// The Chebyquad test problem (Fletcher, 1
 }
 
 			template<typename V>  typename V::value_type
-of_resenberg		(V& X, void* var=NULL)   {  return 100*pow2(X[1]-pow2(X[0]))+pow2(1-X[0]);  };
+of_rosenberg		(V& X, void* var=NULL)   {  return 100*pow2(X[2]-pow2(X[1]))+pow2(1-X[1]);  };
 
 
 
 int main() {
 
+	/*
 	int    IPRINT = 2;
 	int    MAXFUN = 5000;
 	double RHOEND = 1.0e-6;
-	/*
 	{
 		const int N = 2; const int NPT = 2*N+1;
 		typedef array<double,N, 1> vector;
@@ -825,7 +819,6 @@ int main() {
 		double RHOBEG = 0.2 * X[1];
 		newuoa<vector, NPT>(&of_chebyquad, X, RHOBEG, RHOEND, IPRINT, MAXFUN);
 	}
-	*/
 	{
 		const int N = 8; const int NPT = 2*N+1;
 		typedef array<double,N, 1> vector;
@@ -834,6 +827,40 @@ int main() {
 		double RHOBEG = 0.2 * X[1];
 		newuoa<vector, NPT>(&of_chebyquad, X, RHOBEG, RHOEND, IPRINT, MAXFUN);
 	}
+	*/
 
+	{
+		const int N=2;
+		//typedef lvv::array<double,N>		array_t;	
+
+		typedef array<double,N, 1> vector;
+		//array_t		X /*= {{ -1.2, 1 }}*/;
+		vector		X;
+		for (int I=1; I<=N; I++) X[I] = I/double(N+1);
+
+		newuoa_wrap<vector, 2*N+1>	mzr(&of_chebyquad, X);
+		mzr.rho_begin		(0.2*X[1]);
+		mzr.rho_end		(1e-4);
+		mzr.verbose		(true);
+		vector	Xmin = mzr.argmin();
+		
+		MSG("# Result: Xmin%.10g   y=%.10g   iter=%d \n") %Xmin  %(mzr.ymin())  %(mzr.iter());
+	}
+
+	{
+		const int N=2;
+		//typedef lvv::array<double,N>		array_t;	
+
+		typedef array<double,N, 1> vector;
+		vector		X= {{ -1.2, 1 }};
+
+		newuoa_wrap<vector, 2*N+1>	mzr(&of_rosenberg, X);
+		mzr.rho_begin		(0.5);
+		mzr.rho_end		(1e-4);
+		mzr.verbose		(true);
+		vector	Xmin = mzr.argmin();
+		
+		MSG("# Result: Xmin%.10g   y=%.10g   iter=%d \n") %Xmin  %(mzr.ymin())  %(mzr.iter());
+	}
 return 0 ;}
 
