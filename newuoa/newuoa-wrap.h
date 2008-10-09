@@ -27,7 +27,8 @@ extern "C" void  update_  (int* N, int* NPT, double* BMAT, double* ZMAT, int* ID
 
 
 		template<typename V, int NPT>
-class newuoa_wrap: public minimizer<V>, public trust_region<V> { public:
+//class newuoa_wrap: public minimizer<V>, public trust_region<V> { public:
+class newuoa_wrap:  public trust_region_minimizer<V> { public:
 	typedef  typename V::value_type fp_t;
 	typedef  fp_t (*of_ptr_t)(V&, void*); 
 
@@ -37,10 +38,11 @@ class newuoa_wrap: public minimizer<V>, public trust_region<V> { public:
 	using minimizer<V>::of_;
 	using minimizer<V>::verbose_;
 	using minimizer<V>::ymin_;
-	using trust_region<V>::rho_begin_;
-	using trust_region<V>::rho_end_;
+	using trust_region_minimizer<V>::rho_begin_;
+	using trust_region_minimizer<V>::rho_end_;
 
-	newuoa_wrap		(of_ptr_t of, V& _X):   minimizer<V>(of, _X)  {};
+	newuoa_wrap		(of_ptr_t of, V& _X):   trust_region_minimizer<V>(of, _X)  {};
+	//newuoa_wrap		(of_ptr_t of, V& _X):   minimizer<V>(of, _X)  {};
 	virtual V&		 argmin			();
 };
 

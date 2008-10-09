@@ -46,16 +46,18 @@ class	minimizer {
 };
 
                  template<typename V>
-class	trust_region { 
+class	trust_region_minimizer: public minimizer<V> { 
 		typedef  typename V::value_type fp_t;
 		typedef  fp_t (*of_ptr_t)(V&, void*);
 
 	public:
 		fp_t 				rho_begin_;	// r(rho) start
 		fp_t 				rho_end_;	// r end
-	trust_region		()       :
-		rho_begin_ (numeric_limits<fp_t>::quiet_NaN ()),
-		rho_end_   (numeric_limits<fp_t>::quiet_NaN ())
+
+	trust_region_minimizer		(of_ptr_t of, V& _X):  
+		minimizer<V>	(of, _X),
+		rho_begin_ 	(numeric_limits<fp_t>::quiet_NaN ()),
+		rho_end_   	(numeric_limits<fp_t>::quiet_NaN ())
 	{};
 
 	virtual void		rho_begin		(fp_t rho)		{ rho_begin_ = rho; };
