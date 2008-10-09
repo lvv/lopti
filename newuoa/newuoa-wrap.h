@@ -27,18 +27,18 @@ extern "C" void  update_  (int* N, int* NPT, double* BMAT, double* ZMAT, int* ID
 
 
 		template<typename V, int NPT>
-class newuoa_wrap: public minimizer<V> { public:
-	typedef  typename V::value_type v;
-	typedef  v (*of_ptr_t)(V&, void*); 
+class newuoa_wrap: public minimizer<V>, public trust_region<V> { public:
+	typedef  typename V::value_type fp_t;
+	typedef  fp_t (*of_ptr_t)(V&, void*); 
 
 	using minimizer<V>::X;  		// without this we woun't see minimizer members
-	using minimizer<V>::rho_begin_;
-	using minimizer<V>::rho_end_;
 	using minimizer<V>::max_iter_;
 	using minimizer<V>::verbose_;
 	using minimizer<V>::of_;
 	using minimizer<V>::verbose_;
 	using minimizer<V>::ymin_;
+	using trust_region<V>::rho_begin_;
+	using trust_region<V>::rho_end_;
 
 	newuoa_wrap		(of_ptr_t of, V& _X):   minimizer<V>(of, _X)  {};
 	virtual V&		 argmin			();

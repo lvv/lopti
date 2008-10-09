@@ -7,24 +7,20 @@
 class	minimizer { 
 
 	public:
-		typedef  typename V::value_type v;
-		typedef  v (*of_ptr_t)(V&, void*);
+		typedef  typename V::value_type fp_t;
+		typedef  fp_t (*of_ptr_t)(V&, void*);
 		int				max_iter_;
 		bool				verbose_;
-		v 				rho_begin_;	// r(rho) start
-		v 				rho_end_;	// r end
 		V				X;
 		V				Xmin;
-		v				ymin_;
+		fp_t				ymin_;
 		int				iter_;
 		of_ptr_t			of_;
 
 	minimizer		(of_ptr_t of,  V& _X)       
 	:
 		max_iter_  (500),
-		ymin_      (numeric_limits<v>::quiet_NaN ()),
-		rho_begin_ (numeric_limits<v>::quiet_NaN ()),
-		rho_end_   (numeric_limits<v>::quiet_NaN ()),
+		ymin_      (numeric_limits<fp_t>::quiet_NaN ()),
 		iter_      (-1),
 		X          (_X),
 		verbose_   (false),
@@ -33,11 +29,9 @@ class	minimizer {
 
 	virtual 		~minimizer		()		{};  // it it here so that approprite polimorfic DTOR called 
 
-	virtual void		rho_begin		(v rho)		{ rho_begin_ = rho; };
-	virtual void		rho_end			(v rho)		{ rho_end_   = rho; };
 	virtual void		max_iter		(int mx)	{ max_iter_   = mx;  };
-	virtual v 	 	ymin			()		{  return ymin_; };
-	virtual v 	 	iter			()		{  return iter_; };
+	virtual fp_t 	 	ymin			()		{  return ymin_; };
+	virtual fp_t 	 	iter			()		{  return iter_; };
 
 	virtual void 	 verbose		(bool flag)	{
 		#define  GP_F "splot [-2:1.5][-0.5:2] log(100 * (y - x*x)**2 + (1 - x)**2),  "
@@ -49,5 +43,22 @@ class	minimizer {
 	};
 
 	virtual V&		 argmin() = 0;
+};
+
+                 template<typename V>
+class	trust_region { 
+		typedef  typename V::value_type fp_t;
+		typedef  fp_t (*of_ptr_t)(V&, void*);
+
+	public:
+		fp_t 				rho_begin_;	// r(rho) start
+		fp_t 				rho_end_;	// r end
+	trust_region		()       :
+		rho_begin_ (numeric_limits<fp_t>::quiet_NaN ()),
+		rho_end_   (numeric_limits<fp_t>::quiet_NaN ())
+	{};
+
+	virtual void		rho_begin		(fp_t rho)		{ rho_begin_ = rho; };
+	virtual void		rho_end			(fp_t rho)		{ rho_end_   = rho; };
 };
 
