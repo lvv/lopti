@@ -1,0 +1,40 @@
+
+#include <lvv/lvv.h>
+
+                 template<typename V>
+class	minimizer { 
+
+	public:
+		typedef  typename V::value_type v;
+		typedef  v (*of_ptr_t)(V&, void*);
+		int				max_iter_;
+		bool				verbose_;
+		v 				rho_begin_;	// r(rho) start
+		v 				rho_end_;	// r end
+		V				X;
+		V				Xmin;
+		v				ymin_;
+		int				iter_;
+		of_ptr_t			of_;
+
+	minimizer		(of_ptr_t of,  V& _X)        :max_iter_(500), X(_X), of_(of)  {};
+	virtual 		~minimizer		()		{};  // it it here so that approprite polimorfic DTOR called 
+
+	virtual void		rho_begin		(v rho)		{ rho_begin_ = rho; };
+	virtual void		rho_end			(v rho)		{ rho_end_   = rho; };
+	virtual void		max_iter		(int mx)	{ max_iter_   = mx;  };
+	virtual v 	 	ymin			()		{  return ymin_; };
+	virtual v 	 	iter			()		{  return iter_; };
+
+	virtual void 	 verbose		(bool flag)	{
+		#define  GP_F "splot [-2:1.5][-0.5:2] log(100 * (y - x*x)**2 + (1 - x)**2),  "
+		cout << "# :gnuplot: set view 0,0,1.7;   set font \"arial,6\"; set dgrid3d;  set key off;"
+			"  set contour surface;  set cntrparam levels 20;  set isosample 40;"
+			GP_F "\"pipe\" using 3:4:2:1 with labels; \n";
+
+		verbose_ = flag;
+	};
+
+	virtual V&		 argmin() = 0;
+};
+

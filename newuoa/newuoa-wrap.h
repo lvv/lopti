@@ -1,6 +1,6 @@
 
-#include <lvv/lvv.h>
-/////////////////////////////////////////////////////////////////////////////////////////////////	NEWUOA-WRAP.CC
+#include <lopti.h>
+
 // reverse indexes for fortran compat
 #define		BMAT(i,j)	BMAT[j][i]
 #define		ZMAT(i,j)	ZMAT[j][i]
@@ -24,43 +24,6 @@ extern "C" void  biglag_  (int* N, int* NPT, double* XOPT, double* XPT, double* 
 extern "C" void  bigden_  (int* N, int* NPT, double* XOPT, double* XPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, int* KOPT, int*  KNEW, double* D, double* W, double* VLAG, double* BETA, double* XNEW, double* /*W[NDIM+1]*/, double* /*W[6*NDIM+1]*/);
 extern "C" void  update_  (int* N, int* NPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, double* VLAG, double* BETA, int* KNEW, double* W);
 
-
-                 template<typename V>
-class	minimizer { 
-
-	public:
-		typedef  typename V::value_type v;
-		typedef  v (*of_ptr_t)(V&, void*);
-		int				max_iter_;
-		bool				verbose_;
-		v 				rho_begin_;	// r(rho) start
-		v 				rho_end_;	// r end
-		V				X;
-		V				Xmin;
-		v				ymin_;
-		int				iter_;
-		of_ptr_t			of_;
-
-	minimizer		(of_ptr_t of,  V& _X)        :max_iter_(500), X(_X), of_(of)  {};
-	virtual 		~minimizer		()		{};  // it it here so that approprite polimorfic DTOR called 
-
-	virtual void		rho_begin		(v rho)		{ rho_begin_ = rho; };
-	virtual void		rho_end			(v rho)		{ rho_end_   = rho; };
-	virtual void		max_iter		(int mx)	{ max_iter_   = mx;  };
-	virtual v 	 	ymin			()		{  return ymin_; };
-	virtual v 	 	iter			()		{  return iter_; };
-
-	virtual void 	 verbose		(bool flag)	{
-		#define  GP_F "splot [-2:1.5][-0.5:2] log(100 * (y - x*x)**2 + (1 - x)**2),  "
-		cout << "# :gnuplot: set view 0,0,1.7;   set font \"arial,6\"; set dgrid3d;  set key off;"
-			"  set contour surface;  set cntrparam levels 20;  set isosample 40;"
-			GP_F "\"pipe\" using 3:4:2:1 with labels; \n";
-
-		verbose_ = flag;
-	};
-
-	virtual V&		 argmin() = 0;
-};
 
 
 		template<typename V, int NPT>
@@ -746,121 +709,4 @@ new_rho_490:
 	ymin_ = F;
 	return X;
 }; // newuoa
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////  T-NEWUOA.CC
-
-			template<typename V>  typename V::value_type
-of_chebyquad		(V& X, void* var)   {			// The Chebyquad test problem (Fletcher, 1965) 
-	
-	const int N = V::size();
-	typedef  typename V::value_type v;
-
-	array<array<v,V::sz,1>, V::sz+1,1> Y;
-
-     	for (int J=1; J<=N; J++)  {
-		Y[1][J] = 1.0;
-		Y[2][J] = 2.0*X[J]-1.0;
-	}
-
-     	for (int I=2; I<=N; I++) 
-		for (int J=1; J<=N; J++)
-			Y[I+1][J]=2.0*Y[2][J]*Y[I][J]-Y[I-1][J];
-
-     	v 	F  = 0.0;
-     	int	NP = N+1;
-     	int	IW = 1;
-
-     	for (int I=1; I<=NP; I++)  {
-		v  SUM=0.0;
-		for (int J=1; J<=N; J++) 	SUM += Y[I][J];
-		SUM = SUM/N;
-		if (IW > 0)  SUM += 1.0/(I*I-2*I);
-		IW =-IW;
-	   	F += SUM*SUM;
-	}
-
-	return F;
-}
-
-			template<typename V>  typename V::value_type
-of_rosenberg		(V& X, void* var=NULL)   {  return 100*pow2(X[2]-pow2(X[1]))+pow2(1-X[1]);  };
-
-
-
-int main() {
-
-	/*
-	int    IPRINT = 2;
-	int    MAXFUN = 5000;
-	double RHOEND = 1.0e-6;
-	{
-		const int N = 2; const int NPT = 2*N+1;
-		typedef array<double,N, 1> vector;
-		vector X;
-		for (int I=1; I<=N; I++) X[I] = I/double(N+1);
-		double RHOBEG = 0.2 * X[1];
-		newuoa<vector NPT>(&of_chebyquad, X, RHOBEG, RHOEND, IPRINT, MAXFUN);
-	}
-
-	{
-		const int N = 4; const int NPT = 2*N+1;
-		typedef array<double,N, 1> vector;
-		vector X;
-		for (int I=1; I<=N; I++) X[I] = I/double(N+1);
-		double RHOBEG = 0.2 * X[1];
-		newuoa<vector, NPT>(&of_chebyquad, X, RHOBEG, RHOEND, IPRINT, MAXFUN);
-	}
-
-	{
-		const int N = 6; const int NPT = 2*N+1;
-		typedef array<double,N, 1> vector;
-		vector X;
-		for (int I=1; I<=N; I++) X[I] = I/double(N+1);
-		double RHOBEG = 0.2 * X[1];
-		newuoa<vector, NPT>(&of_chebyquad, X, RHOBEG, RHOEND, IPRINT, MAXFUN);
-	}
-	{
-		const int N = 8; const int NPT = 2*N+1;
-		typedef array<double,N, 1> vector;
-		vector X;
-		for (int I=1; I<=N; I++) X[I] = I/double(N+1);
-		double RHOBEG = 0.2 * X[1];
-		newuoa<vector, NPT>(&of_chebyquad, X, RHOBEG, RHOEND, IPRINT, MAXFUN);
-	}
-	*/
-
-	{
-		const int N=2;
-		//typedef lvv::array<double,N>		array_t;	
-
-		typedef array<double,N, 1> vector;
-		//array_t		X /*= {{ -1.2, 1 }}*/;
-		vector		X;
-		for (int I=1; I<=N; I++) X[I] = I/double(N+1);
-
-		newuoa_wrap<vector, 2*N+1>	mzr(&of_chebyquad, X);
-		mzr.rho_begin		(0.2*X[1]);
-		mzr.rho_end		(1e-4);
-		mzr.verbose		(true);
-		vector	Xmin = mzr.argmin();
-		
-		MSG("# Result: Xmin%.10g   y=%.10g   iter=%d \n") %Xmin  %(mzr.ymin())  %(mzr.iter());
-	}
-
-	{
-		const int N=2;
-		//typedef lvv::array<double,N>		array_t;	
-
-		typedef array<double,N, 1> vector;
-		vector		X= {{ -1.2, 1 }};
-
-		newuoa_wrap<vector, 2*N+1>	mzr(&of_rosenberg, X);
-		mzr.rho_begin		(0.5);
-		mzr.rho_end		(1e-4);
-		mzr.verbose		(true);
-		vector	Xmin = mzr.argmin();
-		
-		MSG("# Result: Xmin%.10g   y=%.10g   iter=%d \n") %Xmin  %(mzr.ymin())  %(mzr.iter());
-	}
-return 0 ;}
 
