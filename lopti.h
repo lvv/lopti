@@ -1,5 +1,7 @@
 
 #include <lvv/lvv.h>
+#include <limits>
+	using 	std::numeric_limits;
 
                  template<typename V>
 class	minimizer { 
@@ -17,7 +19,18 @@ class	minimizer {
 		int				iter_;
 		of_ptr_t			of_;
 
-	minimizer		(of_ptr_t of,  V& _X)        :max_iter_(500), X(_X), of_(of)  {};
+	minimizer		(of_ptr_t of,  V& _X)       
+	:
+		max_iter_  (500),
+		ymin_      (numeric_limits<v>::quiet_NaN ()),
+		rho_begin_ (numeric_limits<v>::quiet_NaN ()),
+		rho_end_   (numeric_limits<v>::quiet_NaN ()),
+		iter_      (-1),
+		X          (_X),
+		verbose_   (false),
+		of_        (of)
+	{};
+
 	virtual 		~minimizer		()		{};  // it it here so that approprite polimorfic DTOR called 
 
 	virtual void		rho_begin		(v rho)		{ rho_begin_ = rho; };

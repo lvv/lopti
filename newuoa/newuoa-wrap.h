@@ -30,7 +30,8 @@ extern "C" void  update_  (int* N, int* NPT, double* BMAT, double* ZMAT, int* ID
 class newuoa_wrap: public minimizer<V> { public:
 	typedef  typename V::value_type v;
 	typedef  v (*of_ptr_t)(V&, void*); 
-	using minimizer<V>::X;
+
+	using minimizer<V>::X;  		// without this we woun't see minimizer members
 	using minimizer<V>::rho_begin_;
 	using minimizer<V>::rho_end_;
 	using minimizer<V>::max_iter_;
@@ -45,7 +46,8 @@ class newuoa_wrap: public minimizer<V> { public:
 
 		template<typename V, int NPT> 	V&
 newuoa_wrap<V,NPT>::argmin () {
-
+						assert(!isnan(rho_begin_) && " rho_begin definition ");
+						assert(!isnan(rho_end_)   && " rho_end   definition ");
 	const int N = V::sz;
 	const int NP = N+1;
 	const int NPTM = NPT-NP;
