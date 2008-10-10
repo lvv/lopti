@@ -30,7 +30,7 @@ using namespace boost;
 int main() {
 	
 	//////////////////////////////////////////////////////////////////////////////////////////// MY WRAP TEST
-	fwrap<int (*)(string s)>        	t1	(&plain_f);		t1.eval("lvv fwrap: ");
+	//fwrap<int (*)(string s)>        	t1	(&plain_f);		t1.eval("lvv fwrap: ");
 					//fwrap<int (*)(string s)> 		t2	(&obj_t::static_mem_f); t2.eval("lvv fwrap: ");
 					//fwrap<typeof(&obj_t::static_mem_f)>	t3	(&obj_t::static_mem_f);	t3.eval("lvv fwrap: ");
 					
@@ -55,8 +55,9 @@ int main() {
 
 	// MEMEBER-F
 	//function<int(string s)>       	bf_mf = &ObjF::mem_f;
-	//ObjF objf;
-	//cout << bf_mf(&objf, "objf") << endl;
+	function<int(string s)>       	bf_mfa_mf = mem_fun_ref(&obj_t::mem_f);
+	obj_t o;
+	//cout << bf_mfa_mf(o, "boost: o/mem_fun_ref ") << endl;
 
 	return 0;
 
