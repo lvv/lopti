@@ -1,23 +1,26 @@
 #include <lvv/lvv.h>
 #include <string>
 
-int		f(string s)	{ cout  << "function: " << s << " =  "; return 0;}
+//////////////////////////////////////////////////////////////////////////////////////////////////// TEST FUNCTION
+int				plain_f		(string s)	{ cout  << "function: " << s << " =  "; return 0;}
+struct	functor_t { int		operator()	(string s)	{ cout << s;  return 77; }; }; // can not be inside main()
 
-class ObjF { public:
-	//int		static operator()(double x, double y)	{ cout << x+y << " objf.operator() \n"; return 0; };	// error: must be non static
-	int		static static_mem_f(string s)	{ cout << s; return 0; };
-	int		mem_f(string s)	{ cout << s << " ObjF::mem_f()"; return 0; };
+class	obj_t 	{ public:
+	int	static		static_mem_f	(string s)	{ cout << s; return 0; };
+	int			mem_f		(string s)	{ cout << s << " ObjF::mem_f()"; return 0; };
 };
 
 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////  MY WRAP
+// my wrap for condor
 				template <typename FuncT> // <- What would go here
-class		fwrap { public:
+struct		fwrap {
 		fwrap		(FuncT func) : func_(func) 	{}
-	int 	eval		() 				{ return func_(1, 2); }
+	int 	eval		() 				{ return func_(" test "); }
 		FuncT func_;
 };
 
-struct fobj_t { int operator()(int i) { cout << "fobj_t: ";  return i+100; }; }; // can not be inside main()
 
 #include <boost/function.hpp>
 #include <functional>
@@ -26,21 +29,29 @@ using namespace boost;
 
 int main() {
 	
-	//////////////////////////////////////////////////////////////////////////////////////////   BOOST
+	//////////////////////////////////////////////////////////////////////////////////////////// MY WRAP TEST
+	fwrap<int (*)(string s)>        	t1	(&plain_f);		t1.eval("lvv fwrap: ");
+					//fwrap<int (*)(string s)> 		t2	(&obj_t::static_mem_f); t2.eval("lvv fwrap: ");
+					//fwrap<typeof(&obj_t::static_mem_f)>	t3	(&obj_t::static_mem_f);	t3.eval("lvv fwrap: ");
+					
+					//fwrap<int (ObjF::operator())(double, double)>         t4(Func2);      t4.eval();
+					
+					//fwrap<int(ObjF::*)(double, double)>           t4(objf.*operator());
+					// no err:  fwrap<int(ObjF::*)(double, double)>         t4(&ObjF::operator());
+	//fwrap<int(*)(string s)>          	t4(&obj_t::static_mem_f);		t4.eval("lvv fwrap: ");
+	//fwrap<typeof(&obj_t::eval)>		t5(&obj_t::static_mem_f);		t5.eval("lvv fwrap: " );
+
+	//////////////////////////////////////////////////////////////////////////////////////////   BOOST  TEST
 	
 	// FUNCTOR
-	boost::function<int(int i)>   	bf_fct = fobj_t();
-	cout << bf_fct(11) << endl;
+	boost::function<int(string s)>   	bf_fct = functor_t();		cout << bf_fct("boost: functor ") << endl;
 
 
 	// PLAIN F()
-	function<int(string s)>       	bf_f = &f;
-	bf_f = &f;
-	cout << bf_f("plain f()") << endl;
+	function<int(string s)>       		bf_f = &plain_f;		cout << bf_f("boost: plain f()") << endl;
 	
 	// PLAIN static mem_f()
-	function<int(string s)>       	bf_smf = &ObjF::static_mem_f;
-	cout << bf_smf("ObjF::static_mem_f = ") << endl;
+	function<int(string s)>			bf_smf = &obj_t::static_mem_f;	cout << bf_smf("boost: ObjF::static_mem_f = ") << endl;
 
 	// MEMEBER-F
 	//function<int(string s)>       	bf_mf = &ObjF::mem_f;
