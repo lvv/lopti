@@ -1,16 +1,14 @@
 #include <lvv/lvv.h>
-#include <functional>
-using namespace std;
+#include <string>
 
-int		f1(int x, int y)	{ cout << x+y << " f1 \n"; return 0; }
-int		f2(double x, double y)	{ cout << x+y << " f2 \n"; return 0;}
+int		f(string s)	{ cout  << "function: " << s << " =  "; return 0;}
 
 class ObjF { public:
-	//int		static operator()(double x, double y)	{ cout << x+y << " objf.operator() \n"; return 0; };
-	int		static eval(double x, double y)	{ cout << x+y << " ObjF::eval() \n"; return 0; };
+	//int		static operator()(double x, double y)	{ cout << x+y << " objf.operator() \n"; return 0; };	// error: must be non static
+	int		static static_mem_f(string s)	{ cout << s; return 0; };
+	int		mem_f(string s)	{ cout << s << " ObjF::mem_f()"; return 0; };
 };
 
-ObjF objf;
 
 				template <typename FuncT> // <- What would go here
 class		fwrap { public:
@@ -19,17 +17,35 @@ class		fwrap { public:
 		FuncT func_;
 };
 
+struct fobj_t { int operator()(int i) { cout << "fobj_t: ";  return i+100; }; }; // can not be inside main()
+
+#include <boost/function.hpp>
+#include <functional>
+using namespace std;
+using namespace boost;
+
 int main() {
-	fwrap<int (*)(int, int)>	t1(f1);	t1.eval();
-	fwrap<int (*)(double, double)>	t2(f2);	t2.eval();
-	fwrap<typeof(&f2)>		t3(f2);	t3.eval();
+	
+	//////////////////////////////////////////////////////////////////////////////////////////   BOOST
+	
+	// FUNCTOR
+	boost::function<int(int i)>   	bf_fct = fobj_t();
+	cout << bf_fct(11) << endl;
 
-	//fwrap<int (ObjF::operator())(double, double)>		t4(Func2);	t4.eval();
 
-	//fwrap<int(ObjF::*)(double, double)>		t4(objf.*operator());
-	// no err:  fwrap<int(ObjF::*)(double, double)>		t4(&ObjF::operator());
-	fwrap<int(*)(double, double)>		t4(ObjF::eval); t4.eval();
-	fwrap<typeof(&ObjF::eval)>		t5(ObjF::eval); t5.eval();
+	// PLAIN F()
+	function<int(string s)>       	bf_f = &f;
+	bf_f = &f;
+	cout << bf_f("plain f()") << endl;
+	
+	// PLAIN static mem_f()
+	function<int(string s)>       	bf_smf = &ObjF::static_mem_f;
+	cout << bf_smf("ObjF::static_mem_f = ") << endl;
+
+	// MEMEBER-F
+	//function<int(string s)>       	bf_mf = &ObjF::mem_f;
+	//ObjF objf;
+	//cout << bf_mf(&objf, "objf") << endl;
 
 	return 0;
 
