@@ -1,7 +1,7 @@
 
 include  ../lvv/include.mk
 
-.DEFAULT_GOAL := t-condor
+.DEFAULT_GOAL := t-fun-wrap
 	
 LDFLAGS += -lgsl -lgslcblas -L /usr/local/lib -lcondor
 CXXFLAGS += -I /home/lvv/NF/
