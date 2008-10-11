@@ -17,8 +17,14 @@ struct	functor_t {
 	int value;
 };
 
+struct empty {}; 
+template< typename RET=empty, typename ARG=empty> 
+struct eval_count;
+
+template<typename RET, typename ARG>        struct	eval_count;
+
 	   template<typename RET, typename ARG>                                                                                                          
-struct	eval_count : public unary_function<RET,ARG>		{ 
+struct	eval_count<RET(ARG)> : public unary_function<RET,ARG>		{ 
 	eval_count		(function<RET (ARG a)>    _of)	: of(_of), eval_cnt(0)	{ cout << "\neval_cnt_wrap CTor\n"; };
 	//~eval_count		()		{ cout << "\neval_cnt_wrap dtOR:  object function called  total times: " << eval_cnt << endl;};
 	RET	operator()	(ARG    arg)	{ FMT("eval_cnt_wrap: cnt=%d   arg=%s.   Executing:\n ") %eval_cnt %arg;  eval_cnt++; return of(arg);};
@@ -43,15 +49,15 @@ int main() {
 			fct2.init(33);						cout << fct2("stand alone  fct2.init(33) ") << endl;
 	
 	// FUNCTOR  WRAP
-	//eval_count		ecw(fct2);					cout << ecw("boost: ecw(fct2)-1 ") << endl;
-	//									cout << ecw("boost: ecw(fct2)-2 ") << endl;
+	eval_count<int(string)>		ecw(fct2);				cout << ecw("boost: ecw(fct2)-1 ") << endl;
+										cout << ecw("boost: ecw(fct2)-2 ") << endl;
+
+	function<int(string s)> 	ecw_p = eval_count<int(string)>(fct2);	cout << ecw_p("boost: ecw ") << endl;
 
 	// F POINTERS
 	function<int(string s)>   		fct1_p = functor_t();		cout << fct1_p("boost: functor_t ") << endl;
 	function<int(string s)>   		fct2_p = fct2;			cout << fct2_p("boost: fct2 ") << endl;
-	//function<int(string s)>   		ecw_p = ecw;			cout << ecw_p("boost: ecw ") << endl;
 
-	function<int(string s)>   		ecw_p = eval_count<int, string>(fct2);
 										cout << ecw_p("boost: ecw_p ") << endl;
 										cout << ecw_p("boost: ecw_p ") << endl;
 
