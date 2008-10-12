@@ -27,5 +27,12 @@ install:
 	cd /usr/local &&  git merge lvvlib
 
 
+#FCFLAGS = -frange-check -fbounds-check -O0 -ggdb3
+
+t-newuoa: newuoa/t-newuoa.cc newuoa-wrap.h  lopti.h
+	#	rm -f *.o
+	#$(FC)  $(FCFLAGS) -c bigden.f  biglag.f  calfun.f   trsapp.f  update.f
+	$(CXX) $(CXXFLAGS) $<  newuoa/*.o -lgfortran -o $@
+
 sync:
 	cp -v condor-wrap.h gsl-nelder-mead-wrap.h Makefile  t.cc ../nf/lopti-ss/
