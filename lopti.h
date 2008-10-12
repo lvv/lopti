@@ -8,7 +8,8 @@ class	minimizer {
 
 	public:
 		typedef  typename V::value_type fp_t;
-		typedef  fp_t (*of_ptr_t)(V&, void*);
+		//typedef  fp_t (*of_ptr_t)(V&, void*);
+		typedef  function<V::value_type(V&, void*)>  fp_t;
 		int				max_iter_;
 		bool				verbose_;
 		V				X;

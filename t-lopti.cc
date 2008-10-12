@@ -1,9 +1,5 @@
-
-
-
-
 	///////////////////////////////////////////////////////////////////////////////   OPTI selection
-						// should be before array.h
+						// should be before array.h (so that gsl*.h  are before array.h)
 	#ifndef OPTI
 	        #define OPTI    NM
 	#endif 
@@ -32,7 +28,8 @@ int main(int argc, char **argv) {
 	
 	array_t		X0 = {{ -1.2, 1 }};
 
-	minimizer<array_t>	mzr			(of_rb, X0);
+	minimizer<array_t>	mzr			(&of_rb, X0);
+				//mzr.object_function	(of_rb);
 			#ifdef OPTI_CONDOR
 				mzr.condor_rho_start	(2);
 				mzr.condor_rho_end	(1e-4);
