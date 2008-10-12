@@ -2,13 +2,19 @@
 #include <string>
 
 #include <functional>
-using namespace std;
-using namespace boost;
+	using std::binder1st;
+	using std::unary_function;
 #include <boost/function.hpp>
-using boost::function;
+	using boost::function;
+#include <boost/bind.hpp>
+	using boost::bind;
 
+	//using namespace std;
+	//using namespace boost;
+	//
 //////////////////////////////////////////////////////////////////////////////////////////////////// TEST CALLABLE OBJECT
-int				plain_f		(string s)	{ cout  << "function: " << s << " =  "; return 0;}
+int				plain_f		(string s)	{ cout  << "plain_f: " << s << " =  "; return 0;}
+int				plain_f2	(string s, int i)	{ cout  << "plain_f2: " << s << " =  "; return i;}
 
 struct	functor_t {
 				functor_t	()		: value(0) {};
@@ -63,7 +69,10 @@ int main() {
 										cout << ecw_p("boost: ecw_p ") << endl;
 
 	// PLAIN F()
-	function<int(string s)>       		bf_f = &plain_f;		cout << bf_f("boost: plain f()") << endl;
+	function<int(string s)>       		bf_f;
+	bf_f = &plain_f;						cout << bf_f("boost: plain f()") << endl;
+	bf_f = bind2nd(function<int(string,int)>(&plain_f2),100);	cout << bf_f("sdt::bind2nd plain-f2()") << endl;
+	bf_f = bind (plain_f2, _1, 100);				cout << bf_f("boost::bind  plain-f2()") << endl;
 	
 	// PLAIN static mem_f()
 	function<int(string s)>			bf_smf = &obj_t::static_mem_f;	cout << bf_smf("boost: ObjF::static_mem_f = ") << endl;
