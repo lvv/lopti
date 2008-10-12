@@ -1,8 +1,20 @@
 
-#include <lvv/lvv.h>
-#include <limits>
-	using 	std::numeric_limits;
-	using 	std::function;
+	#include <lvv/lvv.h>
+	#include <limits>
+		using 	std::numeric_limits;
+
+	// functional 
+	#include <functional>
+		using std::binder1st;
+		using std::unary_function;
+	#include <boost/function.hpp>
+		using boost::function;
+	#include <boost/bind.hpp>
+		//using boost::bind;
+		
+		//using namespace boost;
+		//using namespace std;
+
 
                  template<typename V>
 class	minimizer { 
@@ -10,7 +22,8 @@ class	minimizer {
 	public:
 		typedef  typename V::value_type fp_t;
 		//typedef  fp_t (*of_ptr_t)(V&, void*);
-		typedef  function<V::value_type(V&, void*)>  fp_t;
+		//typedef  fp_t (*of_ptr_t)(V&, void*);
+		typedef  function<fp_t(V&)>	of_ptr_t;
 		int				max_iter_;
 		bool				verbose_;
 		V				X;
@@ -48,11 +61,11 @@ class	minimizer {
 };
 
                  template<typename V>
-class	trust_region_minimizer: public minimizer<V> { 
-		typedef  typename V::value_type fp_t;
-		typedef  fp_t (*of_ptr_t)(V&, void*);
+class	trust_region_minimizer : public minimizer<V>    { public:
 
-	public:
+		typedef  typename minimizer<V>::fp_t		fp_t;
+		typedef  typename minimizer<V>::of_ptr_t	of_ptr_t;
+
 		fp_t 				rho_begin_;	// r(rho) start
 		fp_t 				rho_end_;	// r end
 

@@ -9,15 +9,19 @@
  
                  template<typename V>
 class gsl_of_wrap {  public:
-		typedef  typename V::value_type (*of_ptr_t)(V&, void*) ;	
+		//typedef  typename V::value_type (*of_ptr_t)(V&, void*) ;	
+		typedef  typename V::value_type (*of_ptr_t)(V&) ;	
 		static of_ptr_t  of_ptr;
 
+	//static void	init	(of_ptr_t of) 				{ of_ptr = of; }	
 	static void	init	(of_ptr_t of) 				{ of_ptr = of; }	
-	static double	eval2	(const gsl_vector* gX, void * var)	{ V X;    X << gX;    return  (*of_ptr)(X, var); }	
+	//static double	eval2	(const gsl_vector* gX, void * var)	{ V X;    X << gX;    return  (*of_ptr)(X, var); }	  // with var
+	static double	eval	(const gsl_vector* gX, void * var)	{ V X;    X << gX;    return  (*of_ptr)(X); }	
  };
 
 
-template<typename V>  typename V::value_type  (*gsl_of_wrap<V>::of_ptr)(V&, void*); // this is in gsl_ow_wrap class, but we need to decl it 1 more time for compiler
+template<typename V>  typename V::value_type  (*gsl_of_wrap<V>::of_ptr)(V&); // this is in gsl_ow_wrap class, but we need to decl it 1 more time for compiler
+//template<typename V>  typename V::value_type  (*gsl_of_wrap<V>::of_ptr)(V&, void*); // this is in gsl_ow_wrap class, but we need to decl it 1 more time for compiler
 
 
                  template<typename V>
@@ -38,15 +42,18 @@ class	minimizer { public:
 
 
 
-	minimizer		(v (*of)(V&, void*),  V& X,  void* var=NULL)     
+	//minimizer		(v (*of)(V&),  V& X,  void* var=NULL)     
+	minimizer		(v (*of)(V&),  V& X)     
 	:	
 		max_iter_(300),
 		T (gsl_multimin_fminimizer_nmsimplex)
 	{
 		gsl_of_wrap<V>::init(of);
-		minex_func.f = &gsl_of_wrap<V>::eval2;
+		//minex_func.f = &gsl_of_wrap<V>::eval2;
+		minex_func.f = &gsl_of_wrap<V>::eval;
 		minex_func.n = X.size();
-		minex_func.params = var;
+		//minex_func.params = var;
+		minex_func.params = NULL;
 		gX  = gsl_vector_alloc(X.size());
 		gX << X;
 	};
@@ -63,7 +70,7 @@ class	minimizer { public:
 	};
 
 	void 		max_iter		(int mx)	{ max_iter_ 	= mx;	 };
-	//void 		gsl_var			(void* var )	{ minex_func.params = var; };
+	void 		gsl_var			(void* var )	{ minex_func.params = var; };
 	void   		gsl_characteristic_size	(double cs)	{ characteristic_size = cs; };
 
 	v 	 	ymin			()		{  return gsl_minimizer->fval; };

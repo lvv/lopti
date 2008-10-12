@@ -30,8 +30,10 @@ extern "C" void  update_  (int* N, int* NPT, double* BMAT, double* ZMAT, int* ID
 
 		template<typename V, int NPT=2*V::sz+1>
 class newuoa_wrap:  public trust_region_minimizer<V> { public:
-	typedef  typename V::value_type fp_t;
-	typedef  fp_t (*of_ptr_t)(V&, void*); 
+		typedef  typename minimizer<V>::fp_t	fp_t;
+		typedef  typename minimizer<V>::of_ptr_t	of_ptr_t;
+	//typedef  typename V::value_type fp_t;
+	//typedef  fp_t (*of_ptr_t)(V&, void*); 
 
 	using minimizer<V>::X;  		// without this we woun't see minimizer members
 	using minimizer<V>::max_iter_;
@@ -42,6 +44,7 @@ class newuoa_wrap:  public trust_region_minimizer<V> { public:
 	using trust_region_minimizer<V>::rho_begin_;
 	using trust_region_minimizer<V>::rho_end_;
 
+	newuoa_wrap		(const newuoa_wrap& x);
 	explicit 	newuoa_wrap		(of_ptr_t of, V& _X):   trust_region_minimizer<V>(of, _X)  {};
 	virtual V&	argmin			();
 };
@@ -455,7 +458,8 @@ eval_f_310:
 
 	// CALL CALFUN (N,X,F)
 	// calfun_ (&_n, (double*)&X, &F);
-	F = (*of_)(X, NULL);
+	//F = (*of_)(X, NULL);
+	F = of_(X);
 
 	if (verbose_) FMT ("%d \t %18.10g  \t  %18.10g \n")  %iter_  %F  %X;
 

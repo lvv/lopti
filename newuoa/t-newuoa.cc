@@ -1,6 +1,7 @@
 #include <newuoa-wrap.h>
 			template<typename V>  typename V::value_type
-of_chebyquad		(V& X, void* var)   {			// The Chebyquad test problem (Fletcher, 1965) 
+of_chebyquad		(V& X) 		{			// The Chebyquad test problem (Fletcher, 1965) 
+//of_chebyquad		(V& X, void* var)   {			// The Chebyquad test problem (Fletcher, 1965) 
 	
 	const int N = V::size();
 	typedef  typename V::value_type fp_t;
@@ -33,7 +34,8 @@ of_chebyquad		(V& X, void* var)   {			// The Chebyquad test problem (Fletcher, 1
 }
 
 			template<typename V>  typename V::value_type
-of_rosenberg		(V& X, void* var=NULL)   {  return 100*pow2(X[2]-pow2(X[1]))+pow2(1-X[1]);  };
+//of_rosenberg		(V& X, void* var=NULL)   {  return 100*pow2(X[2]-pow2(X[1]))+pow2(1-X[1]);  };
+of_rosenberg		(V& X)   {  return 100*pow2(X[2]-pow2(X[1]))+pow2(1-X[1]);  };
 
 
 
@@ -77,18 +79,18 @@ int main() {
 		double RHOBEG = 0.2 * X[1];
 		newuoa<vector, NPT>(&of_chebyquad, X, RHOBEG, RHOEND, IPRINT, MAXFUN);
 	}
-	*/
 
+	*/
 	{
 		const int N=2;
 		//typedef lvv::array<double,N>		array_t;	
 
 		typedef array<double,N, 1> vector;
-		//array_t		X /*= {{ -1.2, 1 }}*/;
+		//array_t		X ; // *= {{ -1.2, 1 }};
 		vector		X;
-		for (int I=1; I<=N; I++) X[I] = I/double(N+1);
+		for (int I=1; I<=N; I++)	X[I] = I/double(N+1);
 
-		newuoa_wrap<vector, 2*N+1>	mzr(&of_chebyquad, X);
+		newuoa_wrap<vector, 2*N+1>	mzr(of_chebyquad<vector>, X);
 		mzr.rho_begin		(0.2*X[1]);
 		mzr.rho_end		(1e-4);
 		mzr.verbose		(true);
@@ -99,17 +101,19 @@ int main() {
 
 	{
 		const int N=2;
-		//typedef lvv::array<double,N>		array_t;	
+		typedef array<double,N,1>		array_t;	
 
-		typedef array<double,N, 1> vector;
-		vector		X= {{ -1.2, 1 }};
+		array_t			X= {{ -1.2, 1 }};
+												// good too
+												//function<double(array_t&)>	fct;
+												//fct = of_rosenberg<array_t>;
+												//newuoa_wrap<array_t>	mzr(fct,  X);
 
-		//newuoa_wrap<vector, 2*N+1>	mzr(&of_rosenberg, X);
-		newuoa_wrap<vector>	mzr(&of_rosenberg, X);
+		newuoa_wrap<array_t>	mzr(of_rosenberg<array_t>,  X);
 		mzr.rho_begin		(0.5);
 		mzr.rho_end		(1e-4);
 		mzr.verbose		(true);
-		vector	Xmin = mzr.argmin();
+		array_t			Xmin = mzr.argmin();
 		
 		MSG("# Result: Xmin%.10g   y=%.10g   iter=%d \n") %Xmin  %(mzr.ymin())  %(mzr.iter());
 	}

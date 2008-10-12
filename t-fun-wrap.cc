@@ -1,4 +1,6 @@
 #include <lvv/lvv.h>
+#include <lvv/array.h>
+	using lvv::array;
 #include <string>
 
 #include <functional>
@@ -13,8 +15,12 @@
 	//using namespace boost;
 	//
 //////////////////////////////////////////////////////////////////////////////////////////////////// TEST CALLABLE OBJECT
-int				plain_f		(string s)	{ cout  << "plain_f: " << s << " =  "; return 0;}
+typedef array<double,2,1> array_t;
+
+int				plain_f		(string s)		{ cout  << "plain_f: " << s << " =  "; return 0;}
 int				plain_f2	(string s, int i)	{ cout  << "plain_f2: " << s << " =  "; return i;}
+int				plain_fa	(array_t A)		{ cout  << "plain_fA: " << A << " =  "; return 0;}
+template<typename T> T		plain_fa	(array_t A)		{ cout  << "plain_fA: " << A << " =  "; return 0;}
 
 struct	functor_t {
 				functor_t	()		: value(0) {};
@@ -68,9 +74,16 @@ int main() {
 	function<int(string s)>   		fct1_p = functor_t();		cout << fct1_p("fct1_p = functor_t() ") << endl;
 	function<int(string s)>   		fct2_p = fct2;			cout << fct2_p("fct2_p = fct2 ") << endl;
 
+	// PLAIN F() with arrays
+	array_t  X = {{11, 22}};
+	function<int(array_t&)>       		bf_fa;
+	bf_fa = plain_fa<int>;						cout << "boost: plain fa()" << bf_fa(X) << endl;
+	//bf_f = bind2nd(function<int(string,int)>(&plain_f2),100);	cout << bf_f("sdt::bind2nd plain-f2()") << endl;
+	//bf_f = bind (plain_f2, _1, 100);				cout << bf_f("boost::bind  plain-f2()") << endl;
+
 	// PLAIN F()
 	function<int(string s)>       		bf_f;
-	bf_f = &plain_f;						cout << bf_f("boost: plain f()") << endl;
+	bf_f = plain_f;						cout << bf_f("boost: plain f()") << endl;
 	bf_f = bind2nd(function<int(string,int)>(&plain_f2),100);	cout << bf_f("sdt::bind2nd plain-f2()") << endl;
 	bf_f = bind (plain_f2, _1, 100);				cout << bf_f("boost::bind  plain-f2()") << endl;
 	
