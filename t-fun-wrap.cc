@@ -59,14 +59,14 @@ int main() {
 	eval_count<int(string)>		ecw(fct2);				cout << ecw("boost: ecw(fct2)-1 ") << endl;
 										cout << ecw("boost: ecw(fct2)-2 ") << endl;
 
-	function<int(string s)> 	ecw_p = eval_count<int(string)>(fct2);	cout << ecw_p("boost: ecw ") << endl;
+	function<int(string s)> 	ecw_p = eval_count<int(string)>(fct2);	cout << ecw_p("ecw_p ") << endl;
+										cout << ecw_p("ecw_p ") << endl;
+										cout << ecw_p("ecw_p ") << endl;
+
 
 	// F POINTERS
-	function<int(string s)>   		fct1_p = functor_t();		cout << fct1_p("boost: functor_t ") << endl;
-	function<int(string s)>   		fct2_p = fct2;			cout << fct2_p("boost: fct2 ") << endl;
-
-										cout << ecw_p("boost: ecw_p ") << endl;
-										cout << ecw_p("boost: ecw_p ") << endl;
+	function<int(string s)>   		fct1_p = functor_t();		cout << fct1_p("fct1_p = functor_t() ") << endl;
+	function<int(string s)>   		fct2_p = fct2;			cout << fct2_p("fct2_p = fct2 ") << endl;
 
 	// PLAIN F()
 	function<int(string s)>       		bf_f;
