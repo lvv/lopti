@@ -17,6 +17,14 @@ struct	functor_t {
 	int value;
 };
 
+
+class	obj_t 	{ public:
+	int	static		static_mem_f	(string s)	{ cout << s; return 0; };
+	int			mem_f		(string s)	{ cout << s << " ObjF::mem_f() = "; return 0; };
+};
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////  TEST WRAPPER
 struct empty {}; 
 template< typename RET=empty, typename ARG=empty> 
 struct eval_count;
@@ -31,13 +39,6 @@ struct	eval_count<RET(ARG)> : public unary_function<RET,ARG>		{
 	int eval_cnt; 
 	function<RET (ARG)> of;
 }; 
-
-class	obj_t 	{ public:
-	int	static		static_mem_f	(string s)	{ cout << s; return 0; };
-	int			mem_f		(string s)	{ cout << s << " ObjF::mem_f() = "; return 0; };
-};
-
-
 
 int main() {
 	
@@ -75,7 +76,5 @@ int main() {
 	cout << bf_mfa_mf  (    "boost:  bind1st( mem_fun(&obj_t::mem_f), &o)  ") << endl;
 	cout << bf_mfa_mf2 (&o, "boost:  &obj_t::mem_f                         ") << endl;
 
-
 	return 0;
-
 }
