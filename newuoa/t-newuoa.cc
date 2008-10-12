@@ -34,7 +34,6 @@ of_chebyquad		(V& X) 		{			// The Chebyquad test problem (Fletcher, 1965)
 }
 
 			template<typename V>  typename V::value_type
-//of_rosenberg		(V& X, void* var=NULL)   {  return 100*pow2(X[2]-pow2(X[1]))+pow2(1-X[1]);  };
 of_rosenberg		(V& X)   {  return 100*pow2(X[2]-pow2(X[1]))+pow2(1-X[1]);  };
 
 
@@ -104,11 +103,10 @@ int main() {
 		typedef array<double,N,1>		array_t;	
 
 		array_t			X= {{ -1.2, 1 }};
-												// good too
-												//function<double(array_t&)>	fct;
-												//fct = of_rosenberg<array_t>;
-												//newuoa_wrap<array_t>	mzr(fct,  X);
-
+											// TO CONVERT SIG:
+											// function<double(array_t&)>	fct;
+											// fct = boost::bind(&of_rosenberg<array_t>,_1, (void*)0) ;
+											// newuoa_wrap<array_t>		mzr(fct,  X);
 		newuoa_wrap<array_t>	mzr(of_rosenberg<array_t>,  X);
 		mzr.rho_begin		(0.5);
 		mzr.rho_end		(1e-4);
