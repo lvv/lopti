@@ -2,6 +2,7 @@
 #include <lvv/lvv.h>
 #include <limits>
 	using 	std::numeric_limits;
+	using 	std::function;
 
                  template<typename V>
 class	minimizer { 

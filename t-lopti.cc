@@ -1,12 +1,14 @@
-	///////////////////////////////////////////////////////////////////////////////   OPTI selection
-						// should be before array.h (so that gsl*.h  are before array.h)
-	#ifndef OPTI
-	        #define OPTI    NM
+	///////////////////////////////////////////////////////////////////////////////   LOPTI method selection
+						// This selector only for this t-*.  
+						// Application should select optimizer by including approprite *-wrap.h. 
+						// Should be before array.h (so that gsl*.h  are before array.h)
+	#ifndef LOPTI
+	        #define LOPTI    CONDOR
 	#endif 
 	
 	#define         NM              <lopti/gsl-nelder-mead-wrap.h>
 	#define         CONDOR          <lopti/condor-wrap.h>
-	        #include        OPTI
+	        #include        LOPTI
 	#undef          NM
 	#undef          CONDOR
 

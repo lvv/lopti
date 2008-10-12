@@ -6,10 +6,12 @@ include  ../lvv/include.mk
 LDFLAGS += -lgsl -lgslcblas -L /usr/local/lib -lcondor
 CXXFLAGS += -I /home/lvv/NF/
 
+t-lopti: t-lopti.cc
+
 t-condor: CXXFLAGS +=   -I ..
 t-condor: LDFLAGS  +=   -L /usr/local/lib/ -lcondor  -lm 
 
-t-condor: t.cc condor-wrap.h
+t-condor: t-condor.cc condor-wrap.h
 	$(CXX) $(CXXFLAGS) -DOPTI=CONDOR  $< -o $@ $(LDFLAGS)
 
 t-nm: t.cc  gsl-nelder-mead-wrap.h
