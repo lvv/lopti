@@ -1,6 +1,7 @@
 
 #include <lopti.h>
 #define LOPTI_NEWUOA
+#undef        NEWUOA
 
 // reverse indexes for fortran compat
 #define		BMAT(i,j)	BMAT[j][i]
@@ -46,7 +47,7 @@ class newuoa_minimizer:  public trust_region_minimizer<V> { public:
 	using trust_region_minimizer<V>::rho_end_;
 
 	explicit 		newuoa_minimizer	(of_ptr_t of, V& _X):   trust_region_minimizer<V>(of, _X)  {};
-	virtual const char*	name			()	const 		{ return "trust region type"; };
+	virtual const char*	name			()	const 		{ return "newuoa"; };
 	virtual V&		argmin			();
 };
 

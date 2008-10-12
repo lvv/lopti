@@ -3,9 +3,9 @@
 						// Application should select optimizer by including approprite *-wrap.h. 
 						// Should be before array.h (so that gsl*.h  are before array.h)
 	#ifndef LOPTI
-	        //#define LOPTI    CONDOR
+	        #define LOPTI    CONDOR
 	        //#define LOPTI    NM
-	        #define LOPTI    NEWUOA
+	        //#define LOPTI    NEWUOA
 	#endif 
 	
 	#define         NEWUOA   	<lopti/newuoa-wrap.h>
@@ -82,6 +82,7 @@ of_rosenberg		(V& X)   {  return 100*pow2(X[2]-pow2(X[1]))+pow2(1-X[1]);  };
 int main(int argc, char **argv) {
 	
 	typedef array<double,2,1>		array_t;	
+	typedef array<double,2,0>		array0_t;	
 	array_t		X0 = {{ -1.2, 1 }};
 
 	// WORKS: minimizer<array_t>	mzr			(&of_rb, X0);
@@ -91,19 +92,20 @@ int main(int argc, char **argv) {
 	//minimizer<array_t>	mzr			(boost::bind(type<double>(), &of_rb, _1, NULL), X0);
 	//minimizer<array_t>	mzr			(&of_rb, X0);
 				//mzr.object_function	(of_rb);
-			#ifdef LOPTI_NEWUOA
+			#if	defined(LOPTI_NEWUOA)
 				newuoa_minimizer<array_t>	mzr			(of_rosenberg<array_t>,  X0);
 								mzr.rho_begin		(0.5);
 								mzr.rho_end		(1e-4);
 								mzr.verbose		(true);
 
-			#elif LOPTI_CONDOR
-				mzr.rho_start		(2);
-				mzr.rho_end		(1e-4);
-				array_t			R  = {{ 0.2, 0.2 }};
-				mzr.rescale		(R);
+			#elif 	defined(LOPTI_CONDOR)
+				condor_minimizer<array0_t>	mzr			(of_rosenberg<array0_t>, *(array0_t*)&X0);
+								mzr.rho_begin		(2);
+								mzr.rho_end		(1e-4);
+								//array_t			R  = {{ 0.2, 0.2 }};
+								//mzr.rescale		(R);
 
-			#elif	LOPTI_NM
+			#elif	defined(LOPTI_NM)
 				array_t		S  = {{ 0.5, 0.5 }};
 				mzr.step		(S);
 				mzr.gsl_characteristic_size(0.00001);
@@ -111,7 +113,7 @@ int main(int argc, char **argv) {
 				assert(false && "macro LOPTI_<method>  not defined\n");
 			#endif
 				mzr.verbose		(true);
-	array_t	Xmin =		mzr.argmin		();
+	array_t	Xmin =		*(array_t*) &(mzr.argmin());
 	
 	MSG("result: Xmin%g   y=%g   iter=%d  minimizer=%s\n") %Xmin  %(mzr.ymin())  %mzr.iter()  %mzr.name() ;
 

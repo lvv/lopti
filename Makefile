@@ -7,7 +7,6 @@ LDFLAGS += -lgsl -lgslcblas -L /usr/local/lib -lcondor newuoa/*.o -lgfortran
 CXXFLAGS += -I /home/lvv/NF/
 
 t-lopti: t-lopti.cc
-t-lopti: LDFLAGS +=
 
 t-condor: CXXFLAGS +=   -I ..
 t-condor: LDFLAGS  +=   -L /usr/local/lib/ -lcondor  -lm 

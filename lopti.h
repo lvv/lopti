@@ -24,13 +24,13 @@ class	minimizer {
 		//typedef  fp_t (*of_ptr_t)(V&, void*);
 		//typedef  fp_t (*of_ptr_t)(V&, void*);
 		typedef  function<fp_t(V&)>	of_ptr_t;
+		of_ptr_t			of_;
 		int				max_iter_;
 		bool				verbose_;
 		V				X;
 		V				Xmin;
 		fp_t				ymin_;
 		int				iter_;
-		of_ptr_t			of_;
 
 	minimizer		(of_ptr_t of,  V& _X)       
 	:
