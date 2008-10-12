@@ -1,5 +1,6 @@
 
 #include <lopti.h>
+#define LOPTI_NEWUOA
 
 // reverse indexes for fortran compat
 #define		BMAT(i,j)	BMAT[j][i]
@@ -29,7 +30,7 @@ extern "C" void  update_  (int* N, int* NPT, double* BMAT, double* ZMAT, int* ID
 
 
 		template<typename V, int NPT=2*V::sz+1>
-class newuoa_wrap:  public trust_region_minimizer<V> { public:
+class newuoa_minimizer:  public trust_region_minimizer<V> { public:
 		typedef  typename minimizer<V>::fp_t	fp_t;
 		typedef  typename minimizer<V>::of_ptr_t	of_ptr_t;
 	//typedef  typename V::value_type fp_t;
@@ -44,13 +45,13 @@ class newuoa_wrap:  public trust_region_minimizer<V> { public:
 	using trust_region_minimizer<V>::rho_begin_;
 	using trust_region_minimizer<V>::rho_end_;
 
-	newuoa_wrap		(const newuoa_wrap& x);
-	explicit 	newuoa_wrap		(of_ptr_t of, V& _X):   trust_region_minimizer<V>(of, _X)  {};
-	virtual V&	argmin			();
+	explicit 		newuoa_minimizer	(of_ptr_t of, V& _X):   trust_region_minimizer<V>(of, _X)  {};
+	virtual const char*	name			()	const 		{ return "trust region type"; };
+	virtual V&		argmin			();
 };
 
 		template<typename V, int NPT> 	V&
-newuoa_wrap<V,NPT>::argmin () {
+newuoa_minimizer<V,NPT>::argmin () {
 						assert(!isnan(rho_begin_) && " rho_begin definition ");
 						assert(!isnan(rho_end_)   && " rho_end   definition ");
 						assert(V::ibg == 1        && " 1st vector index == 1 "); //  newuoa have index:  [1:N]

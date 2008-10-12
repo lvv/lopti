@@ -57,7 +57,8 @@ class	minimizer {
 		verbose_ = flag;
 	};
 
-	virtual V&		 argmin() = 0;
+	virtual V&		 argmin			() 		= 0;
+	virtual const char*	 name			() 	const	{ return "n/a";};
 };
 
                  template<typename V>
@@ -75,7 +76,8 @@ class	trust_region_minimizer : public minimizer<V>    { public:
 		rho_end_   	(numeric_limits<fp_t>::quiet_NaN ())
 	{};
 
-	virtual void		rho_begin		(fp_t rho)		{ rho_begin_ = rho; };
-	virtual void		rho_end			(fp_t rho)		{ rho_end_   = rho; };
+	virtual void		rho_begin		(fp_t rho)	{ rho_begin_ = rho; };
+	virtual void		rho_end			(fp_t rho)	{ rho_end_   = rho; };
+	virtual const char*	name			() 	const	{ return "trust region type"; };
 };
 

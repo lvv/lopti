@@ -29,17 +29,18 @@ class	of_wrap  : public CONDOR::ObjectiveFunction { public:
 
 			typedef  typename V::value_type v;
 			v (*of)(V&, void*);
-			void* var;
+			//void* var;
 			int eval_cnt;
 			bool verbose;
 
-	of_wrap (v of(V&, void*), V X0, void* var) {  			// we use this CTOR to construct
+	//of_wrap (v of(V&, void*), V X0, void* var) {  			// we use this CTOR to construct
+	of_wrap (v of(V&), V X0) {  			// we use this CTOR to construct
 		strcpy(name,"condor_of_wrap");
 		xOptimal.setSize(X0.size());
 		xStart.  setSize(X0.size());
 		xStart << X0;
 		this->of =  of;
-		this->var =  var;
+		//this->var =  var;
 		eval_cnt = 0;
 		verbose = false;
 	};
@@ -60,9 +61,46 @@ class	of_wrap  : public CONDOR::ObjectiveFunction { public:
 		return	y;
 	};
  };
- 
+/////////////////////////////////////////////////////////////// 
+		template<typename V, int NPT=2*V::sz+1>
+class newuoa_wrap:  public trust_region_minimizer<V> { public:
+		typedef  typename minimizer<V>::fp_t	fp_t;
+		typedef  typename minimizer<V>::of_ptr_t	of_ptr_t;
+	//typedef  typename V::value_type fp_t;
+	//typedef  fp_t (*of_ptr_t)(V&, void*); 
+
+	using minimizer<V>::X;  		// without this we woun't see minimizer members
+	using minimizer<V>::max_iter_;
+	using minimizer<V>::verbose_;
+	using minimizer<V>::of_;
+	using minimizer<V>::verbose_;
+	using minimizer<V>::ymin_;
+	using trust_region_minimizer<V>::rho_begin_;
+	using trust_region_minimizer<V>::rho_end_;
+
+	explicit 		newuoa_wrap		(const newuoa_wrap& x);
+	explicit 		newuoa_wrap		(of_ptr_t of, V& _X):   trust_region_minimizer<V>(of, _X)  {};
+	virtual const char*	name			()	const 		{ return "trust region type"; };
+	virtual V&		argmin			();
+};
+
+		template<typename V, int NPT> 	V&
+newuoa_wrap<V,NPT>::argmin () {
+						assert(!isnan(rho_begin_) && " rho_begin definition ");
+						assert(!isnan(rho_end_)   && " rho_end   definition ");
+						assert(V::ibg == 1        && " 1st vector index == 1 "); //  newuoa have index:  [1:N]
+/////////////////////////////////////////////////////////////// 
                  template<typename V>
-class	minimizer { public:
+//class	newuoa_wrap:      public trust_region_minimizer<V> { public:
+class	condor_minimizer { public:
+		typedef  typename minimizer<V>::fp_t	fp_t;
+		typedef  typename minimizer<V>::of_ptr_t	of_ptr_t;
+
+
+
+
+
+
 		typedef  typename V::value_type v;
 		int				max_iter_;
 		//bool				verbose_;
