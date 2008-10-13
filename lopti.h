@@ -21,8 +21,6 @@ class	minimizer {
 
 	public:
 		typedef  typename V::value_type fp_t;
-		//typedef  fp_t (*of_ptr_t)(V&, void*);
-		//typedef  fp_t (*of_ptr_t)(V&, void*);
 		typedef  function<fp_t(V&)>	of_ptr_t;
 		of_ptr_t			of_;
 		int				max_iter_;
@@ -31,15 +29,17 @@ class	minimizer {
 		V				Xmin;
 		fp_t				ymin_;
 		int				iter_;
+		bool				found_;
 
 	minimizer		(of_ptr_t of,  V& _X)       
 	:
-		max_iter_  (500),
-		ymin_      (numeric_limits<fp_t>::quiet_NaN ()),
-		iter_      (-1),
-		X          (_X),
-		verbose_   (false),
-		of_        (of)
+		max_iter_	(500),
+		ymin_    	(numeric_limits<fp_t>::quiet_NaN ()),
+		iter_    	(-1),
+		X        	(_X),
+		verbose_ 	(false),
+		of_      	(of),
+		found_ 		(false)
 	{};
 
 	virtual 		~minimizer		()		{};  // it it here so that approprite polimorfic DTOR called 
@@ -57,8 +57,9 @@ class	minimizer {
 		verbose_ = flag;
 	};
 
-	virtual V&		 argmin			() 		= 0;
-	virtual const char*	 name			() 	const	{ return "n/a";};
+	virtual V&		argmin			() 		= 0;
+	virtual bool		found			() 	const	{ return found_;};
+	virtual const char*	name			() 	const	{ return "n/a";};
 };
 
                  template<typename V>

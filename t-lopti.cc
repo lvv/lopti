@@ -3,9 +3,9 @@
 						// Application should select optimizer by including approprite *-wrap.h. 
 						// Should be before array.h (so that gsl*.h  are before array.h)
 	#ifndef LOPTI
-	        #define LOPTI    CONDOR
-	        //#define LOPTI    NM
-	        //#define LOPTI    NEWUOA
+	        //#define	LOPTI    NEWUOA
+	        //#define	LOPTI    CONDOR
+	        #define	LOPTI    NM
 	#endif 
 	
 	#define         NEWUOA   	<lopti/newuoa-wrap.h>
@@ -22,17 +22,19 @@
 		using lvv::pow2;
 	#include <lvv/array.h>
 		using lvv::array;
+		using lvv::matrix;
 
 	// functional 
 	#include <functional>
 		//using std::binder1st;
-		//using std::unary_function;
+		using std::unary_function;
 	#include <boost/function.hpp>
-		//using boost::function;
+		using boost::function;
 	#include <boost/bind.hpp>
-		//using boost::bind;
-		using namespace boost;
-		using namespace std;
+		using boost::bind;
+
+	//using namespace boost;
+	//using namespace std;
 	/////////////////////////////////////////////////////////////////////////////// OF
 
 			template<typename V>  typename V::value_type
@@ -41,7 +43,8 @@ of_chebyquad		(V& X) 		{			// The Chebyquad test problem (Fletcher, 1965)
 	const int N = V::size();
 	typedef  typename V::value_type fp_t;
 
-	array<array<fp_t,V::sz,1>, V::sz+1,1> Y;
+	//array<array<fp_t,V::sz,1>, V::sz+1,1> Y;
+	matrix <fp_t, V::sz, V::sz+1> Y;
 
      	for (int J=1; J<=N; J++)  {
 		Y[1][J] = 1.0;
@@ -69,7 +72,14 @@ of_chebyquad		(V& X) 		{			// The Chebyquad test problem (Fletcher, 1965)
 }
 
 			template<typename V>  typename V::value_type
-of_rosenberg		(V& X)   {  return 100*pow2(X[2]-pow2(X[1]))+pow2(1-X[1]);  };
+of_rosenberg		(V& X)   {  
+	typename V::value_type&		// to make it work if X index start from 0 or 1
+		x1 = *X.begin(), 
+		x2 = *(X.begin()+1);
+	//return 100*pow2(X[2]-pow2(X[1]))+pow2(1-X[1]); 
+	assert(X.size() == 2);
+	return 100*pow2(x2-pow2(x1))+pow2(1-x1); 
+};
 
 
 
@@ -85,33 +95,27 @@ int main(int argc, char **argv) {
 	typedef array<double,2,0>		array0_t;	
 	array_t		X0 = {{ -1.2, 1 }};
 
-	// WORKS: minimizer<array_t>	mzr			(&of_rb, X0);
-	//minimizer<array_t>	mzr			(bind(of_rosenberg<array_t>, _1, (void*)NULL),    X0);
-	// good minimizer<array_t>	mzr			(bind(&of_rb<array_t>, _1, (void*)NULL), X0);
-	//minimizer<array_t>	mzr			(boost::bind(fun_ptr(&of_rb), _1, NULL), X0);
-	//minimizer<array_t>	mzr			(boost::bind(type<double>(), &of_rb, _1, NULL), X0);
-	//minimizer<array_t>	mzr			(&of_rb, X0);
-				//mzr.object_function	(of_rb);
+
 			#if	defined(LOPTI_NEWUOA)
-				newuoa_minimizer<array_t>	mzr			(of_rosenberg<array_t>,  X0);
+				newuoa_minimizer<array_t>	mzr			(of_rosenberg<array_t>,  X0);	// X[1..N]
 								mzr.rho_begin		(0.5);
 								mzr.rho_end		(1e-4);
 								mzr.verbose		(true);
-
 			#elif 	defined(LOPTI_CONDOR)
-				condor_minimizer<array0_t>	mzr			(of_rosenberg<array0_t>, *(array0_t*)&X0);
+				condor_minimizer<array0_t>	mzr			(of_rosenberg<array0_t>, *(array0_t*)&X0);	// X[0..N-1]
 								mzr.rho_begin		(2);
 								mzr.rho_end		(1e-4);
 								//array_t			R  = {{ 0.2, 0.2 }};
 								//mzr.rescale		(R);
-
 			#elif	defined(LOPTI_NM)
-				array_t		S  = {{ 0.5, 0.5 }};
-				mzr.step		(S);
-				mzr.gsl_characteristic_size(0.00001);
+				array0_t		S  = {{ 0.6, 0.6 }};
+				nelder_mead_minimizer<array0_t>	mzr			(of_rosenberg<array0_t>,  *(array0_t*)&X0);	// X[0..N-1]
+								mzr.step		(S);
+								mzr.gsl_characteristic_size(0.0001);
 			#else
 				assert(false && "macro LOPTI_<method>  not defined\n");
 			#endif
+
 				mzr.verbose		(true);
 	array_t	Xmin =		*(array_t*) &(mzr.argmin());
 	

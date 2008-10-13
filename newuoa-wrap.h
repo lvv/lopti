@@ -1,6 +1,7 @@
 
 #include <lopti.h>
 #define LOPTI_NEWUOA
+#define	MINIMIZER	newuoa_minimizer
 #undef        NEWUOA
 
 // reverse indexes for fortran compat

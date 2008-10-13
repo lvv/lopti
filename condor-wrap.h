@@ -2,6 +2,7 @@
 	#include <lopti.h>
 
 	#define  LOPTI_CONDOR
+	#define	MINIMIZER	condor_minimizer
 	#undef CONDOR
 	
 	#include <stdio.h>
