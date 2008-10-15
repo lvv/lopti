@@ -1,9 +1,11 @@
 	
 	#include <lopti.h>
 
-	#define  LOPTI_CONDOR
-	#define	MINIMIZER	condor_minimizer
 	#undef CONDOR
+	#define  LOPTI_CONDOR
+
+	#undef	MINIMIZER
+	#define	MINIMIZER	condor_minimizer
 	
 	#include <stdio.h>
 	#include <stdlib.h>
@@ -78,10 +80,12 @@ class	condor_minimizer: public trust_region_minimizer<V> { public:
 
 		using minimizer<V>::X;  		// without this we woun't see minimizer members
 		using minimizer<V>::max_iter_;
+		using minimizer<V>::iter_;
 		using minimizer<V>::verbose_;
 		using minimizer<V>::of_;
 		using minimizer<V>::verbose_;
 		using minimizer<V>::ymin_;
+		using minimizer<V>::Xmin_;
 		using trust_region_minimizer<V>::rho_begin_;
 		using trust_region_minimizer<V>::rho_end_;
 
@@ -92,7 +96,7 @@ class	condor_minimizer: public trust_region_minimizer<V> { public:
 
 
 	// m-vars
-	V	Xmin;
+	//V	Xmin;
 	c_of_t<V>			c_of;	// condor object func wrap	
 	//CONDOR::ObjectiveFunction*	c_of;		
 	//CONDOR::ObjectiveFunction*	c_rof_wrap;	// condor object func rescaled wrap	
@@ -100,14 +104,10 @@ class	condor_minimizer: public trust_region_minimizer<V> { public:
 	CONDOR::Vector			cX;		// param in condor format
 	CONDOR::Vector			cR;		// rescale divider
 
-//	~condor_minimizer		()		{ delete   c_of; };
 
 	//	void		rescale			(V& R) 		{ cR << R; c_rof_wrap = new CONDOR::CorrectScaleOF(2, c_of, cR); };
 
-	fp_t 	 	ymin			()		{  return c_of.valueBest; };
-	fp_t 	 	iter			()		{  return c_of.getNFE(); };
-
-	void 	 verbose		(bool flag)	{
+	virtual void 		 verbose		(bool flag)	{
 		#define  GP_F "splot [-2:1.5][-0.5:2] log(100 * (y - x*x)**2 + (1 - x)**2),  "
 		cout << "# :gnuplot: set view 0,0,1.7;   set font \"arial,6\"; set dgrid3d;  set key off;"
 			"  set contour surface;  set cntrparam levels 20;  set isosample 40;"
@@ -123,9 +123,10 @@ class	condor_minimizer: public trust_region_minimizer<V> { public:
 		globalPrintLevel = 10;		// off
 		// XXXXXXXXXXXXXXX CONDOR::CONDORSolver(rho_start_, rho_end_, max_iter_,  c_rof_wrap == NULL ? c_of : c_rof_wrap);
 		CONDOR::CONDORSolver(rho_begin_, rho_end_, max_iter_,  &c_of);
-		Xmin << (c_of.xBest);
-						//c_of.printStats();
-		return Xmin;
+		Xmin_ << (c_of.xBest);
+		ymin_ = c_of.valueBest; 				//c_of.printStats();
+		iter_ = c_of.getNFE(); 
+		return Xmin_;
 	};
 
 };

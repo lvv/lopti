@@ -1,6 +1,8 @@
 
 	#undef  NM
 	#define	LOPTI_NM
+
+	#undef	MINIMIZER
 	#define	MINIMIZER	nelder_mead_minimizer
 
 	#include <lopti/lopti.h>
@@ -41,11 +43,11 @@ class	nelder_mead_minimizer  :  public minimizer<V> { public:
 	using minimizer<V>::of_;
 	using minimizer<V>::verbose_;
 	using minimizer<V>::ymin_;
-	using minimizer<V>::Xmin;
+	using minimizer<V>::Xmin_;
 	using minimizer<V>::iter_;
 	using minimizer<V>::found_;
 
-	virtual const char*	name			()	const 		{ return "nelder-mead (aka simplex)"; };
+	virtual const char*	name			()	const 		{ return "nelder-mead (simplex)"; };
 
 
 		gsl_vector*			gX;	
@@ -53,7 +55,7 @@ class	nelder_mead_minimizer  :  public minimizer<V> { public:
 		const gsl_multimin_fminimizer_type *gsl_minimizer_type_ptr;
 		gsl_multimin_fminimizer*	gsl_minimizer;
 		gsl_multimin_function		minex_func;
-		double 				characteristic_size;
+		double 				characteristic_size_;
 
 
 
@@ -77,16 +79,12 @@ class	nelder_mead_minimizer  :  public minimizer<V> { public:
 		gS = gsl_vector_alloc(V::size()); 
 		gS << S; 
 		gsl_minimizer = gsl_multimin_fminimizer_alloc(gsl_minimizer_type_ptr, V::size());
-		//xmin = minimizer->x->data;
 		if (verbose_)   cerr << "#  minimizer: "  <<  gsl_multimin_fminimizer_name (gsl_minimizer)  <<  endl;
 		gsl_multimin_fminimizer_set(gsl_minimizer, &minex_func, gX  , gS);
 	};
 
-	void 		gsl_var			(void* var )	{ minex_func.params = var; };
-	void   		gsl_characteristic_size	(double cs)	{ characteristic_size = cs; };
-
-	fp_t 	 	ymin			()		{  return gsl_minimizer->fval; };
-	fp_t 	 	iter			()		{  return iter_; };
+	//void 		gsl_var			(void* var )	{ minex_func.params = var; };
+	void   		characteristic_size	(double cs)	{ characteristic_size_ = cs; };
 
 	V&		argmin () {
 		int	test_status=GSL_CONTINUE;			// test_status:  GSL_SUCCESS==0; GSL_CONTINUE==-2; 
@@ -103,7 +101,7 @@ class	nelder_mead_minimizer  :  public minimizer<V> { public:
 			}
 
 			double size = gsl_multimin_fminimizer_size(gsl_minimizer);
-			test_status = gsl_multimin_test_size(size, characteristic_size);
+			test_status = gsl_multimin_test_size(size, characteristic_size_);
 
 			if (test_status == GSL_SUCCESS)  {
 				found_=true;
@@ -119,17 +117,10 @@ class	nelder_mead_minimizer  :  public minimizer<V> { public:
 			}
 		}
 
-		Xmin << gsl_minimizer->x;
-		return Xmin;
+		ymin_ = gsl_minimizer->fval;
+		Xmin_  <<  gsl_minimizer->x;
+		return Xmin_;
 	}
 
-
-	void 	 verbose		(bool flag)	{
-		verbose_ =flag;
-		#define  GP_F  "splot [-2:1.5][-0.5:2] log(100 * (y - x*x)**2 + (1 - x)**2),  "
-		cout << "# :gnuplot: set view 0,0,1.7;   set font \"arial,6\"; set dgrid3d;  set key off;"
-			"  set contour surface;  set cntrparam levels 20;  set isosample 40;"
-			GP_F "\"pipe\" using 3:4:2:1 with labels; \n";
-	};
 
  };

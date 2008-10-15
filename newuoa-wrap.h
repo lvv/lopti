@@ -1,6 +1,7 @@
 
 #include <lopti.h>
 #define LOPTI_NEWUOA
+#undef  MINIMIZER                                                                                                                                  
 #define	MINIMIZER	newuoa_minimizer
 #undef        NEWUOA
 
@@ -33,17 +34,17 @@ extern "C" void  update_  (int* N, int* NPT, double* BMAT, double* ZMAT, int* ID
 
 		template<typename V, int NPT=2*V::sz+1>
 class newuoa_minimizer:  public trust_region_minimizer<V> { public:
-		typedef  typename minimizer<V>::fp_t	fp_t;
-		typedef  typename minimizer<V>::of_ptr_t	of_ptr_t;
-	//typedef  typename V::value_type fp_t;
-	//typedef  fp_t (*of_ptr_t)(V&, void*); 
+	typedef  typename minimizer<V>::fp_t	fp_t;
+	typedef  typename minimizer<V>::of_ptr_t	of_ptr_t;
 
 	using minimizer<V>::X;  		// without this we woun't see minimizer members
 	using minimizer<V>::max_iter_;
+	using minimizer<V>::iter_;
 	using minimizer<V>::verbose_;
 	using minimizer<V>::of_;
 	using minimizer<V>::verbose_;
 	using minimizer<V>::ymin_;
+	using minimizer<V>::Xmin_;
 	using trust_region_minimizer<V>::rho_begin_;
 	using trust_region_minimizer<V>::rho_end_;
 
@@ -158,7 +159,8 @@ newuoa_minimizer<V,NPT>::argmin () {
      	double	RHOSQ = rho_begin_*rho_begin_;
      	double	RECIP = ONE/RHOSQ;
      	double	RECIQ = sqrt(HALF)/RHOSQ;
-     	int	iter_ = 0;
+
+     	iter_ = 0;
 
 fill_xpt_50:
 
@@ -721,6 +723,7 @@ new_rho_490:
 
 	if (verbose_)  FMT("-- (%d) RETURNED: \t F =%.15g    X is: %.15g\n\n")  %iter_ %F  %X;
 	ymin_ = F;
+	Xmin_ = X;
 	return X;
 }; // newuoa
 

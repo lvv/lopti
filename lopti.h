@@ -1,3 +1,6 @@
+	#ifndef LVV_LOPTI_H
+	#define LVV_LOPTI_H
+
 
 	#include <lvv/lvv.h>
 	#include <limits>
@@ -26,12 +29,12 @@ class	minimizer {
 		int				max_iter_;
 		bool				verbose_;
 		V				X;
-		V				Xmin;
+		V				Xmin_;
 		fp_t				ymin_;
 		int				iter_;
 		bool				found_;
 
-	minimizer		(of_ptr_t of,  V& _X)       
+	explicit 		minimizer		(of_ptr_t of,  V& _X)       
 	:
 		max_iter_	(500),
 		ymin_    	(numeric_limits<fp_t>::quiet_NaN ()),
@@ -44,9 +47,10 @@ class	minimizer {
 
 	virtual 		~minimizer		()		{};  // it it here so that approprite polimorfic DTOR called 
 
-	virtual void		max_iter		(int mx)	{ max_iter_   = mx;  };
-	virtual fp_t 	 	ymin			()		{  return ymin_; };
-	virtual fp_t 	 	iter			()		{  return iter_; };
+	virtual void		max_iter		(int mx)	{  max_iter_   = mx;  };
+	virtual fp_t 	 	ymin			()	const	{  return ymin_; };
+	virtual V 	 	Xmin			()	const	{  return Xmin_; };
+	virtual fp_t 	 	iter			()	const	{  return iter_; };
 
 	virtual void 	 verbose		(bool flag)	{
 		#define  GP_F "splot [-2:1.5][-0.5:2] log(100 * (y - x*x)**2 + (1 - x)**2),  "
@@ -60,6 +64,7 @@ class	minimizer {
 	virtual V&		argmin			() 		= 0;
 	virtual bool		found			() 	const	{ return found_;};
 	virtual const char*	name			() 	const	{ return "n/a";};
+	virtual void		print			()		{ MSG("%s %25t iter=%d  \t ymin=%g \t Xmin%g \n") %name()  %iter()  %ymin()  %Xmin();};
 };
 
                  template<typename V>
@@ -82,3 +87,4 @@ class	trust_region_minimizer : public minimizer<V>    { public:
 	virtual const char*	name			() 	const	{ return "trust region type"; };
 };
 
+	#endif 

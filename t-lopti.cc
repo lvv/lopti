@@ -1,20 +1,8 @@
-	///////////////////////////////////////////////////////////////////////////////   LOPTI method selection
-						// This selector only for this t-*.  
-						// Application should select optimizer by including approprite *-wrap.h. 
-						// Should be before array.h (so that gsl*.h  are before array.h)
-	#ifndef LOPTI
-	        //#define	LOPTI    NEWUOA
-	        //#define	LOPTI    CONDOR
-	        #define	LOPTI    NM
-	#endif 
 	
-	#define         NEWUOA   	<lopti/newuoa-wrap.h>
-	#define         NM              <lopti/gsl-nelder-mead-wrap.h>
-	#define         CONDOR          <lopti/condor-wrap.h>
-	        #include        LOPTI
-	#undef          NM
-	#undef          CONDOR
-	#undef          NEWUOA
+	#include	<gsl/gsl_vector.h>
+	#include	<lopti/condor-wrap.h>
+	#include   	<lopti/newuoa-wrap.h>
+	#include	<lopti/gsl-nelder-mead-wrap.h>
 
 	/////////////////////////////////////////////////////////////////////////////// 
 	#include <lvv/lvv.h>
@@ -85,35 +73,38 @@ of_rosenberg		(V& X)   {
 
 int main(int argc, char **argv) {
 	
-	typedef array<double,2,1>		array_t;	
+	typedef array<double,2,1>		array1_t;	
 	typedef array<double,2,0>		array0_t;	
-	array_t		X0 = {{ -1.2, 1 }};
+	array0_t		X0 = {{ -1.2, 1 }};
+	array0_t		X;
 
 
-			#if	defined(LOPTI_NEWUOA)
-				newuoa_minimizer<array_t>	mzr			(of_rosenberg<array_t>,  X0);	// X[1..N]
-								mzr.rho_begin		(0.5);
-								mzr.rho_end		(1e-4);
-								mzr.verbose		(true);
-			#elif 	defined(LOPTI_CONDOR)
-				condor_minimizer<array0_t>	mzr			(of_rosenberg<array0_t>, *(array0_t*)&X0);	// X[0..N-1]
-								mzr.rho_begin		(2);
-								mzr.rho_end		(1e-4);
-								//array_t			R  = {{ 0.2, 0.2 }};
-								//mzr.rescale		(R);
-			#elif	defined(LOPTI_NM)
-				array_t		S  = {{ 0.6, 0.6 }};
-				nelder_mead_minimizer<array_t>	mzr			(of_rosenberg<array_t>,  X0);	// will ignore BEGIN index
-								mzr.step		(S);
-								mzr.gsl_characteristic_size(0.0001);
-			#else
-				assert(false && "macro LOPTI_<method>  not defined\n");
-			#endif
+	{
+	newuoa_minimizer<array1_t>	mzr			(of_rosenberg<array1_t>,  *(array1_t*)&(X0=X));	// X[1..N]
+					mzr.rho_begin		(0.5);
+					mzr.rho_end		(4e-4);
+					mzr.argmin();
+					mzr.print();
+	}
 
-				mzr.verbose		(true);
-	array_t	Xmin =		*(array_t*) &(mzr.argmin());
-	
-	MSG("result: Xmin%g   y=%g   iter=%d  minimizer=%s\n") %Xmin  %(mzr.ymin())  %mzr.iter()  %mzr.name() ;
+	{
+	condor_minimizer<array0_t>	mzr			(of_rosenberg<array0_t>, X0=X);	// X[0..N-1]
+					mzr.rho_begin		(2);
+					mzr.rho_end		(1e-3);
+					mzr.argmin();
+					mzr.print();
+					//array_t			R  = {{ 0.2, 0.2 }};
+					//mzr.rescale		(R);
+	}
+
+	{
+	array0_t		S  = {{ 0.6, 0.6 }};
+	nelder_mead_minimizer<array0_t>	mzr			(of_rosenberg<array0_t>,  X0=X);	// will ignore BEGIN index
+					mzr.step		(S);
+					mzr.characteristic_size	(0.0002);
+					mzr.argmin();
+					mzr.print();
+	}
 
 	return 0;
  }
