@@ -73,7 +73,7 @@ of_chebyquad		(V& X) 		{			// The Chebyquad test problem (Fletcher, 1965)
 
 			template<typename V>  typename V::value_type
 of_rosenberg		(V& X)   {  
-	typename V::value_type&		// to make it work if X index start from 0 or 1
+	typename V::value_type&		// these refs make it work if X index start from 0 or 1
 		x1 = *X.begin(), 
 		x2 = *(X.begin()+1);
 	//return 100*pow2(X[2]-pow2(X[1]))+pow2(1-X[1]); 
@@ -82,12 +82,6 @@ of_rosenberg		(V& X)   {
 };
 
 
-
-		//template<typename V>  typename V::value_type 
-	//of_rb(V& X, void* var)   { return 100*pow2(X[1]-pow2(X[0]))+pow2(1-X[0]); };
-
-	//double of_rb(array_t& X, void* var)   { return 100*pow2(X[1]-pow2(X[0]))+pow2(1-X[0]); };
-	//double of_rb(array_t& X)   { return 100*pow2(X[1]-pow2(X[0]))+pow2(1-X[0]); };
 
 int main(int argc, char **argv) {
 	
@@ -108,8 +102,8 @@ int main(int argc, char **argv) {
 								//array_t			R  = {{ 0.2, 0.2 }};
 								//mzr.rescale		(R);
 			#elif	defined(LOPTI_NM)
-				array0_t		S  = {{ 0.6, 0.6 }};
-				nelder_mead_minimizer<array0_t>	mzr			(of_rosenberg<array0_t>,  *(array0_t*)&X0);	// X[0..N-1]
+				array_t		S  = {{ 0.6, 0.6 }};
+				nelder_mead_minimizer<array_t>	mzr			(of_rosenberg<array_t>,  X0);	// will ignore BEGIN index
 								mzr.step		(S);
 								mzr.gsl_characteristic_size(0.0001);
 			#else
