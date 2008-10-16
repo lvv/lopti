@@ -60,6 +60,8 @@ int main() {
 	// FUNCTOR  with init fun
 	functor_t	fct2;	 						cout << fct2("stand alone  fct2 ") << endl;
 			fct2.init(33);						cout << fct2("stand alone  fct2.init(33) ") << endl;
+	function<int(string s)> 	fct2p = fct2;				cout << fct2p("fct2p ") << endl;
+					fct2p->init(111);			cout << fct2p("fct2p 2") << endl;
 	
 	// FUNCTOR  WRAP
 	eval_count<int(string)>		ecw(fct2);				cout << ecw("boost: ecw(fct2)-1 ") << endl;
