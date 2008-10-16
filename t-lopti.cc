@@ -25,6 +25,7 @@
 	//using namespace std;
 	/////////////////////////////////////////////////////////////////////////////// OF
 
+/////////////////////////////////////////////////////////////////////////////////////////  OF: CHEBYQUAD
 			template<typename V>  typename V::value_type
 of_chebyquad		(V& X) 		{			// The Chebyquad test problem (Fletcher, 1965) 
 	
@@ -59,8 +60,9 @@ of_chebyquad		(V& X) 		{			// The Chebyquad test problem (Fletcher, 1965)
 	return F;
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////  OF: ROSENBERG
 			template<typename V>  typename V::value_type
-of_rosenberg		(V& X)   {  
+XXXXXXXXXXXXXXXXXXXXXXXXXXX_FUN_of_rosenberg		(V& X)   {  
 	typename V::value_type&		// these refs make it work if X index start from 0 or 1
 		x1 = *X.begin(), 
 		x2 = *(X.begin()+1);
@@ -69,13 +71,51 @@ of_rosenberg		(V& X)   {
 	return 100*pow2(x2-pow2(x1))+pow2(1-x1); 
 };
 
+/////////////////////////////////////////////////////////////////////////////////////////   OF_BASE
+
+			template<typename V>
+struct	of_base		{  
+	of_base		(const char* s) :  		name_(s)   { X_opt_ = 0; };
+	typedef  typename V::value_type	 fp_t;
+	const char*	name_;
+	V	X_opt_;
+	int	iter_;
+
+	virtual fp_t	operator()	(V& X) 		= 0;
+	virtual const char*	name		()	const	{ return  name_; };
+	virtual int 		size		()	const	{ return  V::size(); };
+	virtual int 		iter		()	const	{ return  iter_; };
+	//virtual bool 		have_opt	()	const	{ return  false; };
+		void 		opt		(const V& X_answ)	{ X_opt_ = X_answ; };
+		fp_t 		opt_distance	(V& X)	const	{ return  distance_norm2<V>(X_opt_, X); };
+};
+
+
+			template<typename V>  
+struct	of_rosenberg	: public of_base<V> { 
+	of_rosenberg()	: of_base<V>("rosenberg")  {
+		V const	 X_answ = {{ 1.0, 1.0 }};
+		of_base<V>::opt(X_answ);
+	};
+
+
+			virtual  typename V::value_type
+	operator() 	(V& X)   {  
+		typename V::value_type&		// these refs make it work if X index start from 0 or 1
+			x1 = *X.begin(), 
+			x2 = *(X.begin()+1);
+		//return 100*pow2(X[2]-pow2(X[1]))+pow2(1-X[1]); 
+		assert(X.size() == 2);
+		return 100*pow2(x2-pow2(x1))+pow2(1-x1); 
+	};
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////  OF WRAP:  OF_LOG
 //#include <gzstream.h>
 #include <iostream>                                                                                                                                         
 #include <fstream>
-	//using namespace std;
 	using std::ios;
 	using std::ofstream;
-//#include <cstdlib>
 
 			template<typename V>
 struct	of_log  {
@@ -84,23 +124,18 @@ struct	of_log  {
 
 		of_ptr_t	of_p;
 		int		iter;
-		//ogzstream	log_file;
 		ofstream&	log_file;
 
 	explicit	of_log		(of_ptr_t of, ofstream& lf)		: of_p(of), iter(0), log_file(lf)  { assert(log_file.good());};
-	//explicit	of_log		(of_ptr_t of, ostream& lf)		: of_p(of), iter(0), log_file(lf)  { assert(log_file.good());};
-	//explicit	of_log		(of_ptr_t of, const char* log_name)		: of_p(of), iter(0) , log_file(new ofstream(log_name, ios::trunc | ios::out)){};
-//			~of_log		()						{ log_file.close(); };
 
 	fp_t	operator()	(V&  X)			{
 		iter++;  
 		fp_t   y = of_p(X); 
 		//assert(log_file.good());
-		log_file << format("%d \t \%g \t %g \n") % iter %y %X; 
+		log_file << format("%d \t %g \t %g \n") % iter %y %X; 
 		//cout << format("%d \t \%g \t %g \n") % iter %y %X; 
 		return y;
 	};
-
 };
 
 int main(int argc, char **argv) {
@@ -113,8 +148,8 @@ int main(int argc, char **argv) {
 
 
 	{
-	newuoa_minimizer<array1_t>	mzr			(of_log<array1_t>(of_rosenberg<array1_t>, log_file),  *(array1_t*)&(X0=X));	// X[1..N]
-	//newuoa_minimizer<array1_t>	mzr			(of_log<array1_t>(of_rosenberg<array1_t>, "log"),  *(array1_t*)&(X0=X));	// X[1..N]
+	newuoa_minimizer<array1_t>	mzr			(of_log<array1_t>(of_rosenberg<array1_t>(), log_file),  *(array1_t*)&(X=X0));	// X[1..N]
+	//newuoa_minimizer<array1_t>	mzr			(of_log<array1_t>(of_rosenberg<array1_t>, log_file),  *(array1_t*)&(X=X0));	// X[1..N]
 					mzr.rho_begin		(0.5);
 					mzr.rho_end		(4e-4);
 					mzr.argmin();
@@ -122,7 +157,7 @@ int main(int argc, char **argv) {
 	}
 
 	{
-	condor_minimizer<array0_t>	mzr			(of_rosenberg<array0_t>, X0=X);	// X[0..N-1]
+	condor_minimizer<array0_t>	mzr			(of_rosenberg<array0_t>(), X=X0);	// X[0..N-1]
 					mzr.rho_begin		(2);
 					mzr.rho_end		(1e-3);
 					mzr.argmin();
@@ -133,7 +168,7 @@ int main(int argc, char **argv) {
 
 	{
 	array0_t		S  = {{ 0.6, 0.6 }};
-	nelder_mead_minimizer<array0_t>	mzr			(of_rosenberg<array0_t>,  X0=X);	// will ignore BEGIN index
+	nelder_mead_minimizer<array0_t>	mzr			(of_rosenberg<array0_t>(),  X=X0);	// will ignore BEGIN index
 					mzr.step		(S);
 					mzr.characteristic_size	(0.0002);
 					mzr.argmin();
