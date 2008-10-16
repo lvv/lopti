@@ -1,34 +1,36 @@
+	#ifndef LVV_LOPTI_NEWUOA_H
+	#define LVV_LOPTI_NEWUOA_H
 
-#include <lopti.h>
-#define LOPTI_NEWUOA
-#undef  MINIMIZER                                                                                                                                  
-#define	MINIMIZER	newuoa_minimizer
-#undef        NEWUOA
+	#include <lopti.h>
+	#define LOPTI_NEWUOA
+	#undef  MINIMIZER                                                                                                                                  
+	#define	MINIMIZER	newuoa_minimizer
+	#undef        NEWUOA
 
-// reverse indexes for fortran compat
-#define		BMAT(i,j)	BMAT[j][i]
-#define		ZMAT(i,j)	ZMAT[j][i]
-#define		XPT(i,j)	XPT[j][i]
+	// reverse indexes for fortran compat
+	#define		BMAT(i,j)	BMAT[j][i]
+	#define		ZMAT(i,j)	ZMAT[j][i]
+	#define		XPT(i,j)	XPT[j][i]
 
-#include        <cmath>
-		using   std::sqrt;  
-#include        <algorithm>
-		using   std::max;  
-		using   std::min;  
+	#include        <cmath>
+			using   std::sqrt;  
+	#include        <algorithm>
+			using   std::max;  
+			using   std::min;  
 
-#include	<lvv/math.h>
-		using lvv::pow2;
-		using lvv::pow3;
-		using lvv::abs;
-#include	<lvv/array.h>
-		using lvv::array;
-		using lvv::vector;
-		using lvv::matrix;
+	#include	<lvv/math.h>
+			using lvv::pow2;
+			using lvv::pow3;
+			using lvv::abs;
+	#include	<lvv/array.h>
+			using lvv::array;
+			using lvv::vector;
+			using lvv::matrix;
 
-extern "C" void  trsapp_  (int* N, int* NPT, double* XOPT, double* XPT, double* GQ, double* HQ, double* PQ, double* DELTA, double* D, double* W, double* /*W[NP]*/, double* /*W[NP+N]*/, double* /*W[NP+2*N]*/, double* CRVMIN);
-extern "C" void  biglag_  (int* N, int* NPT, double* XOPT, double* XPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, int* KNEW, double* DSTEP, double* D, double* ALPHA, double* VLAG, double* /*VLAG[NPT+1]*/, double* W, double* /*W[NP]*/, double* /*W[NP+N]*/);
-extern "C" void  bigden_  (int* N, int* NPT, double* XOPT, double* XPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, int* KOPT, int*  KNEW, double* D, double* W, double* VLAG, double* BETA, double* XNEW, double* /*W[NDIM+1]*/, double* /*W[6*NDIM+1]*/);
-extern "C" void  update_  (int* N, int* NPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, double* VLAG, double* BETA, int* KNEW, double* W);
+	extern "C" void  trsapp_  (int* N, int* NPT, double* XOPT, double* XPT, double* GQ, double* HQ, double* PQ, double* DELTA, double* D, double* W, double* /*W[NP]*/, double* /*W[NP+N]*/, double* /*W[NP+2*N]*/, double* CRVMIN);
+	extern "C" void  biglag_  (int* N, int* NPT, double* XOPT, double* XPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, int* KNEW, double* DSTEP, double* D, double* ALPHA, double* VLAG, double* /*VLAG[NPT+1]*/, double* W, double* /*W[NP]*/, double* /*W[NP+N]*/);
+	extern "C" void  bigden_  (int* N, int* NPT, double* XOPT, double* XPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, int* KOPT, int*  KNEW, double* D, double* W, double* VLAG, double* BETA, double* XNEW, double* /*W[NDIM+1]*/, double* /*W[6*NDIM+1]*/);
+	extern "C" void  update_  (int* N, int* NPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, double* VLAG, double* BETA, int* KNEW, double* W);
 
 
 
@@ -727,3 +729,4 @@ new_rho_490:
 	return X;
 }; // newuoa
 
+	#endif // LVV_LOPTI_NEWUOA_H

@@ -1,4 +1,7 @@
 	
+	#ifndef LVV_LOPTI_CONDOR_H
+	#define LVV_LOPTI_CONDOR_H
+
 	#include <lopti.h>
 
 	#undef CONDOR
@@ -130,3 +133,4 @@ class	condor_minimizer: public trust_region_minimizer<V> { public:
 	};
 
 };
+	#endif // LVV_LOPTI_CONDOR_H

@@ -1,8 +1,8 @@
 	
-	#include	<gsl/gsl_vector.h>
-	#include	<lopti/condor-wrap.h>
-	#include   	<lopti/newuoa-wrap.h>
-	#include	<lopti/gsl-nelder-mead-wrap.h>
+	#include	<lopti/lopti.h>
+	//#include	<lopti/condor-wrap.h>
+	//#include   	<lopti/newuoa-wrap.h>
+	//#include	<lopti/gsl-nelder-mead-wrap.h>
 
 	/////////////////////////////////////////////////////////////////////////////// 
 	#include <lvv/lvv.h>
@@ -69,7 +69,35 @@ of_rosenberg		(V& X)   {
 	return 100*pow2(x2-pow2(x1))+pow2(1-x1); 
 };
 
+//#include <gzstream.h>
+//#include <iostream>                                                                                                                                         
+//#include <fstream>
+	//using namespace std;
+	//using std::ios;
+	//using std::ofstream;
+//#include <cstdlib>
 
+			template<typename V>
+struct	of_log  {
+		typedef 	typename V::value_type		fp_t;
+		typedef 	typename minimizer<V>::of_ptr_t		of_ptr_t;
+
+		of_ptr_t	of_p;
+		int		iter;
+		//ogzstream	log_file;
+		//ofstream	log_file;
+
+	explicit	of_log		(of_ptr_t of, const char* log_name)		: of_p(of), iter(0) /*, log_file(log_name, ios::out)*/{};
+	//explicit	~of_log		()						: {log_file.close()};
+
+	fp_t	operator()	(V&  X)			{
+		iter++;  
+		fp_t   y = of_p(X); 
+		//log_file << format("%d \t \%g \t %g \n") % iter %y %X; 
+		return y;
+	};
+
+};
 
 int main(int argc, char **argv) {
 	
@@ -80,7 +108,7 @@ int main(int argc, char **argv) {
 
 
 	{
-	newuoa_minimizer<array1_t>	mzr			(of_rosenberg<array1_t>,  *(array1_t*)&(X0=X));	// X[1..N]
+	newuoa_minimizer<array1_t>	mzr			(of_log<array1_t>(of_rosenberg<array1_t>, "ttt.gz"),  *(array1_t*)&(X0=X));	// X[1..N]
 					mzr.rho_begin		(0.5);
 					mzr.rho_end		(4e-4);
 					mzr.argmin();

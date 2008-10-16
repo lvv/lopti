@@ -1,4 +1,7 @@
 
+	#ifndef LVV_LOPTI_NELDER_MEAD_H
+	#define LVV_LOPTI_NELDER_MEAD_H
+
 	#undef  NM
 	#define	LOPTI_NM
 
@@ -124,3 +127,4 @@ class	nelder_mead_minimizer  :  public minimizer<V> { public:
 
 
  };
+	#endif // LVV_LOPTI_NELDER_MEAD_H

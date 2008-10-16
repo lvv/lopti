@@ -2,6 +2,12 @@
 	#define LVV_LOPTI_H
 
 
+	// this should be included 1st so that array.h will know how to convert
+	#ifndef MINIMIZER
+		#include	<gsl/gsl_vector.h>
+		#include	<condor/Vector.h>
+	#endif
+
 	#include <lvv/lvv.h>
 	#include <limits>
 		using 	std::numeric_limits;
@@ -17,7 +23,6 @@
 		
 		//using namespace boost;
 		//using namespace std;
-
 
                  template<typename V>
 class	minimizer { 
@@ -86,5 +91,12 @@ class	trust_region_minimizer : public minimizer<V>    { public:
 	virtual void		rho_end			(fp_t rho)	{ rho_end_   = rho; };
 	virtual const char*	name			() 	const	{ return "trust region type"; };
 };
+
+	// of prog inlude <lopti.h> then include all
+	#ifndef MINIMIZER
+		#include	<lopti/condor-wrap.h>
+		#include   	<lopti/newuoa-wrap.h>
+		#include	<lopti/gsl-nelder-mead-wrap.h>
+	#endif 
 
 	#endif 
