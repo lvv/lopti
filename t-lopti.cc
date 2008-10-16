@@ -70,11 +70,11 @@ of_rosenberg		(V& X)   {
 };
 
 //#include <gzstream.h>
-//#include <iostream>                                                                                                                                         
-//#include <fstream>
+#include <iostream>                                                                                                                                         
+#include <fstream>
 	//using namespace std;
-	//using std::ios;
-	//using std::ofstream;
+	using std::ios;
+	using std::ofstream;
 //#include <cstdlib>
 
 			template<typename V>
@@ -85,15 +85,19 @@ struct	of_log  {
 		of_ptr_t	of_p;
 		int		iter;
 		//ogzstream	log_file;
-		//ofstream	log_file;
+		ofstream&	log_file;
 
-	explicit	of_log		(of_ptr_t of, const char* log_name)		: of_p(of), iter(0) /*, log_file(log_name, ios::out)*/{};
-	//explicit	~of_log		()						: {log_file.close()};
+	explicit	of_log		(of_ptr_t of, ofstream& lf)		: of_p(of), iter(0), log_file(lf)  { assert(log_file.good());};
+	//explicit	of_log		(of_ptr_t of, ostream& lf)		: of_p(of), iter(0), log_file(lf)  { assert(log_file.good());};
+	//explicit	of_log		(of_ptr_t of, const char* log_name)		: of_p(of), iter(0) , log_file(new ofstream(log_name, ios::trunc | ios::out)){};
+//			~of_log		()						{ log_file.close(); };
 
 	fp_t	operator()	(V&  X)			{
 		iter++;  
 		fp_t   y = of_p(X); 
-		//log_file << format("%d \t \%g \t %g \n") % iter %y %X; 
+		//assert(log_file.good());
+		log_file << format("%d \t \%g \t %g \n") % iter %y %X; 
+		//cout << format("%d \t \%g \t %g \n") % iter %y %X; 
 		return y;
 	};
 
@@ -105,10 +109,12 @@ int main(int argc, char **argv) {
 	typedef array<double,2,0>		array0_t;	
 	array0_t		X0 = {{ -1.2, 1 }};
 	array0_t		X;
+	ofstream		log_file("log");
 
 
 	{
-	newuoa_minimizer<array1_t>	mzr			(of_log<array1_t>(of_rosenberg<array1_t>, "ttt.gz"),  *(array1_t*)&(X0=X));	// X[1..N]
+	newuoa_minimizer<array1_t>	mzr			(of_log<array1_t>(of_rosenberg<array1_t>, log_file),  *(array1_t*)&(X0=X));	// X[1..N]
+	//newuoa_minimizer<array1_t>	mzr			(of_log<array1_t>(of_rosenberg<array1_t>, "log"),  *(array1_t*)&(X0=X));	// X[1..N]
 					mzr.rho_begin		(0.5);
 					mzr.rho_end		(4e-4);
 					mzr.argmin();
