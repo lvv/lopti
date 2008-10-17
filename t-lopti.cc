@@ -23,7 +23,6 @@
 
 	//using namespace boost;
 	//using namespace std;
-	/////////////////////////////////////////////////////////////////////////////// OF
 
 /////////////////////////////////////////////////////////////////////////////////////////  OF: CHEBYQUAD
 			template<typename V>  typename V::value_type
@@ -113,16 +112,34 @@ struct	of_log  {
 		int		iter;
 		ofstream&	log_file;
 
-	explicit	of_log		(of_base<V>* of, ofstream& lf)		: of_p(*of), of_base_p((of_base<V>*)of),  iter(0), log_file(lf)  { assert(log_file.good());};
-	//explicit	of_log		(of_ptr_t of, ofstream& lf)		: of_p(of), of_base_p(&of),  iter(0), log_file(lf)  { assert(log_file.good());};
+	explicit	of_log		(of_base<V>* of, ofstream& lf)	
+	:	of_p(*of),
+		of_base_p((of_base<V>*)of), 
+		iter(0),
+		log_file(lf) 
+	{
+		assert(log_file.good());
+		log_file << "# iter \t y=f(X) \t |y-opt| \t X  (above)\n";
+		log_file << format("# :gnuplot: set grid ; plot \"pipe\" using 1:(log10($2)) with lines title \"%s\"  \n")  % of_base_p->name();
+	};
+
 
 	fp_t	operator()	(V&  X)			{
 		iter++;  
 		//fp_t   y = of_p(X); 
 		fp_t   y = of_base_p->operator()(X); 
 								assert(log_file.good());
-		//log_file << format("%d \t %g \t %g \n") % iter %y %X; 
-		log_file << format("%d \t %g \t %g %g  %g\n") % iter %y  %of_base_p->opt_distance(X) %X %of_base_p->X_opt_;
+
+
+
+		/*
+		#define  GP_F "splot [-2:1.5][-0.5:2] log(100 * (y - x*x)**2 + (1 - x)**2),  "
+		cout << "# :gnuplot: set view 0,0,1.7;   set font \"arial,6\"; set dgrid3d;  set key off;"
+			"  set contour surface;  set cntrparam levels 20;  set isosample 40;"
+			GP_F "\"pipe\" using 3:4:2:1 with labels; \n"; //  3,4 - coord;  2 - hight (y);  1 - lablel
+		*/
+
+		log_file << format("%d \t %g \t %g \t %g \n") % iter %y  %of_base_p->opt_distance(X) %X; 
 		return y;
 	};
 };
@@ -138,7 +155,6 @@ int main(int argc, char **argv) {
 
 	{
 	newuoa_minimizer<array1_t>	mzr			(of_log<array1_t>(&of_rb, log_file),  *(array1_t*)&(X=X0));	// X[1..N]
-	//newuoa_minimizer<array1_t>	mzr			(of_log<array1_t>(of_rosenberg<array1_t>(), log_file),  *(array1_t*)&(X=X0));	// X[1..N]
 					mzr.rho_begin		(0.5);
 					mzr.rho_end		(4e-4);
 					mzr.argmin();
