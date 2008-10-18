@@ -74,7 +74,6 @@ struct	of_base		{
 	virtual const char*	name		()	const	{ return  name_; };
 	virtual int 		size		()	const	{ return  V::size(); };
 	virtual int 		iter		()	const	{ return  iter_; };
-	//virtual bool 		have_opt	()	const	{ return  false; };
 		void 		opt		(const V& X_answ)	{ X_opt_ = X_answ; };
 	virtual	fp_t 		opt_distance	(V& X)	const	{ return  distance_norm2(X_opt_, X); };
 };
@@ -85,17 +84,16 @@ struct	of_base		{
 			template<typename V>  
 struct	of_rosenberg	: public of_base<V> { 
 	of_rosenberg()	: of_base<V>("rosenberg") 	{ V const  X_answ = {{ 1.0, 1.0 }};   of_base<V>::opt(X_answ); };
+	int const static	B = 		V::ibg;
 
 			virtual  typename V::value_type
 	operator() 	(V& X)   {  
-		typename V::value_type&		// these refs make it work if X index start from 0 or 1
-			x1 = *X.begin(), 
-			x2 = *(X.begin()+1);
-		return 100*pow2(x2-pow2(x1))+pow2(1-x1); 
+		return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); 
 	};
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////  OF WRAP:  OF_LOG
+
 //#include <gzstream.h>
 #include <iostream>                                                                                                                                         
 #include <fstream>
@@ -118,7 +116,7 @@ struct	of_log  {
 		iter(0),
 		log_file(lf) 
 	{
-		assert(log_file.good());
+		assert (log_file.good());
 		log_file << "# iter \t y=f(X) \t |y-opt| \t X  (above)\n";
 		log_file << format("# :gnuplot: set grid ; plot \"pipe\" using 1:(log10($2)) with lines title \"%s\"  \n")  % of_base_p->name();
 	};
