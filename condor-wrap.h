@@ -77,25 +77,23 @@ class	c_of_t  : public CONDOR::ObjectiveFunction { public:
 /////////////////////////////////////////////////////////////// 
                  template<typename V>
 class	condor_minimizer: public trust_region_minimizer<V> { public:
-		typedef  typename minimizer<V>::fp_t		fp_t;
-		typedef  typename minimizer<V>::of_ptr_t	of_ptr_t;
+				typedef  typename minimizer<V>::fp_t		fp_t;
+				typedef  typename minimizer<V>::of_ptr_t	of_ptr_t;
 
 
-		using minimizer<V>::X;  		// without this we woun't see minimizer members
-		using minimizer<V>::max_iter_;
-		using minimizer<V>::iter_;
-		using minimizer<V>::verbose_;
-		using minimizer<V>::of_;
-		using minimizer<V>::verbose_;
-		using minimizer<V>::ymin_;
-		using minimizer<V>::Xmin_;
-		using trust_region_minimizer<V>::rho_begin_;
-		using trust_region_minimizer<V>::rho_end_;
+				using minimizer<V>::X;  		// without this we woun't see minimizer members
+				using minimizer<V>::max_iter_;
+				using minimizer<V>::iter_;
+				using minimizer<V>::verbose_;
+				using minimizer<V>::of_;
+				using minimizer<V>::verbose_;
+				using minimizer<V>::ymin_;
+				using minimizer<V>::Xmin_;
+				using trust_region_minimizer<V>::rho_begin_;
+				using trust_region_minimizer<V>::rho_end_;
 
-		explicit 		condor_minimizer(of_ptr_t _of, V& _X)
-		: trust_region_minimizer<V>(_of, _X) 
-		{ c_of.init(of_, _X); };
-		virtual const char*	name			()	const 		{ return "condor"; };
+	explicit 		condor_minimizer(V& _X) : trust_region_minimizer<V>( _X) {};
+	virtual const char*	name			()	const 		{ return "condor"; };
 
 
 	// m-vars
@@ -122,10 +120,10 @@ class	condor_minimizer: public trust_region_minimizer<V> { public:
 
 	virtual V&		 argmin			()		{
 						assert(!of_.empty());
-						assert(!isnan(rho_begin_) && " rho_begin definition ");
-						assert(!isnan(rho_end_)   && " rho_end   definition ");
+						assert(!isnan(rho_begin_) && " rho_begin not initialised ");
+						assert(!isnan(rho_end_)   && " rho_end   not initialised ");
+		c_of.init(of_, X);
 		globalPrintLevel = 10;		// off
-		// XXXXXXXXXXXXXXX CONDOR::CONDORSolver(rho_start_, rho_end_, max_iter_,  c_rof_wrap == NULL ? c_of : c_rof_wrap);
 		CONDOR::CONDORSolver(rho_begin_, rho_end_, max_iter_,  &c_of);
 		Xmin_ << (c_of.xBest);
 		ymin_ = c_of.valueBest; 				//c_of.printStats();

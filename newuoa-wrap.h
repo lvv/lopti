@@ -36,21 +36,22 @@
 
 		template<typename V, int NPT=2*V::sz+1>
 class newuoa_minimizer:  public trust_region_minimizer<V> { public:
-	typedef  typename minimizer<V>::fp_t	fp_t;
-	typedef  typename minimizer<V>::of_ptr_t	of_ptr_t;
+			typedef  typename minimizer<V>::fp_t	fp_t;
+			typedef  typename minimizer<V>::of_ptr_t	of_ptr_t;
 
-	using minimizer<V>::X;  		// without this we woun't see minimizer members
-	using minimizer<V>::max_iter_;
-	using minimizer<V>::iter_;
-	using minimizer<V>::verbose_;
-	using minimizer<V>::of_;
-	using minimizer<V>::verbose_;
-	using minimizer<V>::ymin_;
-	using minimizer<V>::Xmin_;
-	using trust_region_minimizer<V>::rho_begin_;
-	using trust_region_minimizer<V>::rho_end_;
+			using minimizer<V>::X;  		// without this we woun't see minimizer members
+			using minimizer<V>::max_iter_;
+			using minimizer<V>::iter_;
+			using minimizer<V>::verbose_;
+			using minimizer<V>::of_;
+			using minimizer<V>::verbose_;
+			using minimizer<V>::ymin_;
+			using minimizer<V>::Xmin_;
+			using trust_region_minimizer<V>::rho_begin_;
+			using trust_region_minimizer<V>::rho_end_;
 
-	explicit 		newuoa_minimizer	(of_ptr_t of, V& _X):   trust_region_minimizer<V>(of, _X)  {};
+	//explicit 		newuoa_minimizer	(of_ptr_t of, V& _X):   trust_region_minimizer<V>(of, _X)  {};
+	explicit 		newuoa_minimizer	(V& _X):   trust_region_minimizer<V>(_X)  {};
 	virtual const char*	name			()	const 		{ return "newuoa"; };
 	virtual V&		argmin			();
 };

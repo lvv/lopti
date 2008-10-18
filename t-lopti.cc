@@ -157,7 +157,9 @@ int main(int argc, char **argv) {
 	of_rosenberg<array1_t>  of_rb0;
 
 	{
-	newuoa_minimizer<array1_t>	mzr			(of_log<array1_t>(&of_rb1, log_file),  *(array1_t*)&(X=X0));	// X[1..N]
+	//newuoa_minimizer<array1_t>	mzr			(of_log<array1_t>(&of_rb1, log_file),  *(array1_t*)&(X=X0));	// X[1..N]
+	newuoa_minimizer<array1_t>	mzr			(*(array1_t*)&(X=X0));	// X[1..N]
+					mzr.object_function	(of_log<array1_t>(&of_rb1, log_file));
 					mzr.rho_begin		(0.5);
 					mzr.rho_end		(4e-4);
 					mzr.argmin();
@@ -165,7 +167,9 @@ int main(int argc, char **argv) {
 	}
 
 	{
-	condor_minimizer<array0_t>	mzr			(of_rosenberg<array0_t>(), X=X0);	// X[0..N-1]
+	//condor_minimizer<array0_t>	mzr			(of_rosenberg<array0_t>(), X=X0);	// X[0..N-1]
+	condor_minimizer<array0_t>	mzr			(X=X0);	// X[0..N-1]
+					mzr.object_function	(of_rosenberg<array0_t>());
 					mzr.rho_begin		(2);
 					mzr.rho_end		(1e-3);
 					mzr.argmin();
@@ -176,7 +180,9 @@ int main(int argc, char **argv) {
 
 	{
 	array0_t		S  = {{ 0.6, 0.6 }};
-	nelder_mead_minimizer<array0_t>	mzr			(of_rosenberg<array0_t>(),  X=X0);	// will ignore BEGIN index
+	//nelder_mead_minimizer<array0_t>	mzr			(of_rosenberg<array0_t>(),  X=X0);	// will ignore BEGIN index
+	nelder_mead_minimizer<array0_t>	mzr			(X=X0);	// will ignore BEGIN index
+					mzr.object_function	(of_rosenberg<array0_t>());
 					mzr.step		(S);
 					mzr.characteristic_size	(0.0002);
 					mzr.argmin();
