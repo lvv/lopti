@@ -47,12 +47,11 @@ class newuoa_minimizer:  public trust_region_minimizer<V> { public:
 			using minimizer<V>::verbose_;
 			using minimizer<V>::ymin_;
 			using minimizer<V>::Xmin_;
+			using minimizer<V>::name;
 			using trust_region_minimizer<V>::rho_begin_;
 			using trust_region_minimizer<V>::rho_end_;
 
-	//explicit 		newuoa_minimizer	(of_ptr_t of, V& _X):   trust_region_minimizer<V>(of, _X)  {};
-	explicit 		newuoa_minimizer	(V& _X):   trust_region_minimizer<V>(_X)  {};
-	virtual const char*	name			()	const 		{ return "newuoa"; };
+	explicit 		newuoa_minimizer	(V& _X):   trust_region_minimizer<V>(_X, "newoua") {};
 	virtual V&		argmin			();
 };
 
@@ -69,8 +68,6 @@ newuoa_minimizer<V,NPT>::argmin () {
 	if ((NPT < N+2) || ( NPT > ((N+2)*NP)/2))  { cout << "error: NPT is not in the required interval\n"; exit(33); }
 	if (verbose_) FMT("olduoa:  N =%d and NPT =%d   ----------------------------------------------------------\n")  % N  % NPT;
 
-	//array<double,N,1>		XBASE;
-	//V&	XBASE = *new V;
 	V		XBASE;
 	V		XOPT; 
 	V		XNEW;

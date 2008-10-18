@@ -32,9 +32,6 @@ class gsl_of_wrap {  public:
 
 template<typename V>  typename boost::function<typename V::value_type(V&)>   gsl_of_wrap<V>::of_ptr; // this is in gsl_ow_wrap class, but we need to decl it 1 more time for compiler
 
-//template<typename V>  typename V::value_type  (*gsl_of_wrap<V>::of_ptr)(V&); // this is in gsl_ow_wrap class, but we need to decl it 1 more time for compiler
-//template<typename V>  typename V::value_type  (*gsl_of_wrap<V>::of_ptr)(V&, void*); // this is in gsl_ow_wrap class, but we need to decl it 1 more time for compiler
-
                  template<typename V>
 class	nelder_mead_minimizer  :  public minimizer<V> { public:
 				typedef  typename minimizer<V>::fp_t		fp_t;
@@ -47,10 +44,10 @@ class	nelder_mead_minimizer  :  public minimizer<V> { public:
 				using minimizer<V>::verbose_;
 				using minimizer<V>::ymin_;
 				using minimizer<V>::Xmin_;
+				using minimizer<V>::name;
 				using minimizer<V>::iter_;
 				using minimizer<V>::found_;
 
-	virtual const char*	name			()	const 		{ return "nelder-mead (simplex)"; };
 
 
 		gsl_vector*			gX;	
@@ -62,8 +59,11 @@ class	nelder_mead_minimizer  :  public minimizer<V> { public:
 
 
 
-	//explicit 		nelder_mead_minimizer	(of_ptr_t of, V& _X)
-	explicit 		nelder_mead_minimizer	(V& _X) :minimizer<V>(_X), gsl_minimizer_type_ptr (gsl_multimin_fminimizer_nmsimplex) {};
+	explicit 		nelder_mead_minimizer	(V& _X)
+		: 
+		minimizer<V>(_X, "nelder-mead (simplex)"),
+		gsl_minimizer_type_ptr (gsl_multimin_fminimizer_nmsimplex)
+		{};
 
 	~nelder_mead_minimizer () { gsl_multimin_fminimizer_free(gsl_minimizer);  gsl_vector_free(gX);   gsl_vector_free(gS);  };
 
@@ -78,17 +78,18 @@ class	nelder_mead_minimizer  :  public minimizer<V> { public:
 	void   		characteristic_size	(double cs)	{ characteristic_size_ = cs; };
 
 	V&		argmin () {
-			///////////////////////////////////
-			gsl_of_wrap<V>::init(of_);
-			//minex_func.f = &gsl_of_wrap<V>::eval2;
-			minex_func.f = &gsl_of_wrap<V>::eval;
-			minex_func.n = X.size();
-			//minex_func.params = var;
-			minex_func.params = NULL;
-			gX  = gsl_vector_alloc(X.size());
-			gX << X;
-			gsl_multimin_fminimizer_set(gsl_minimizer, &minex_func, gX  , gS);
-			///////////////////////////////////
+		
+		////  gsl init
+		gsl_of_wrap<V>::init(of_);
+		minex_func.f = &gsl_of_wrap<V>::eval;
+		minex_func.n = X.size();
+		//minex_func.params = var;
+		minex_func.params = NULL;
+		gX  = gsl_vector_alloc(X.size());
+		gX << X;
+		gsl_multimin_fminimizer_set(gsl_minimizer, &minex_func, gX  , gS);
+
+		///// main cicle
 		int	test_status=GSL_CONTINUE;			// test_status:  GSL_SUCCESS==0; GSL_CONTINUE==-2; 
 
 		if (verbose_)  FMT("# Itr  %10t Y   %20t  X[0..]   Step\n");

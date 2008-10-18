@@ -89,11 +89,11 @@ class	condor_minimizer: public trust_region_minimizer<V> { public:
 				using minimizer<V>::verbose_;
 				using minimizer<V>::ymin_;
 				using minimizer<V>::Xmin_;
+				using minimizer<V>::name;
 				using trust_region_minimizer<V>::rho_begin_;
 				using trust_region_minimizer<V>::rho_end_;
 
-	explicit 		condor_minimizer(V& _X) : trust_region_minimizer<V>( _X) {};
-	virtual const char*	name			()	const 		{ return "condor"; };
+	explicit 		condor_minimizer(V& _X) : trust_region_minimizer<V>( _X, "condor") {};
 
 
 	// m-vars
