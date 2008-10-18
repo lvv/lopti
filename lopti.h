@@ -53,21 +53,23 @@ class	minimizer {
 
 	virtual 		~minimizer		()		{};  // it it here so that approprite polimorfic DTOR called 
 
-	virtual void		object_function		(of_ptr_t of)	{  of_ = of; };
-	virtual void		max_iter		(int mx)	{  max_iter_   = mx;  };
+	// set-ters
+	virtual minimizer<V>&		object_function		(of_ptr_t of)	{  of_ = of;		return *this;  };
+	virtual minimizer<V>&		max_iter		(int mx)	{  max_iter_   = mx;	return *this;  };
+	virtual minimizer<V>&		verbose			(bool flag)	{  verbose_ = flag;	return *this;  };
+	virtual minimizer<V>&		rho_begin		(fp_t rho)	{  return *this;  };
+	virtual minimizer<V>&		rho_end			(fp_t rho)	{  return *this;  };
+	virtual minimizer<V>&		step			(V&)		{  return *this;  };
+	virtual minimizer<V>&		characteristic_size	(fp_t)		{  return *this;  };
 
-
-	virtual fp_t 	 	ymin			()	const	{  return ymin_; };
-	virtual V 	 	Xmin			()	const	{  return Xmin_; };
-	virtual fp_t 	 	iter			()	const	{  return iter_; };
-
-	virtual void 		verbose			(bool flag)	{ verbose_ = flag; };
-
-	virtual V&		argmin			() 		= 0;
-	virtual bool		found			() 	const	{ return found_; };
-	virtual const char*	name			() 	const	{ return name_; };
-
-	virtual void		print			()		{ MSG("%s %25t iter=%d  \t ymin=%g \t Xmin%g \n") %name()  %iter()  %ymin()  %Xmin();};
+	// get-ters
+	virtual fp_t 	 		ymin			()	const	{  return ymin_; };
+	virtual V 	 		Xmin			()	const	{  return Xmin_; };
+	virtual fp_t 	 		iter			()	const	{  return iter_; };
+	virtual V&			argmin			() 		{  return Xmin_;  };
+	virtual bool			found			() 	const	{  return found_; };
+	virtual const char*		name			() 	const	{  return name_;  };
+	virtual void			print			()		{ MSG("%s %25t iter=%d  \t ymin=%g \t Xmin=%g \n") %name()  %iter()  %ymin()  %Xmin();};
 };
 
                  template<typename V>
@@ -87,8 +89,8 @@ class	trust_region_minimizer : public minimizer<V>    { public:
 		rho_end_   	(numeric_limits<fp_t>::quiet_NaN ())
 	{};
 
-	virtual void		rho_begin		(fp_t rho)	{ rho_begin_ = rho; };
-	virtual void		rho_end			(fp_t rho)	{ rho_end_   = rho; };
+	virtual minimizer<V>&	rho_begin		(fp_t rho)	{ rho_begin_ = rho;  return *this; };
+	virtual minimizer<V>&	rho_end			(fp_t rho)	{ rho_end_   = rho;  return *this; };
 };
 
 	// of prog inlude <lopti.h> then include all

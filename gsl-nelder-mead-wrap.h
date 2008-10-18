@@ -67,17 +67,18 @@ class	nelder_mead_minimizer  :  public minimizer<V> { public:
 
 	~nelder_mead_minimizer () { gsl_multimin_fminimizer_free(gsl_minimizer);  gsl_vector_free(gX);   gsl_vector_free(gS);  };
 
-	void		step			(V S)		{
+	virtual minimizer<V>&		step			(V& S)		{
 		gS = gsl_vector_alloc(V::size()); 
 		gS << S; 
 		gsl_minimizer = gsl_multimin_fminimizer_alloc(gsl_minimizer_type_ptr, V::size());
 		if (verbose_)   cerr << "#  minimizer: "  <<  gsl_multimin_fminimizer_name (gsl_minimizer)  <<  endl;
+		return *this;
 	};
 
 	//void 		gsl_var			(void* var )	{ minex_func.params = var; };
-	void   		characteristic_size	(double cs)	{ characteristic_size_ = cs; };
+	virtual  minimizer<V>&		characteristic_size	(fp_t cs)	{ characteristic_size_ = cs;  return *this; };
 
-	V&		argmin () {
+	virtual V&		argmin () {
 		
 		////  gsl init
 		gsl_of_wrap<V>::init(of_);

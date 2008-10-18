@@ -108,14 +108,16 @@ class	condor_minimizer: public trust_region_minimizer<V> { public:
 
 	//	void		rescale			(V& R) 		{ cR << R; c_rof_wrap = new CONDOR::CorrectScaleOF(2, c_of, cR); };
 
-	virtual void 		 verbose		(bool flag)	{
+	virtual minimizer<V>&	 verbose		(bool flag)	{
 		#undef GP_F
 		#define  GP_F "splot [-2:1.5][-0.5:2] log(100 * (y - x*x)**2 + (1 - x)**2),  "
 		cout << "# :gnuplot: set view 0,0,1.7;   set font \"arial,6\"; set dgrid3d;  set key off;"
 			"  set contour surface;  set cntrparam levels 20;  set isosample 40;"
 			GP_F "\"pipe\" using 3:4:2:1 with labels; \n";
 
-		c_of.verbose =flag;
+		verbose_     = flag;
+		c_of.verbose = flag;
+		return *this;
 	};
 
 	virtual V&		 argmin			()		{
