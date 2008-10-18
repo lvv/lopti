@@ -116,27 +116,31 @@ struct	of_log  {
 		iter(0),
 		log_file(lf) 
 	{
-		assert (log_file.good());
-		log_file << "# iter \t y=f(X) \t |y-opt| \t X  (above)\n";
+										assert (log_file.good());
+
+		// plot:  opt_dist (iter)
 		log_file << format("# :gnuplot: set grid ; plot \"pipe\" using 1:(log10($2)) with lines title \"%s\"  \n")  % of_base_p->name();
+
+		// splot:  path 
+		#undef	 GP_F
+		#define  GP_F "set view 0,0,1.7;  splot [-2:1.5][-0.5:2] log(100 * (y - x*x)**2 + (1 - x)**2),  "
+		log_file << format(
+			"# :gnuplot2: set font \"arial,6\"; set dgrid3d;  set key off;"
+			"set contour surface;  set cntrparam levels 20;  set isosample 40;"
+			GP_F "\"pipe\" using 4:5:2:1 with labels title \"%s\" ; \n" 
+		)  % of_base_p->name();
+		 
+		// col header
+		log_file << "# iter \t y=f(X) \t |y-opt| \t X\n";
 	};
 
 
 	fp_t	operator()	(V&  X)			{
 		iter++;  
 		//fp_t   y = of_p(X); 
-		fp_t   y = of_base_p->operator()(X); 
+		fp_t   y = (*of_base_p)(X); 
 								assert(log_file.good());
-
-
-
-		/*
-		#define  GP_F "splot [-2:1.5][-0.5:2] log(100 * (y - x*x)**2 + (1 - x)**2),  "
-		cout << "# :gnuplot: set view 0,0,1.7;   set font \"arial,6\"; set dgrid3d;  set key off;"
-			"  set contour surface;  set cntrparam levels 20;  set isosample 40;"
-			GP_F "\"pipe\" using 3:4:2:1 with labels; \n"; //  3,4 - coord;  2 - hight (y);  1 - lablel
-		*/
-
+		// 1 - iter no(gp: splot label);  2 - hight (y);  3 - |X-opt| ignored;  4,5 - X coord;  
 		log_file << format("%d \t %g \t %g \t %g \n") % iter %y  %of_base_p->opt_distance(X) %X; 
 		return y;
 	};
@@ -149,10 +153,11 @@ int main(int argc, char **argv) {
 	array0_t		X0 = {{ -1.2, 1 }};
 	array0_t		X;
 	ofstream		log_file("log");
-	of_rosenberg<array1_t>  of_rb;
+	of_rosenberg<array1_t>  of_rb1;
+	of_rosenberg<array1_t>  of_rb0;
 
 	{
-	newuoa_minimizer<array1_t>	mzr			(of_log<array1_t>(&of_rb, log_file),  *(array1_t*)&(X=X0));	// X[1..N]
+	newuoa_minimizer<array1_t>	mzr			(of_log<array1_t>(&of_rb1, log_file),  *(array1_t*)&(X=X0));	// X[1..N]
 					mzr.rho_begin		(0.5);
 					mzr.rho_end		(4e-4);
 					mzr.argmin();
