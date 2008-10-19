@@ -44,7 +44,7 @@ class	minimizer {
 	:
 		max_iter_	(500),
 		ymin_    	(numeric_limits<fp_t>::quiet_NaN ()),
-		iter_    	(-1),
+		iter_    	(0),
 		X        	(_X),
 		verbose_ 	(false),
 		found_ 		(false),
@@ -66,10 +66,12 @@ class	minimizer {
 	virtual fp_t 	 		ymin			()	const	{  return ymin_; };
 	virtual V 	 		Xmin			()	const	{  return Xmin_; };
 	virtual fp_t 	 		iter			()	const	{  return iter_; };
-	virtual V&			argmin			() 		{  return Xmin_;  };
 	virtual bool			found			() 	const	{  return found_; };
 	virtual const char*		name			() 	const	{  return name_;  };
-	virtual void			print			()		{ MSG("%s %25t iter=%d  \t ymin=%g \t Xmin=%g \n") %name()  %iter()  %ymin()  %Xmin();};
+
+	// do-ers
+	virtual V&			argmin			() 		{  return Xmin_;  };
+	virtual void			print			()		{ MSG("%s %25t iter=%d  \t ymin=%g \t Xmin=%g") %name()  %iter()  %ymin()  %Xmin();};
 };
 
                  template<typename V>

@@ -1,10 +1,19 @@
 
 include  ../lvv/include.mk
 
-.DEFAULT_GOAL := t-fun-wrap
+#.DEFAULT_GOAL := t-fun-wrap
 	
 LDFLAGS += -lgsl -lgslcblas -L /usr/local/lib -lcondor newuoa/*.o -lgfortran 
 CXXFLAGS += -I /home/lvv/NF/
+XGRAPHIC = xgraphic  -mark -markcol=-1  -g2 -logy -leg -legpos=3  -legsiz=1 -legtyp=2 -titgen="Convergance speed for dirivative-free algorithms" -titx="Objective function evaluation count" -tity="Distance to optimum: log10(|X-X_opt|)" 
+
+t-lopti-xg: t-lopti
+	cd log
+	$(XGRAPHIC)
+
+t-lopti-ps: t-lopti
+	cd log; $(XGRAPHIC) -pscoltex=../$@ *
+	gsview $@
 
 t-lopti: t-lopti.cc
 
@@ -17,7 +26,7 @@ t-condor: t-condor.cc condor-wrap.h
 t-nm: t.cc  gsl-nelder-mead-wrap.h
 	$(CXX) $(CXXFLAGS) -DOPTI=NM  $< -o $@ $(LDFLAGS)
 
-install:
+git-install:
 	cd /usr/local &&  git checkout lvvlib 
 	mkdir -p /usr/local/include/lvvlib/
 	cp *.h   /usr/local/include/lvvlib/

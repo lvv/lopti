@@ -1,3 +1,5 @@
 *.o
 .old
 *main
+log
+t-lopti.ps
