@@ -67,11 +67,11 @@ class	minimizer {
 	virtual V 	 		Xmin			()	const	{  return Xmin_; };
 	virtual fp_t 	 		iter			()	const	{  return iter_; };
 	virtual bool			found			() 	const	{  return found_; };
-	virtual const char*		name			() 	const	{  return name_;  };
+	virtual const string		name			() 	const	{  return (format("%s-%d") %name_ %(V::size())). str(); };
 
 	// do-ers
 	virtual V&			argmin			() 		{  return Xmin_;  };
-	virtual void			print			()		{ MSG("%s %25t iter=%d  \t ymin=%g \t Xmin=%g") %name()  %iter()  %ymin()  %Xmin();};
+	virtual void			print			()		{ MSG("%s-%d  %25t iter=%d  \t ymin=%g \t Xmin=%g") %name() %V::size() %iter()  %ymin()  %Xmin();};
 };
 
                  template<typename V>

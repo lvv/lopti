@@ -61,7 +61,7 @@ class	nelder_mead_minimizer  :  public minimizer<V> { public:
 
 	explicit 		nelder_mead_minimizer	(V& _X)
 		: 
-		minimizer<V>(_X, "nelder-mead (simplex)"),
+		minimizer<V>(_X, "nelder-mead"),
 		gsl_minimizer_type_ptr (gsl_multimin_fminimizer_nmsimplex)
 		{};
 

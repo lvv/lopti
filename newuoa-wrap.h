@@ -47,12 +47,17 @@ class newuoa_minimizer:  public trust_region_minimizer<V> { public:
 			using minimizer<V>::verbose_;
 			using minimizer<V>::ymin_;
 			using minimizer<V>::Xmin_;
-			using minimizer<V>::name;
+			using minimizer<V>::name_;
+			using minimizer<V>::iter;
+			using minimizer<V>::ymin;
+			using minimizer<V>::Xmin;
 			using trust_region_minimizer<V>::rho_begin_;
 			using trust_region_minimizer<V>::rho_end_;
 
 	explicit 		newuoa_minimizer	(V& _X):   trust_region_minimizer<V>(_X, "newoua") {};
 	virtual V&		argmin			();
+	virtual const string	name			() 	const	{  return (format("%s-%d") %(minimizer<V>::name()) %NPT).str(); };
+	virtual void		print			()		{  MSG("%s-%d-%d  %25t iter=%d  \t ymin=%g \t Xmin=%g") %name() %(V::size()) %NPT %iter()  %ymin()  %Xmin();};
 };
 
 		template<typename V, int NPT> 	V&

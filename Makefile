@@ -8,14 +8,17 @@ CXXFLAGS += -I /home/lvv/NF/
 XGRAPHIC = xgraphic  -mark -markcol=-1  -g2 -logy -leg -legpos=3  -legsiz=1 -legtyp=2 -titgen="Convergance speed for dirivative-free algorithms" -titx="Objective function evaluation count" -tity="Distance to optimum: log10(|X-X_opt|)" 
 
 t-lopti-xg: t-lopti
-	cd log
-	$(XGRAPHIC)
+	$<
+	cd log; $(XGRAPHIC) *
 
-t-lopti-ps: t-lopti
+log/condor: t-lopti 
+	./$<
+
+t-lopti.ps: t-lopti log/condor
 	cd log; $(XGRAPHIC) -pscoltex=../$@ *
 	gsview $@
 
-t-lopti: t-lopti.cc
+t-lopti: t-lopti.cc *.cc *.h
 
 t-condor: CXXFLAGS +=   -I ..
 t-condor: LDFLAGS  +=   -L /usr/local/lib/ -lcondor  -lm 
