@@ -38,7 +38,7 @@
 class	c_of_t  : public CONDOR::ObjectiveFunction { public:
 			typedef  typename V::value_type fp_t;
 			typedef  function<fp_t(V&)>	of_ptr_t;
-			of_ptr_t			of_;
+			of_ptr_t			oco;
 
 			//typedef  typename V::value_type fp_t;
 			//fp_t (*of)(V&, void*);
@@ -52,7 +52,7 @@ class	c_of_t  : public CONDOR::ObjectiveFunction { public:
 			xOptimal.setSize(X0.size());
 			xStart.  setSize(X0.size());
 			xStart << X0;
-			of_ =  of;
+			oco =  of;
 			//this->var =  var;
 			eval_cnt = 0;
 			verbose = false;
@@ -61,7 +61,7 @@ class	c_of_t  : public CONDOR::ObjectiveFunction { public:
 	double  eval (CONDOR::Vector cX, int *nerror=NULL) {  		// condor use this to eval
 			V X;	
 			X << cX;
-			fp_t y = of_(X);
+			fp_t y = oco(X);
 			updateCounter(y,cX);
 			eval_cnt++;
 
@@ -86,7 +86,7 @@ class	condor_minimizer: public trust_region_minimizer<V> { public:
 				using minimizer<V>::max_iter_;
 				using minimizer<V>::iter_;
 				using minimizer<V>::verbose_;
-				using minimizer<V>::of_;
+				using minimizer<V>::oco;
 				using minimizer<V>::verbose_;
 				using minimizer<V>::ymin_;
 				using minimizer<V>::Xmin_;
@@ -122,10 +122,10 @@ class	condor_minimizer: public trust_region_minimizer<V> { public:
 	};
 
 	virtual V&		 argmin			()		{
-						assert(!of_.empty());
+						assert(!oco.empty());
 						assert(!isnan(rho_begin_) && " rho_begin not initialised ");
 						assert(!isnan(rho_end_)   && " rho_end   not initialised ");
-		c_of.init(of_, X);
+		c_of.init(oco, X);
 		globalPrintLevel = 10;		// off
 		CONDOR::CONDORSolver(rho_begin_, rho_end_, max_iter_,  &c_of);
 		Xmin_ << (c_of.xBest);

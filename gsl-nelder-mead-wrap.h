@@ -42,7 +42,7 @@ class	nelder_mead_minimizer  :  public minimizer<V> { public:
 				using minimizer<V>::X;  		// without this we woun't see minimizer members
 				using minimizer<V>::max_iter_;
 				using minimizer<V>::verbose_;
-				using minimizer<V>::of_;
+				using minimizer<V>::oco;
 				using minimizer<V>::verbose_;
 				using minimizer<V>::ymin_;
 				using minimizer<V>::Xmin_;
@@ -83,7 +83,7 @@ class	nelder_mead_minimizer  :  public minimizer<V> { public:
 	virtual V&		argmin () {
 		
 		////  gsl init
-		gsl_of_wrap<V>::init(of_);
+		gsl_of_wrap<V>::init(oco);
 		minex_func.f = &gsl_of_wrap<V>::eval;
 		minex_func.n = X.size();
 		//minex_func.params = var;

@@ -43,7 +43,7 @@ class newuoa_minimizer:  public trust_region_minimizer<V> { public:
 			using minimizer<V>::max_iter_;
 			using minimizer<V>::iter_;
 			using minimizer<V>::verbose_;
-			using minimizer<V>::of_;
+			using minimizer<V>::oco;
 			using minimizer<V>::verbose_;
 			using minimizer<V>::ymin_;
 			using minimizer<V>::Xmin_;
@@ -468,8 +468,8 @@ eval_f_310:
 
 	// CALL CALFUN (N,X,F)
 	// calfun_ (&_n, (double*)&X, &F);
-	//F = (*of_)(X, NULL);
-	F = of_(X);
+	//F = (*oco)(X, NULL);
+	F = oco(X);
 
 	if (verbose_) FMT ("%d \t %18.10g  \t  %18.10g \n")  %iter_  %F  %X;
 

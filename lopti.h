@@ -46,26 +46,25 @@ class	oft_base		{  public:
 	virtual void		reset		()		{ iter_ = 0;};
  };
 
-
                  template<typename V>
 class	minimizer { public:
 
-		typedef 	oft_base<V>			oft_base_t;
-		typedef		typename V::value_type		fp_t;
-		typedef		function<fp_t(V&)>		of_ptr_t;
+			typedef 	oft_base<V>			oft_base_t;
+			typedef		typename V::value_type		fp_t;
+			typedef		function<fp_t(V&)>		of_ptr_t;
 
-		oft_base_t*			oft_base_p;		// virt ptr
-		of_ptr_t			of_;
-		int				max_iter_;
-		bool				verbose_;
-		V				X;
-		V				Xmin_;
-		fp_t				ymin_;
-		int				iter_;
-		bool				found_;
-		string				name_;
+			oft_base_t*			loft_v;		// virt ptr
+			of_ptr_t			oco;
+			int				max_iter_;
+			bool				verbose_;
+			V				X;
+			V				Xmin_;
+			fp_t				ymin_;
+			int				iter_;
+			bool				found_;
+			string				name_;
 
-	explicit 		minimizer		(V& _X, const string& _name = "unknown")       
+	explicit 			minimizer		(V& _X, const string& _name = "unknown")       
 	:
 		max_iter_	(500),
 		ymin_    	(numeric_limits<fp_t>::quiet_NaN ()),
@@ -74,26 +73,21 @@ class	minimizer { public:
 		verbose_ 	(false),
 		found_ 		(false),
 		name_		(_name),
-		of_		(0),
-		oft_base_p	(0)
+		oco		(0),		// Object Callable Object (boost::functor)
+		loft_v		(0)		// Lopti Object FuncTor  ptr
 	{};
+	virtual 			~minimizer		()		{};  // it it here so that approprite polimorfic DTOR called 
 
 	// set-ters
-	virtual minimizer<V>&		object_functor		(oft_base_t* of)	{
-		oft_base_p = of;
-		//of_ = of;
-		PR3(name_, name(), oft_base_p->name());
-		name_ += oft_base_p->name();
-		PR3(name_, name(), oft_base_p->name());
-
+	virtual minimizer<V>&		object_functOR		(oft_base_t* oft_p)	{
+		loft_v = oft_p;
+		// oco = *loft_v;    - compiles but operator() of base class called
+		// oco = boost::bind(&oft_base_t::operator(),_1)(*loft_v);  
+		name_ += "-" + loft_v->name();
 		return *this; 
 	};
 
-
-	virtual minimizer<V>&		object_function		(of_ptr_t of)		{  of_ = of;		return *this;  };
-
-	virtual 			~minimizer		()		{};  // it it here so that approprite polimorfic DTOR called 
-
+	virtual minimizer<V>&		object_functION		(of_ptr_t of)	{  oco = of;		return *this;  };
 
 	virtual minimizer<V>&		max_iter		(int mx)	{  max_iter_   = mx;	return *this;  };
 	virtual minimizer<V>&		verbose			(bool flag)	{  verbose_ = flag;	return *this;  };
@@ -111,7 +105,7 @@ class	minimizer { public:
 
 	// do-ers
 	virtual V&			argmin			() 		{  return Xmin_;  };
-	virtual void			print			()		{ MSG("%s-%d  %25t iter=%d  \t ymin=%g \t Xmin=%20.12g") %name() %V::size() %iter()  %ymin()  %Xmin();};
+	virtual void			print			()		{ MSG("%s  %25t iter=%d  \t ymin=%g \t Xmin=%20.12g") %name() %iter()  %ymin()  %Xmin();};
 };
 
                  template<typename V>
