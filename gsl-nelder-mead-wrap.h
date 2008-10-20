@@ -5,19 +5,21 @@
 	#undef  NM
 	#define	LOPTI_NM
 
-	#undef	MINIMIZER
-	#define	MINIMIZER	nelder_mead_minimizer
+	#ifndef		MINIMIZER
+		#define	MINIMIZER	nelder_mead_minimizer
+	#endif
 
+	#include <lvv/convert-gsl.h>
+		using lvv::array;
 	#include <lopti/lopti.h>
 	#include <stdlib.h>
 	#include <gsl/gsl_errno.h>
 	#include <gsl/gsl_math.h>
 	#include <gsl/gsl_multimin.h>
 
-	#include <lvv/array.h>
-		using lvv::array;
 	#include <lvv/lvv.h>
 		using std::cerr;
+
 
  
                  template<typename V>

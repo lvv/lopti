@@ -7,9 +7,13 @@
 	#undef CONDOR
 	#define  LOPTI_CONDOR
 
-	#undef	MINIMIZER
-	#define	MINIMIZER	condor_minimizer
+	#ifndef		MINIMIZER
+		#define	MINIMIZER	condor_minimizer
+	#endif
 	
+	#include <lvv/convert-condor.h>
+		using lvv::array;
+
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <cmath>
@@ -26,9 +30,6 @@
 		using std::cout;
 		using std::cerr;
 		using std::endl;
-	#include <lvv/array.h>
-		using lvv::array;
-		using namespace lvv;
 
 	extern int globalPrintLevel;
 

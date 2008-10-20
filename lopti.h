@@ -1,14 +1,9 @@
 	#ifndef LVV_LOPTI_H
 	#define LVV_LOPTI_H
 
-
-	// this should be included 1st so that array.h will know how to convert
-	#ifndef MINIMIZER
-		#include	<gsl/gsl_vector.h>
-		#include	<condor/Vector.h>
-	#endif
-
 	#include <lvv/lvv.h>
+	#include <lvv/array.h>
+		using lvv::array;
 	#include <limits>
 		using 	std::numeric_limits;
 
@@ -24,12 +19,42 @@
 		//using namespace boost;
 		//using namespace std;
 
-                 template<typename V>
-class	minimizer { 
+/////////////////////////////////////////////////////////////////////////////////////////   OF_BASE
 
-	public:
-		typedef  typename V::value_type fp_t;
-		typedef  function<fp_t(V&)>	of_ptr_t;
+			template<typename V>
+class	oft_base		{  public:
+
+		typedef		typename V::value_type		fp_t;
+		string			name_;
+		V			X_opt_;
+		int			iter_;
+
+	// CTOR
+	oft_base		(const string& s) : name_(s)  		{ X_opt_ = 0; };
+
+	// set-ters
+	void 			opt		(const V& X_answ)	{ X_opt_ = X_answ; };
+
+	// get-ers
+	virtual const string&	name		()	const	{ return  name_; };
+	virtual int 		size		()	const	{ return  V::size(); };
+	virtual int 		iter		()	const	{ return  iter_; };
+	virtual	fp_t 		opt_distance	(V& X)	const	{ return  distance_norm2(X_opt_, X); };
+
+	// do-ers
+	virtual fp_t		operator()	(V& X) 		{ assert(false); return X[0]; };
+	virtual void		reset		()		{ iter_ = 0;};
+ };
+
+
+                 template<typename V>
+class	minimizer { public:
+
+		typedef 	oft_base<V>			oft_base_t;
+		typedef		typename V::value_type		fp_t;
+		typedef		function<fp_t(V&)>		of_ptr_t;
+
+		oft_base_t*			oft_base_p;		// virt ptr
 		of_ptr_t			of_;
 		int				max_iter_;
 		bool				verbose_;
@@ -38,9 +63,9 @@ class	minimizer {
 		fp_t				ymin_;
 		int				iter_;
 		bool				found_;
-		const char*			name_;
+		string				name_;
 
-	explicit 		minimizer		(V& _X, const char* _name = "unknown")       
+	explicit 		minimizer		(V& _X, const string& _name = "unknown")       
 	:
 		max_iter_	(500),
 		ymin_    	(numeric_limits<fp_t>::quiet_NaN ()),
@@ -48,13 +73,28 @@ class	minimizer {
 		X        	(_X),
 		verbose_ 	(false),
 		found_ 		(false),
-		name_		(_name)
+		name_		(_name),
+		of_		(0),
+		oft_base_p	(0)
 	{};
 
-	virtual 		~minimizer		()		{};  // it it here so that approprite polimorfic DTOR called 
-
 	// set-ters
-	virtual minimizer<V>&		object_function		(of_ptr_t of)	{  of_ = of;		return *this;  };
+	virtual minimizer<V>&		object_functor		(oft_base_t* of)	{
+		oft_base_p = of;
+		//of_ = of;
+		PR3(name_, name(), oft_base_p->name());
+		name_ += oft_base_p->name();
+		PR3(name_, name(), oft_base_p->name());
+
+		return *this; 
+	};
+
+
+	virtual minimizer<V>&		object_function		(of_ptr_t of)		{  of_ = of;		return *this;  };
+
+	virtual 			~minimizer		()		{};  // it it here so that approprite polimorfic DTOR called 
+
+
 	virtual minimizer<V>&		max_iter		(int mx)	{  max_iter_   = mx;	return *this;  };
 	virtual minimizer<V>&		verbose			(bool flag)	{  verbose_ = flag;	return *this;  };
 	virtual minimizer<V>&		rho_begin		(fp_t rho)	{  return *this;  };
@@ -67,11 +107,11 @@ class	minimizer {
 	virtual V 	 		Xmin			()	const	{  return Xmin_; };
 	virtual fp_t 	 		iter			()	const	{  return iter_; };
 	virtual bool			found			() 	const	{  return found_; };
-	virtual const string		name			() 	const	{  return (format("%s-%d") %name_ %(V::size())). str(); };
+	virtual const string		name			() 	const	{  return (format("%s-%d") %name_ %(V::size())).str(); };
 
 	// do-ers
 	virtual V&			argmin			() 		{  return Xmin_;  };
-	virtual void			print			()		{ MSG("%s-%d  %25t iter=%d  \t ymin=%g \t Xmin=%g") %name() %V::size() %iter()  %ymin()  %Xmin();};
+	virtual void			print			()		{ MSG("%s-%d  %25t iter=%d  \t ymin=%g \t Xmin=%20.12g") %name() %V::size() %iter()  %ymin()  %Xmin();};
 };
 
                  template<typename V>

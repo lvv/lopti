@@ -20,13 +20,13 @@ typedef array<double,2,1> array_t;
 int				plain_f		(string s)		{ cout  << "plain_f: " << s << " =  "; return 0;}
 int				plain_f2	(string s, int i)	{ cout  << "plain_f2: " << s << " =  "; return i;}
 int				plain_fa	(array_t A)		{ cout  << "plain_fA: " << A << " =  "; return 0;}
-template<typename T> T		plain_fa	(array_t A)		{ cout  << "plain_fA: " << A << " =  "; return 0;}
+template<typename T> int	plain_fx	(T x)		{ cout  << "plain_fx: " << x << " =  "; return 0;}
 
 struct	functor_t {
+		int value;
 				functor_t	()		: value(0) {};
 	void 			init		(int  i)	{ value = i; };
 	int			operator()	(string s)	{ cout << s;  return value; };
-	int value;
 };
 
 
@@ -37,19 +37,18 @@ class	obj_t 	{ public:
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////  TEST WRAPPER
-struct empty {}; 
-template< typename RET=empty, typename ARG=empty> 
-struct eval_count;
-
-template<typename RET, typename ARG>        struct	eval_count;
+struct empty {}; 	// no compile without this (why?)
+template<typename RET=empty, typename ARG=empty>	struct  eval_count;
+//template<typename RET,       typename ARG>		struct	eval_count; // no comp
 
 	   template<typename RET, typename ARG>                                                                                                          
-struct	eval_count<RET(ARG)> : public unary_function<RET,ARG>		{ 
+struct	eval_count<RET(ARG)> : public unary_function<RET,ARG>		{  // this is specialization of above
+			int			eval_cnt; 
+			function<RET (ARG)>	of;
 	eval_count		(function<RET (ARG a)>    _of)	: of(_of), eval_cnt(0)	{ cout << "\neval_cnt_wrap CTor\n"; };
-	//~eval_count		()		{ cout << "\neval_cnt_wrap dtOR:  object function called  total times: " << eval_cnt << endl;};
-	RET	operator()	(ARG    arg)	{ FMT("eval_cnt_wrap: cnt=%d   arg=%s.   Executing:\n ") %eval_cnt %arg;  eval_cnt++; return of(arg);};
-	int eval_cnt; 
-	function<RET (ARG)> of;
+	void 	set		(int new_cnt)	 		{ eval_cnt = new_cnt; };
+	//~eval_count		()				{ cout << "\neval_cnt_wrap dtOR:  object function called  total times: " << eval_cnt << endl;};
+	RET	operator()	(ARG    arg)			{ FMT("eval_cnt_wrap: cnt=%d   arg=%s.   Executing:\n ") %eval_cnt %arg;  eval_cnt++; return of(arg);};
 }; 
 
 int main() {
@@ -61,7 +60,7 @@ int main() {
 	functor_t	fct2;	 						cout << fct2("stand alone  fct2 ") << endl;
 			fct2.init(33);						cout << fct2("stand alone  fct2.init(33) ") << endl;
 	function<int(string s)> 	fct2p = fct2;				cout << fct2p("fct2p ") << endl;
-					fct2p->init(111);			cout << fct2p("fct2p 2") << endl;
+			//		fct2p->init(111);			cout << fct2p("fct2p 2") << endl;
 	
 	// FUNCTOR  WRAP
 	eval_count<int(string)>		ecw(fct2);				cout << ecw("boost: ecw(fct2)-1 ") << endl;
@@ -78,8 +77,9 @@ int main() {
 
 	// PLAIN F() with arrays
 	array_t  X = {{11, 22}};
-	function<int(array_t&)>       		bf_fa;
-	bf_fa = plain_fa<int>;						cout << "boost: plain fa()" << bf_fa(X) << endl;
+	typedef int T;
+	function<int(T)>       		bf_fx;
+	bf_fx = plain_fx<T>;						cout << "boost: plain fx()" << bf_fx(1) << endl;
 	//bf_f = bind2nd(function<int(string,int)>(&plain_f2),100);	cout << bf_f("sdt::bind2nd plain-f2()") << endl;
 	//bf_f = bind (plain_f2, _1, 100);				cout << bf_f("boost::bind  plain-f2()") << endl;
 
