@@ -49,12 +49,12 @@ class	oft_base		{  public:
                  template<typename V>
 class	minimizer { public:
 
-			typedef 	oft_base<V>			oft_base_t;
+			typedef 	oft_base<V>			loft_t;
 			typedef		typename V::value_type		fp_t;
-			typedef		function<fp_t(V&)>		of_ptr_t;
+			//typedef		function<fp_t(V&)>		function<fp_t(V&)>;
 
-			oft_base_t*			loft_v;		// virt ptr
-			of_ptr_t			oco;
+			loft_t*				loft_v;		// virt ptr
+			function<fp_t(V&)>			oco;
 			int				max_iter_;
 			bool				verbose_;
 			V				X;
@@ -79,15 +79,15 @@ class	minimizer { public:
 	virtual 			~minimizer		()		{};  // it it here so that approprite polimorfic DTOR called 
 
 	// set-ters
-	virtual minimizer<V>&		object_functOR		(oft_base_t* oft_p)	{
+	virtual minimizer<V>&		object_functOR		(loft_t* oft_p)	{
 		loft_v = oft_p;
 		// oco = *loft_v;    - compiles but operator() of base class called
-		// oco = boost::bind(&oft_base_t::operator(),_1)(*loft_v);  
+		// oco = boost::bind(&loft_t::operator(),_1)(*loft_v);  
 		name_ += "-" + loft_v->name();
 		return *this; 
 	};
 
-	virtual minimizer<V>&		object_functION		(of_ptr_t of)	{  oco = of;		return *this;  };
+	virtual minimizer<V>&		object_functION		(function<fp_t(V&)> of)	{  oco = of;		return *this;  };
 
 	virtual minimizer<V>&		max_iter		(int mx)	{  max_iter_   = mx;	return *this;  };
 	virtual minimizer<V>&		verbose			(bool flag)	{  verbose_ = flag;	return *this;  };
@@ -111,8 +111,9 @@ class	minimizer { public:
                  template<typename V>
 class	trust_region_minimizer : public minimizer<V>    { public:
 
-		typedef  typename minimizer<V>::fp_t		fp_t;
-		typedef  typename minimizer<V>::of_ptr_t	of_ptr_t;
+		typedef  typename minimizer<V>::fp_t			fp_t;
+		//typedef  typename minimizer<V>::function<fp_t(V&)>	oco_t;
+		//using minimizer<V>::function<fp_t(V&)>	oco_t;
 		using minimizer<V>::name;
 
 		fp_t 				rho_begin_;	// r(rho) start

@@ -37,7 +37,7 @@
 		template<typename V, int NPT=2*V::sz+1>
 class newuoa_minimizer:  public trust_region_minimizer<V> { public:
 			typedef  typename minimizer<V>::fp_t	fp_t;
-			typedef  typename minimizer<V>::of_ptr_t	of_ptr_t;
+			//typedef  typename minimizer<V>::function<fp_t(V&)>	function<fp_t(V&)>;
 
 			using minimizer<V>::X;  		// without this we woun't see minimizer members
 			using minimizer<V>::max_iter_;

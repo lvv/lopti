@@ -37,17 +37,13 @@
 	template<typename V>
 class	c_of_t  : public CONDOR::ObjectiveFunction { public:
 			typedef  typename V::value_type fp_t;
-			typedef  function<fp_t(V&)>	of_ptr_t;
-			of_ptr_t			oco;
+			function<fp_t(V&)>		oco;
 
-			//typedef  typename V::value_type fp_t;
-			//fp_t (*of)(V&, void*);
-			//void* var;
 			int eval_cnt;
 			bool verbose;
 
 	//c_of_t (fp_t of(V&, void*), V X0, void* var) {  			// we use this CTOR to construct
-	void	init (of_ptr_t of, V& X0) {  			// we use this CTOR to construct
+	void	init (function<fp_t(V&)> of, V& X0) {  			// we use this CTOR to construct
 			strcpy(name,"condor_of");
 			xOptimal.setSize(X0.size());
 			xStart.  setSize(X0.size());
@@ -79,7 +75,7 @@ class	c_of_t  : public CONDOR::ObjectiveFunction { public:
                  template<typename V>
 class	condor_minimizer: public trust_region_minimizer<V> { public:
 				typedef  typename minimizer<V>::fp_t		fp_t;
-				typedef  typename minimizer<V>::of_ptr_t	of_ptr_t;
+				//typedef  typename minimizer<V>::function<fp_t(V&)>	function<fp_t(V&)>;
 
 
 				using minimizer<V>::X;  		// without this we woun't see minimizer members
