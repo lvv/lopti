@@ -52,7 +52,7 @@ class	loft		{  public:
 	virtual fp_t		operator()	(V&  X)			{
 		assert(this->wrapped_loft_v);
 		fp_t   y = (*this->wrapped_loft_v)(X); 
-		assert(false);
+		//assert(false);
 		return y;
 	}
 	//virtual fp_t		operator()	(V& X) 		{ assert(false); return X[0]; };
@@ -97,8 +97,8 @@ class	minimizer { public:
 
 	// set-ters
 							virtual minimizer<V>&	
-	object_functOR		(loft_t* oft_p)	{
-		loft_v = oft_p;
+	object_functOR		(loft_t* _loft_v)	{
+		loft_v = _loft_v;
 			oco = *loft_v;    //- compiles but operator() of base class called
 			// oco = boost::bind(&loft<V&>::operator(),_1)(*loft_v);   //  error: ‘operator()’ is not a member of ‘loft
 			//oco = boost::bind(mem_fun(&loft_t::operator()),_1)(loft_v);   //   ‘* f’ cannot be used as a function

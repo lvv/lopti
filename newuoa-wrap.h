@@ -469,7 +469,8 @@ eval_f_310:
 	// CALL CALFUN (N,X,F)
 	// calfun_ (&_n, (double*)&X, &F);
 	//F = (*oco)(X, NULL);
-	F = oco(X);
+	//F = oco(X);
+	F = (*this->loft_v)(X);
 
 	if (verbose_) FMT ("%d \t %18.10g  \t  %18.10g \n")  %iter_  %F  %X;
 

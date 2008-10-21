@@ -35,8 +35,18 @@ int main(int argc, char **argv) {
 
 
 /*
- */
-	{  ////  NEWUOA points default:  2*N + 1 
+	{  ////  CONDOR  x NACKED ROSENBERG
+	condor_minimizer<array0_t>	mzr			(X0);	// X[0..N-1]
+	mzr	.object_functION	(of_rb0)
+		.object_functOR		(&of_rb0)
+		.rho_begin		(1)
+		//.rho_end             (1e-3);
+		.rho_end		(1e-10);
+	mzr.argmin();
+	mzr.print();		cout << " of_iter=" << of_rb0.iter() << endl;}
+*/
+
+	{  ////  NEWUOA :  2*N + 1 
 	newuoa_minimizer<array1_t>	mzr			(*(array1_t*)&(X0));	// X[1..N]
 	of_log<array1_t> ol  (&of_rb1, mzr);
 	mzr
@@ -48,8 +58,8 @@ int main(int argc, char **argv) {
 		.rho_end		(4e-11);
 	mzr.argmin();
 	mzr.print();		cout << " of_iter=" << of_rb1.iter() << endl; }
-
-	{  ////  NEWUOA points max: (N+1)*(N+2)/2
+/*
+	{  ////  NEWUOA  (N+1)*(N+2)/2
 	const int N=array1_t::sz;
 	newuoa_minimizer<array1_t,(N+1)*(N+2)/2>	mzr			(*(array1_t*)&(X0));	// X[1..N]
 	mzr	.object_functION	(of_log<array1_t>(&of_rb1, mzr))
@@ -60,7 +70,8 @@ int main(int argc, char **argv) {
 	mzr.argmin();
 	mzr.print();		cout << " of_iter=" << of_rb1.iter() << endl;  }
 
-	{  ////  CONDOR
+
+	{  ////  CONDOR  logged rosenberg
 	condor_minimizer<array0_t>	mzr			(X0);	// X[0..N-1]
 	mzr	.object_functION	(of_log<array0_t>(&of_rb0,  mzr))
 		.object_functOR		(&of_log<array0_t>(&of_rb0,  mzr))
@@ -81,7 +92,7 @@ int main(int argc, char **argv) {
 		//.rho_end             (1e-3);
 		.rho_end		(1e-10);
 	mzr.argmin();
-/*
+
 								//array_t			R  = {{ 0.2, 0.2 }};
 								//mzr.rescale		(R);
 	mzr.print();		cout << " of_iter=" << of_bsrb0.iter() << endl;}
@@ -95,7 +106,7 @@ int main(int argc, char **argv) {
 		//.rho_end             (1e-3);
 		.rho_end		(1e-10);
 	mzr.argmin();
-*/								//array_t			R  = {{ 0.2, 0.2 }};
+
 								//mzr.rescale		(R);
 	mzr.print();		cout << " of_iter=" << of_bsrb0.iter() << endl;}
 
@@ -110,5 +121,6 @@ int main(int argc, char **argv) {
 	mzr.argmin();
 	mzr.print();		cout << " of_iter=" << of_rb0.iter() << endl;}
 
+ */
 	return 0;
  }
