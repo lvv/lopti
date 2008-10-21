@@ -11,6 +11,7 @@
 	#include <functional>
 		using std::binder1st;
 		using std::unary_function;
+		using std::mem_fun;
 	#include <boost/function.hpp>
 		using boost::function;
 	#include <boost/bind.hpp>
@@ -22,15 +23,21 @@
 /////////////////////////////////////////////////////////////////////////////////////////   OF_BASE
 
 			template<typename V>
-class	oft_base		{  public:
+class	loft		{  public:
 
-		typedef		typename V::value_type		fp_t;
+			typedef		loft<V>*	loft_v_t;	// virt_ptr to  loft
+			typedef		typename V::value_type		fp_t;
 		string			name_;
 		V			X_opt_;
 		int			iter_;
+		//typename loft<typename V>*	wrapped_loft_v;
+		loft_v_t		wrapped_loft_v;
 
 	// CTOR
-	oft_base		(const string& s) : name_(s)  		{ X_opt_ = 0; };
+	loft		() 			: name_("unknown"), wrapped_loft_v(0)		{ X_opt_ = 0; };
+	loft		(loft_v_t loft_v)	: name_(loft_v->name()), wrapped_loft_v(loft_v)		{ X_opt_ = 0; };
+	loft		(const string& s)	: name_(s), wrapped_loft_v(0)		{ X_opt_ = 0; };
+	//loft		(loft<V&>* loft_v, const string& s) : name_(s), wrapped_loft_v(loft_v)		{ X_opt_ = 0; };
 
 	// set-ters
 	void 			opt		(const V& X_answ)	{ X_opt_ = X_answ; };
@@ -42,19 +49,25 @@ class	oft_base		{  public:
 	virtual	fp_t 		opt_distance	(V& X)	const	{ return  distance_norm2(X_opt_, X); };
 
 	// do-ers
-	virtual fp_t		operator()	(V& X) 		{ assert(false); return X[0]; };
+	virtual fp_t		operator()	(V&  X)			{
+		assert(this->wrapped_loft_v);
+		fp_t   y = (*this->wrapped_loft_v)(X); 
+		return y;
+	}
+	//virtual fp_t		operator()	(V& X) 		{ assert(false); return X[0]; };
 	virtual void		reset		()		{ iter_ = 0;};
  };
+
 
                  template<typename V>
 class	minimizer { public:
 
-			typedef 	oft_base<V>			loft_t;
-			typedef		typename V::value_type		fp_t;
-			//typedef		function<fp_t(V&)>		function<fp_t(V&)>;
+				typedef 	loft<V>				loft_t;
+				typedef 	loft<V>*			loft_v_t;
+				typedef		typename V::value_type		fp_t;
 
-			loft_t*				loft_v;		// virt ptr
-			function<fp_t(V&)>			oco;
+			loft_v_t			loft_v;	
+			function<fp_t(V&)>		oco;
 			int				max_iter_;
 			bool				verbose_;
 			V				X;
@@ -64,7 +77,8 @@ class	minimizer { public:
 			bool				found_;
 			string				name_;
 
-	explicit 			minimizer		(V& _X, const string& _name = "unknown")       
+				explicit 		
+	minimizer		(V& _X, const string& _name = "unknown")       
 	:
 		max_iter_	(500),
 		ymin_    	(numeric_limits<fp_t>::quiet_NaN ()),
@@ -76,13 +90,16 @@ class	minimizer { public:
 		oco		(0),		// Object Callable Object (boost::functor)
 		loft_v		(0)		// Lopti Object FuncTor  ptr
 	{};
+
 	virtual 			~minimizer		()		{};  // it it here so that approprite polimorfic DTOR called 
+
 
 	// set-ters
 	virtual minimizer<V>&		object_functOR		(loft_t* oft_p)	{
 		loft_v = oft_p;
-		// oco = *loft_v;    - compiles but operator() of base class called
-		// oco = boost::bind(&loft_t::operator(),_1)(*loft_v);  
+			// oco = *loft_v;    - compiles but operator() of base class called
+			// oco = boost::bind(&loft<V&>::operator(),_1)(*loft_v);   //  error: ‘operator()’ is not a member of ‘loft
+			//oco = boost::bind(mem_fun(&loft_t::operator()),_1)(loft_v);   //   ‘* f’ cannot be used as a function
 		name_ += "-" + loft_v->name();
 		return *this; 
 	};
@@ -112,15 +129,14 @@ class	minimizer { public:
 class	trust_region_minimizer : public minimizer<V>    { public:
 
 		typedef  typename minimizer<V>::fp_t			fp_t;
-		//typedef  typename minimizer<V>::function<fp_t(V&)>	oco_t;
-		//using minimizer<V>::function<fp_t(V&)>	oco_t;
 		using minimizer<V>::name;
 
 		fp_t 				rho_begin_;	// r(rho) start
 		fp_t 				rho_end_;	// r end
 
 
-	explicit trust_region_minimizer		(V& _X, const char* _name= "unknown (trust region type)"):  
+					explicit
+	trust_region_minimizer		(V& _X, const char* _name= "unknown (trust region type)"):  
 		minimizer<V>	(_X, _name),
 		rho_begin_ 	(numeric_limits<fp_t>::quiet_NaN ()),
 		rho_end_   	(numeric_limits<fp_t>::quiet_NaN ())

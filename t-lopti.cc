@@ -26,14 +26,16 @@
 
 int main(int argc, char **argv) {
 	
-	typedef array<double,2,1>		array1_t;	
-	typedef array<double,2,0>		array0_t;	
-	array0_t		X0 = {{ -1.2, 1 }};
-	//array0_t		X;
-	of_rosenberg<array1_t>  of_rb1;
-	of_rosenberg<array0_t>  of_rb0;
+		typedef array<double,2,1>		array1_t;	
+		typedef array<double,2,0>		array0_t;	
+		array0_t		X0 = {{ -1.2, 1 }};
+		//array0_t		X;
+		of_rosenberg<array1_t>  of_rb1;
+		of_rosenberg<array0_t>  of_rb0;
 
 
+/*
+ */
 	{  ////  NEWUOA points default:  2*N + 1 
 	newuoa_minimizer<array1_t>	mzr			(*(array1_t*)&(X0));	// X[1..N]
 	of_log<array1_t> ol  (&of_rb1, mzr);
@@ -79,11 +81,10 @@ int main(int argc, char **argv) {
 		//.rho_end             (1e-3);
 		.rho_end		(1e-10);
 	mzr.argmin();
+/*
 								//array_t			R  = {{ 0.2, 0.2 }};
 								//mzr.rescale		(R);
 	mzr.print();		cout << " of_iter=" << of_bsrb0.iter() << endl;}
-
-/*
 	{  ////  CONDOR (bad_scale_rosenbrock * rescale)
 	const int FACTOR=100;
 	of_bad_scale_rosenberg<array0_t, FACTOR>  of_bsrb0;
@@ -94,15 +95,14 @@ int main(int argc, char **argv) {
 		//.rho_end             (1e-3);
 		.rho_end		(1e-10);
 	mzr.argmin();
-								//array_t			R  = {{ 0.2, 0.2 }};
+*/								//array_t			R  = {{ 0.2, 0.2 }};
 								//mzr.rescale		(R);
 	mzr.print();		cout << " of_iter=" << of_bsrb0.iter() << endl;}
 
-*/
 	{  ////  NELDER-MEAD
 	array0_t		S  = {{ 0.6, 0.6 }};
 	nelder_mead_minimizer<array0_t>	mzr			(X0);	// will ignore BEGIN index
-	mzr	.object_functION	(of_log<array0_t>(&of_rb0, mzr))
+	mzr	.object_functION	( of_log<array0_t>(&of_rb0, mzr))
 		.object_functOR		(&of_log<array0_t>(&of_rb0, mzr))
 		.step			(S)
 		//.characteristic_size	(0.0002);
