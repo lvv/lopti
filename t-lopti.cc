@@ -26,16 +26,16 @@
 
 int main(int argc, char **argv) {
 	
-		typedef array<double,2,1>		array1_t;	
-		typedef array<double,2,0>		array0_t;	
-		array0_t		X0 = {{ -1.2, 1 }};
-		//array0_t		X;
-		of_rosenberg<array1_t>  of_rb1;
-		of_rosenberg<array0_t>  of_rb0;
+				typedef array<double,2,1>		array1_t;	
+				typedef array<double,2,0>		array0_t;	
+
+			array0_t		X0 = {{ -1.2, 1 }};
+			//array0_t		X;
+			of_rosenberg<array1_t>  of_rb1;
+			of_rosenberg<array0_t>  of_rb0;
 
 
-/*
-	{  ////  CONDOR  x NACKED ROSENBERG
+	{  ////  CONDOR  x NAKED ROSENBERG
 	condor_minimizer<array0_t>	mzr			(X0);	// X[0..N-1]
 	mzr	.object_functION	(of_rb0)
 		.object_functOR		(&of_rb0)
@@ -44,7 +44,31 @@ int main(int argc, char **argv) {
 		.rho_end		(1e-10);
 	mzr.argmin();
 	mzr.print();		cout << " of_iter=" << of_rb0.iter() << endl;}
-*/
+
+	{  ////  CONDOR  logged rosenberg
+	condor_minimizer<array0_t>	mzr			(X0);	// X[0..N-1]
+	mzr	.object_functION	(of_log<array0_t>(&of_rb0,  mzr))
+		.object_functOR		(&of_log<array0_t>(&of_rb0,  mzr))
+		.rho_begin		(1)
+		//.rho_end             (1e-3);
+		.rho_end		(1e-10);
+	mzr.argmin();
+	mzr.print();		cout << " of_iter=" << of_rb0.iter() << endl;}
+
+/*
+	{  ////  NEWUOA :  2*N + 1  NAKED
+	newuoa_minimizer<array1_t>	mzr			(*(array1_t*)&(X0));	// X[1..N]
+	of_log<array1_t> ol  (&of_rb1, mzr);
+	mzr
+		.object_functION	(of_rb1)
+		//.object_function	(of_log<array1_t>(&of_rb1, mzr))
+		//.object_functor		(&of_log<array1_t>(&of_rb1, mzr))
+		.object_functOR		(&of_rb1)
+		.rho_begin		(1)
+		.rho_end		(4e-11);
+	mzr.argmin();
+	mzr.print();		cout << " of_iter=" << of_rb1.iter() << endl; }
+
 
 	{  ////  NEWUOA :  2*N + 1 
 	newuoa_minimizer<array1_t>	mzr			(*(array1_t*)&(X0));	// X[1..N]
@@ -58,7 +82,6 @@ int main(int argc, char **argv) {
 		.rho_end		(4e-11);
 	mzr.argmin();
 	mzr.print();		cout << " of_iter=" << of_rb1.iter() << endl; }
-/*
 	{  ////  NEWUOA  (N+1)*(N+2)/2
 	const int N=array1_t::sz;
 	newuoa_minimizer<array1_t,(N+1)*(N+2)/2>	mzr			(*(array1_t*)&(X0));	// X[1..N]
@@ -70,16 +93,6 @@ int main(int argc, char **argv) {
 	mzr.argmin();
 	mzr.print();		cout << " of_iter=" << of_rb1.iter() << endl;  }
 
-
-	{  ////  CONDOR  logged rosenberg
-	condor_minimizer<array0_t>	mzr			(X0);	// X[0..N-1]
-	mzr	.object_functION	(of_log<array0_t>(&of_rb0,  mzr))
-		.object_functOR		(&of_log<array0_t>(&of_rb0,  mzr))
-		.rho_begin		(1)
-		//.rho_end             (1e-3);
-		.rho_end		(1e-10);
-	mzr.argmin();
-	mzr.print();		cout << " of_iter=" << of_rb0.iter() << endl;}
 
 	{  ////  CONDOR (bad_scale_rosenbrock)
 	const int FACTOR=100;

@@ -20,10 +20,10 @@
 		//using namespace boost;
 		//using namespace std;
 
-/////////////////////////////////////////////////////////////////////////////////////////   OF_BASE
+/////////////////////////////////////////////////////////////////////////////////////////   LOFT
 
 			template<typename V>
-class	loft		{  public:
+class	loft		{  public:				// Lopti Object FuncTor
 
 			typedef		loft<V>*	loft_v_t;	// virt_ptr to  loft
 			typedef		typename V::value_type		fp_t;
@@ -34,10 +34,9 @@ class	loft		{  public:
 		loft_v_t		wrapped_loft_v;
 
 	// CTOR
-	loft		() 			: name_("unknown"), wrapped_loft_v(0)		{ X_opt_ = 0; };
-	loft		(loft_v_t loft_v)	: name_(loft_v->name()), wrapped_loft_v(loft_v)		{ X_opt_ = 0; };
-	loft		(const string& s)	: name_(s), wrapped_loft_v(0)		{ X_opt_ = 0; };
-	//loft		(loft<V&>* loft_v, const string& s) : name_(s), wrapped_loft_v(loft_v)		{ X_opt_ = 0; };
+	loft		() 			:  wrapped_loft_v(0),		name_("unknown"),      iter_(0)	{ X_opt_ = 0; };
+	loft		(loft_v_t loft_v)	:  wrapped_loft_v(loft_v),	name_(loft_v->name()), iter_(0)	{ X_opt_ = 0; };
+	loft		(const string& s)	:  wrapped_loft_v(0),		name_(s),              iter_(0)	{ X_opt_ = 0; };
 
 	// set-ters
 	void 			opt		(const V& X_answ)	{ X_opt_ = X_answ; };
@@ -50,7 +49,7 @@ class	loft		{  public:
 
 	// do-ers
 	virtual fp_t		operator()	(V&  X)			{
-		assert(this->wrapped_loft_v);
+					assert(this->wrapped_loft_v);
 		fp_t   y = (*this->wrapped_loft_v)(X); 
 		//assert(false);
 		return y;
@@ -102,7 +101,7 @@ class	minimizer { public:
 			oco = *loft_v;    //- compiles but operator() of base class called
 			// oco = boost::bind(&loft<V&>::operator(),_1)(*loft_v);   //  error: ‘operator()’ is not a member of ‘loft
 			//oco = boost::bind(mem_fun(&loft_t::operator()),_1)(loft_v);   //   ‘* f’ cannot be used as a function
-		name_ += "-" + loft_v->name();
+		name_ += "(" + loft_v->name() + ")";
 		return *this; 
 	};
 
