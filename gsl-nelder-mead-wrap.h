@@ -19,20 +19,19 @@
 
 	#include <lvv/lvv.h>
 		using std::cerr;
-
-
  
                  template<typename V>
 class gsl_of_wrap {  public:
-		typedef  typename V::value_type fp_t;
-		typedef  function<fp_t(V&)>	of_ptr_t;
+					typedef		typename V::value_type		fp_t;
+					typedef 	loft<V>*			loft_v_t;
+				static		loft_v_t	 loft_v;
 
-		static		function<typename V::value_type(V&)>  of_ptr;
-		static void	init	(of_ptr_t of) 				{ of_ptr = of; }	
-		static double	eval	(const gsl_vector* gX, void * var)	{ V X;    X << gX;    return  of_ptr(X); }	
+		static void	init	(loft_v_t  _loft_v)			{ loft_v = _loft_v; }	
+		static double	eval	(const gsl_vector* gX, void * var)	{ V X;    X << gX;    return  (*loft_v)(X); }	
  };
 
-template<typename V>  typename boost::function<typename V::value_type(V&)>   gsl_of_wrap<V>::of_ptr; // this is in gsl_ow_wrap class, but we need to decl it 1 more time for compiler
+//template<typename V>  typename boost::function<typename V::value_type(V&)>   gsl_of_wrap<V>::of_ptr; // this is in gsl_ow_wrap class, but we need to decl it 1 more time for compiler
+template<typename V>  loft<V>* gsl_of_wrap<V>::loft_v; // this is in gsl_ow_wrap class, but we need to decl it 1 more time for compiler
 
                  template<typename V>
 class	nelder_mead_minimizer  :  public minimizer<V> { public:
@@ -43,6 +42,7 @@ class	nelder_mead_minimizer  :  public minimizer<V> { public:
 				using minimizer<V>::max_iter_;
 				using minimizer<V>::verbose_;
 				using minimizer<V>::oco;
+				using minimizer<V>::loft_v;
 				using minimizer<V>::verbose_;
 				using minimizer<V>::ymin_;
 				using minimizer<V>::Xmin_;
@@ -83,7 +83,7 @@ class	nelder_mead_minimizer  :  public minimizer<V> { public:
 	virtual V&		argmin () {
 		
 		////  gsl init
-		gsl_of_wrap<V>::init(oco);
+		gsl_of_wrap<V>::init(loft_v);
 		minex_func.f = &gsl_of_wrap<V>::eval;
 		minex_func.n = X.size();
 		//minex_func.params = var;

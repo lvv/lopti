@@ -6,20 +6,29 @@
 #include <functional>
 	using std::binder1st;
 	using std::unary_function;
+	using std::mem_fun;
+#include <boost/function.hpp> 
+        using boost::function;
+#include <boost/bind.hpp>
+        //using boost::bind;
+
+
 #include <boost/function.hpp>
 	using boost::function;
 #include <boost/bind.hpp>
 	using boost::bind;
 
 	//using namespace std;
-	//using namespace boost;
+	using namespace boost;
 	//
 //////////////////////////////////////////////////////////////////////////////////////////////////// TEST CALLABLE OBJECT
 typedef array<double,2,1> array_t;
+array_t a = {{1,2}};
 
 int				plain_f		(string s)		{ cout  << "plain_f: " << s << " =  "; return 0;}
 int				plain_f2	(string s, int i)	{ cout  << "plain_f2: " << s << " =  "; return i;}
 int				plain_fa	(array_t A)		{ cout  << "plain_fA: " << A << " =  "; return 0;}
+array_t::value_type		plain_ffa	(array_t A)		{ cout  << "plain_fA: " << A << " =  "; return 0;}
 template<typename T> int	plain_fx	(T x)		{ cout  << "plain_fx: " << x << " =  "; return 0;}
 
 struct	functor_t {
@@ -33,6 +42,13 @@ struct	functor_t {
 class	obj_t 	{ public:
 	int	static		static_mem_f	(string s)	{ cout << s; return 0; };
 	int			mem_f		(string s)	{ cout << s << " ObjF::mem_f() = "; return 0; };
+};
+
+			template<typename V>
+class	fdir_t : public boost::function1<typename V::value_type,V&> 	{ public:
+		int	counter;		
+	void init(int i) { counter=i; };
+	void  print() { cout << "counter: " << counter << endl; };
 };
 
 
@@ -70,13 +86,12 @@ int main() {
 										cout << ecw_p("ecw_p ") << endl;
 										cout << ecw_p("ecw_p ") << endl;
 
-
 	// F POINTERS
 	function<int(string s)>   		fct1_p = functor_t();		cout << fct1_p("fct1_p = functor_t() ") << endl;
 	function<int(string s)>   		fct2_p = fct2;			cout << fct2_p("fct2_p = fct2 ") << endl;
 
 	// PLAIN F() with arrays
-	array_t  X = {{11, 22}};
+	//array_t  X = {{11, 22}};
 	typedef int T;
 	function<int(T)>       		bf_fx;
 	bf_fx = plain_fx<T>;						cout << "boost: plain fx()" << bf_fx(1) << endl;
@@ -99,6 +114,16 @@ int main() {
 	boost::function<int(obj_t* o, string s)>  	bf_mfa_mf2 = &obj_t::mem_f;
 	cout << bf_mfa_mf  (    "boost:  bind1st( mem_fun(&obj_t::mem_f), &o)  ") << endl;
 	cout << bf_mfa_mf2 (&o, "boost:  &obj_t::mem_f                         ") << endl;
+
+	// DIRIVED boost::functio
+	/* non-compilable
+	fdir_t<array_t>  fdir = &plain_ffa;	 
+	fdir.init(0);	
+	fdir.print();
+	cout << fdir(a) << endl;
+	cout << fdir(a) << endl;
+	fdir.print();
+	*/
 
 	return 0;
 }

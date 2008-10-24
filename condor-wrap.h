@@ -70,34 +70,6 @@ class	c_of_t  : public CONDOR::ObjectiveFunction { public:
 
 			return	y;
 	};
-			function<fp_t(V&)>		oco;
-	//c_of_t (fp_t of(V&, void*), V X0, void* var) {  			// we use this CTOR to construct
-	void	XXXXXXinit (function<fp_t(V&)> of, V& X0) {  			// we use this CTOR to construct
-			strcpy(name,"condor_of");
-			xOptimal.setSize(X0.size());
-			xStart.  setSize(X0.size());
-			xStart << X0;
-			oco =  of;
-			//this->var =  var;
-			eval_cnt = 0;
-			verbose = false;
-	};
-
-	double  XXXXXXXXXXXXeval (CONDOR::Vector cX, int *nerror=NULL) {  		// condor use this to eval
-			V X;	
-			X << cX;
-			fp_t y = oco(X);
-			updateCounter(y,cX);
-			eval_cnt++;
-
-			if (verbose) {
-				FMT("%5d \t %19.15g  ")  %eval_cnt  %y;
-				for  (typename V::iterator x=X.begin();   x != X.end();   x++)    FMT("\t%19.15g")   %(*x);
-				cout << endl;
-			}
-
-			return	y;
-	};
  };
 
 /////////////////////////////////////////////////////////////// 

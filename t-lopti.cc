@@ -34,7 +34,6 @@ int main(int argc, char **argv) {
 			of_rosenberg<array1_t>  of_rb1;
 			of_rosenberg<array0_t>  of_rb0;
 
-/*
 	{  ////  CONDOR  x NAKED ROSENBERG
 	condor_minimizer<array0_t>	mzr			(X0);	// X[0..N-1]
 	mzr	.object_functION	(of_rb0)
@@ -44,7 +43,8 @@ int main(int argc, char **argv) {
 		.rho_end		(1e-10);
 	mzr.argmin();
 	mzr.print();		cout << " of_iter=" << of_rb0.iter() << endl;}
-*/
+
+
 	{  ////  CONDOR  logged rosenberg
 	condor_minimizer<array0_t>	mzr			(X0);	// X[0..N-1]
 	of_log<array0_t> ol  (&of_rb0, mzr);
@@ -127,21 +127,23 @@ int main(int argc, char **argv) {
 		//.rho_end             (1e-3);
 		.rho_end		(1e-10);
 	mzr.argmin();
-
 								//mzr.rescale		(R);
 	mzr.print();		cout << " of_iter=" << of_bsrb0.iter() << endl;}
 
+ */
 	{  ////  NELDER-MEAD
 	array0_t		S  = {{ 0.6, 0.6 }};
 	nelder_mead_minimizer<array0_t>	mzr			(X0);	// will ignore BEGIN index
-	mzr	.object_functION	( of_log<array0_t>(&of_rb0, mzr))
-		.object_functOR		(&of_log<array0_t>(&of_rb0, mzr))
+	of_log<array0_t> ol  (&of_rb0, mzr);
+	//mzr	.object_functION	( of_log<array0_t>(&of_rb0, mzr))
+	//	.object_functOR		(&of_log<array0_t>(&of_rb0, mzr))
+	mzr	.object_functION	(ol)
+		.object_functOR		(&ol)
 		.step			(S)
 		//.characteristic_size	(0.0002);
 		.characteristic_size	(0.00000001);
 	mzr.argmin();
 	mzr.print();		cout << " of_iter=" << of_rb0.iter() << endl;}
 
- */
 	return 0;
  }
