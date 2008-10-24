@@ -34,16 +34,16 @@
 	extern int globalPrintLevel;
 
 
-	template<typename V>
+			template<typename V>
 class	c_of_t  : public CONDOR::ObjectiveFunction { public:
-			typedef  typename V::value_type fp_t;
-			typedef		loft<V>*	loft_v_t;	// virt_ptr to  loft
+
+				typedef  typename V::value_type fp_t;
+				typedef		loft<V>*	loft_v_t;	// virt_ptr to  loft
 
 			int eval_cnt;
 			bool verbose;
-
-	//c_of_t (fp_t of(V&, void*), V X0, void* var) {  			// we use this CTOR to construct
 			loft_v_t loft_v;
+
 	void	init (loft_v_t _loft_v, V& X0) {  			// we use this CTOR to construct
 			strcpy(name,"condor_of");
 			xOptimal.setSize(X0.size());
@@ -76,14 +76,11 @@ class	c_of_t  : public CONDOR::ObjectiveFunction { public:
                  template<typename V>
 class	condor_minimizer: public trust_region_minimizer<V> { public:
 				typedef  typename minimizer<V>::fp_t		fp_t;
-				//typedef  typename minimizer<V>::function<fp_t(V&)>	function<fp_t(V&)>;
-
 
 				using minimizer<V>::X;  		// without this we woun't see minimizer members
 				using minimizer<V>::max_iter_;
 				using minimizer<V>::iter_;
 				using minimizer<V>::verbose_;
-				using minimizer<V>::oco;
 				using minimizer<V>::verbose_;
 				using minimizer<V>::ymin_;
 				using minimizer<V>::Xmin_;
@@ -120,10 +117,9 @@ class	condor_minimizer: public trust_region_minimizer<V> { public:
 	};
 
 	virtual V&		 	argmin			()		{
-						assert(!oco.empty());
+						// TODO assert(!loft_v.empty());  
 						assert(!isnan(rho_begin_) && " rho_begin not initialised ");
 						assert(!isnan(rho_end_)   && " rho_end   not initialised ");
-						//cout << "condor.argmin:  loft_v->name(): "  << name() << endl;
 		c_of.init(loft_v, X);
 		globalPrintLevel = 10;		// off
 		CONDOR::CONDORSolver(rho_begin_, rho_end_, max_iter_,  &c_of);

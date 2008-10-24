@@ -41,7 +41,7 @@ class	nelder_mead_minimizer  :  public minimizer<V> { public:
 				using minimizer<V>::X;  		// without this we woun't see minimizer members
 				using minimizer<V>::max_iter_;
 				using minimizer<V>::verbose_;
-				using minimizer<V>::oco;
+				//using minimizer<V>::oco;
 				using minimizer<V>::loft_v;
 				using minimizer<V>::verbose_;
 				using minimizer<V>::ymin_;

@@ -17,21 +17,17 @@
 	#include <boost/bind.hpp>
 		//using boost::bind;
 		
-		//using namespace boost;
-		//using namespace std;
-
 /////////////////////////////////////////////////////////////////////////////////////////   LOFT
 
 			template<typename V>
 class	loft		{  public:				// Lopti Object FuncTor
 
-			typedef		loft<V>*	loft_v_t;	// virt_ptr to  loft
-			typedef		typename V::value_type		fp_t;
-		string			name_;
-		V			X_opt_;
-		int			iter_;
-		//typename loft<typename V>*	wrapped_loft_v;
-		loft_v_t		wrapped_loft_v;
+				typedef		loft<V>*			loft_v_t;	// virt_ptr to  loft
+				typedef		typename V::value_type		fp_t;
+			string			name_;
+			V			X_opt_;
+			int			iter_;
+			loft_v_t		wrapped_loft_v;
 
 	// CTOR
 	loft		() 			:  wrapped_loft_v(0),		name_("unknown"),      iter_(0)	{ X_opt_ = 0; };
@@ -51,23 +47,19 @@ class	loft		{  public:				// Lopti Object FuncTor
 	virtual fp_t		operator()	(V&  X)			{
 					assert(this->wrapped_loft_v);
 		fp_t   y = (*this->wrapped_loft_v)(X); 
-		//assert(false);
 		return y;
 	}
-	//virtual fp_t		operator()	(V& X) 		{ assert(false); return X[0]; };
 	virtual void		reset		()		{ iter_ = 0;};
  };
 
 
                  template<typename V>
 class	minimizer { public:
-
 				typedef 	loft<V>				loft_t;
 				typedef 	loft<V>*			loft_v_t;
 				typedef		typename V::value_type		fp_t;
 
 			loft_v_t			loft_v;	
-			function<fp_t(V&)>		oco;
 			int				max_iter_;
 			bool				verbose_;
 			V				X;
@@ -87,7 +79,6 @@ class	minimizer { public:
 		verbose_ 	(false),
 		found_ 		(false),
 		name_		(_name),
-		oco		(0),		// Object Callable Object (boost::functor)
 		loft_v		(0)		// Lopti Object FuncTor  ptr
 	{};
 
@@ -95,19 +86,8 @@ class	minimizer { public:
 
 
 	// set-ters
-							virtual minimizer<V>&	
-	object_functOR		(loft_t* _loft_v)	{
-		loft_v = _loft_v;
-			oco = *loft_v;    //- compiles but operator() of base class called
-			// oco = boost::bind(&loft<V&>::operator(),_1)(*loft_v);   //  error: ‘operator()’ is not a member of ‘loft
-			//oco = boost::bind(mem_fun(&loft_t::operator()),_1)(loft_v);   //   ‘* f’ cannot be used as a function
-		name_ += "(" + loft_v->name() + ")";
-		return *this; 
-	};
-
-							virtual minimizer<V>&	
-	object_functION		(function<fp_t(V&)> of)	{  oco = of;		return *this;  };
-
+	virtual minimizer<V>&		object_functOR		(loft_v_t  p)	{ loft_v = p; return *this; };
+	virtual const string		name			() 	const	{  return (format("%s-%d")  %name_  %(V::size()) ).str(); };
 
 	virtual minimizer<V>&		max_iter		(int mx)	{  max_iter_   = mx;	return *this;  };
 	virtual minimizer<V>&		verbose			(bool flag)	{  verbose_ = flag;	return *this;  };
@@ -121,22 +101,20 @@ class	minimizer { public:
 	virtual V 	 		Xmin			()	const	{  return Xmin_; };
 	virtual fp_t 	 		iter			()	const	{  return iter_; };
 	virtual bool			found			() 	const	{  return found_; };
-	virtual const string		name			() 	const	{  return (format("%s-%d") %name_ %(V::size())).str(); };
 
 	// do-ers
-	virtual V&			argmin			() 		{  return Xmin_;  };
-	virtual void			print			()		{ MSG("%s  %25t iter=%d  \t ymin=%g \t Xmin=%20.12g") %name() %iter()  %ymin()  %Xmin();};
+	virtual V&			argmin			() 		{  return Xmin_; };
+	virtual void			print			()		{ MSG("%s(%s)  %25t  iter=%d  \t ymin=%g \t Xmin=%20.12g \n") %name() %loft_v->name() %loft_v->iter()  %ymin()  %Xmin();};
 };
 
-                 template<typename V>
+				 template<typename V>
 class	trust_region_minimizer : public minimizer<V>    { public:
 
-		typedef  typename minimizer<V>::fp_t			fp_t;
-		using minimizer<V>::name;
+				typedef  typename minimizer<V>::fp_t			fp_t;
+				using minimizer<V>::name;
 
-		fp_t 				rho_begin_;	// r(rho) start
-		fp_t 				rho_end_;	// r end
-
+			fp_t 				rho_begin_;	// r(rho) start
+			fp_t 				rho_end_;	// r end
 
 					explicit
 	trust_region_minimizer		(V& _X, const char* _name= "unknown (trust region type)"):  
@@ -148,6 +126,7 @@ class	trust_region_minimizer : public minimizer<V>    { public:
 	virtual minimizer<V>&	rho_begin		(fp_t rho)	{ rho_begin_ = rho;  return *this; };
 	virtual minimizer<V>&	rho_end			(fp_t rho)	{ rho_end_   = rho;  return *this; };
 };
+
 
 	// of prog inlude <lopti.h> then include all
 	#ifndef MINIMIZER

@@ -36,69 +36,55 @@ int main(int argc, char **argv) {
 
 	{  ////  CONDOR  x NAKED ROSENBERG
 	condor_minimizer<array0_t>	mzr			(X0);	// X[0..N-1]
-	mzr	.object_functION	(of_rb0)
-		.object_functOR		(&of_rb0)
+	mzr	.object_functOR		(&of_rb0)
 		.rho_begin		(1)
 		//.rho_end             (1e-3);
 		.rho_end		(1e-10);
 	mzr.argmin();
-	mzr.print();		cout << " of_iter=" << of_rb0.iter() << endl;}
+	mzr.print();  }
 
 
 	{  ////  CONDOR  logged rosenberg
 	condor_minimizer<array0_t>	mzr			(X0);	// X[0..N-1]
 	of_log<array0_t> ol  (&of_rb0, mzr);
-	mzr	.object_functION	(ol)
-		.object_functOR		(&ol)
-	//mzr	.object_functION	(of_log<array0_t>(&of_rb0,  mzr))
+	mzr	.object_functOR		(&ol)
 	//	.object_functOR		(&of_log<array0_t>(&of_rb0,  mzr))
 		.rho_begin		(1)
 		//.rho_end             (1e-3);
 		.rho_end		(1e-10);
 	mzr.argmin();
-	mzr.print();		cout << " of_iter=" << of_rb0.iter() << endl;}
+	mzr.print();  }	
 
 	{  ////  NEWUOA :  2*N + 1  NAKED
 	newuoa_minimizer<array1_t>	mzr			(*(array1_t*)&(X0));	// X[1..N]
 	of_log<array1_t> ol  (&of_rb1, mzr);
-	mzr
-		.object_functION	(of_rb1)
-		//.object_function	(of_log<array1_t>(&of_rb1, mzr))
-		//.object_functor		(&of_log<array1_t>(&of_rb1, mzr))
-		.object_functOR		(&of_rb1)
+	mzr	.object_functOR		(&of_rb1)
 		.rho_begin		(1)
 		.rho_end		(4e-11);
 	mzr.argmin();
-	mzr.print();		cout << " of_iter=" << of_rb1.iter() << endl; }
+	mzr.print(); }
 
 
 	{  ////  NEWUOA :  2*N + 1 
 	newuoa_minimizer<array1_t>	mzr			(*(array1_t*)&(X0));	// X[1..N]
 	of_log<array1_t> ol  (&of_rb1, mzr);
-	mzr
-		.object_functION	(ol)
-		//.object_function	(of_log<array1_t>(&of_rb1, mzr))
-		//.object_functor		(&of_log<array1_t>(&of_rb1, mzr))
-		.object_functOR		(&ol)
+	mzr	.object_functOR		(&ol)
 		.rho_begin		(1)
 		.rho_end		(4e-11);
 	mzr.argmin();
-	mzr.print();		cout << " of_iter=" << of_rb1.iter() << endl; }
+	mzr.print(); }
 
 
 	{  ////  NEWUOA  (N+1)*(N+2)/2
 	const int N=array1_t::sz;
 	newuoa_minimizer<array1_t,(N+1)*(N+2)/2>	mzr			(*(array1_t*)&(X0));	// X[1..N]
-	//mzr	.object_functION	(of_log<array1_t>(&of_rb1, mzr))
-	//	.object_functOR		(&of_log<array1_t>(&of_rb1, mzr))
 	of_log<array1_t> ol  (&of_rb1, mzr);
-	mzr	.object_functION	(ol)
-		.object_functOR		(&ol)
+	mzr	.object_functOR		(&ol)
 		.rho_begin		(1)
 		//.rho_end             (4e-4);
 		.rho_end		(4e-11);
 	mzr.argmin();
-	mzr.print();		cout << " of_iter=" << of_rb1.iter() << endl;  }
+	mzr.print(); }
 
 
 /*
@@ -112,7 +98,7 @@ int main(int argc, char **argv) {
 		.rho_begin		(1)
 		//.rho_end             (1e-3);
 		.rho_end		(1e-10);
-	mzr.argmin();
+	mzr.argmin(); }
 
 								//array_t			R  = {{ 0.2, 0.2 }};
 								//mzr.rescale		(R);
@@ -128,7 +114,7 @@ int main(int argc, char **argv) {
 		.rho_end		(1e-10);
 	mzr.argmin();
 								//mzr.rescale		(R);
-	mzr.print();		cout << " of_iter=" << of_bsrb0.iter() << endl;}
+	mzr.print(); }
 
  */
 	{  ////  NELDER-MEAD
@@ -137,13 +123,13 @@ int main(int argc, char **argv) {
 	of_log<array0_t> ol  (&of_rb0, mzr);
 	//mzr	.object_functION	( of_log<array0_t>(&of_rb0, mzr))
 	//	.object_functOR		(&of_log<array0_t>(&of_rb0, mzr))
-	mzr	.object_functION	(ol)
-		.object_functOR		(&ol)
+	//mzr	.object_functION	(ol)
+	mzr	.object_functOR		(&ol)
 		.step			(S)
 		//.characteristic_size	(0.0002);
 		.characteristic_size	(0.00000001);
 	mzr.argmin();
-	mzr.print();		cout << " of_iter=" << of_rb0.iter() << endl;}
+	mzr.print(); }
 
 	return 0;
  }
