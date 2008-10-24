@@ -40,8 +40,7 @@ int main(int argc, char **argv) {
 		.rho_begin		(1)
 		//.rho_end             (1e-3);
 		.rho_end		(1e-10);
-	mzr.argmin();
-	mzr.print();  }
+	mzr.argmin(); mzr.print();  }
 
 
 	{  ////  CONDOR  logged rosenberg
@@ -52,8 +51,7 @@ int main(int argc, char **argv) {
 		.rho_begin		(1)
 		//.rho_end             (1e-3);
 		.rho_end		(1e-10);
-	mzr.argmin();
-	mzr.print();  }	
+	mzr.argmin(); mzr.print();  }	
 
 	{  ////  NEWUOA :  2*N + 1  NAKED
 	newuoa_minimizer<array1_t>	mzr			(*(array1_t*)&(X0));	// X[1..N]
@@ -61,8 +59,7 @@ int main(int argc, char **argv) {
 	mzr	.object_functOR		(&of_rb1)
 		.rho_begin		(1)
 		.rho_end		(4e-11);
-	mzr.argmin();
-	mzr.print(); }
+	mzr.argmin(); mzr.print(); }
 
 
 	{  ////  NEWUOA :  2*N + 1 
@@ -71,8 +68,7 @@ int main(int argc, char **argv) {
 	mzr	.object_functOR		(&ol)
 		.rho_begin		(1)
 		.rho_end		(4e-11);
-	mzr.argmin();
-	mzr.print(); }
+	mzr.argmin(); mzr.print(); }
 
 
 	{  ////  NEWUOA  (N+1)*(N+2)/2
@@ -83,8 +79,7 @@ int main(int argc, char **argv) {
 		.rho_begin		(1)
 		//.rho_end             (4e-4);
 		.rho_end		(4e-11);
-	mzr.argmin();
-	mzr.print(); }
+	mzr.argmin(); mzr.print(); }
 
 
 /*
@@ -98,11 +93,11 @@ int main(int argc, char **argv) {
 		.rho_begin		(1)
 		//.rho_end             (1e-3);
 		.rho_end		(1e-10);
-	mzr.argmin(); }
+	mzr.argmin(); mzr.print(); }
 
 								//array_t			R  = {{ 0.2, 0.2 }};
 								//mzr.rescale		(R);
-	mzr.print();		cout << " of_iter=" << of_bsrb0.iter() << endl;}
+							
 	{  ////  CONDOR (bad_scale_rosenbrock * rescale)
 	const int FACTOR=100;
 	of_bad_scale_rosenberg<array0_t, FACTOR>  of_bsrb0;
@@ -112,24 +107,18 @@ int main(int argc, char **argv) {
 		.rho_begin		(1)
 		//.rho_end             (1e-3);
 		.rho_end		(1e-10);
-	mzr.argmin();
-								//mzr.rescale		(R);
-	mzr.print(); }
+	//mzr.argmin(); //mzr.rescale	(R); mzr.print(); }
 
  */
 	{  ////  NELDER-MEAD
 	array0_t		S  = {{ 0.6, 0.6 }};
 	nelder_mead_minimizer<array0_t>	mzr			(X0);	// will ignore BEGIN index
 	of_log<array0_t> ol  (&of_rb0, mzr);
-	//mzr	.object_functION	( of_log<array0_t>(&of_rb0, mzr))
-	//	.object_functOR		(&of_log<array0_t>(&of_rb0, mzr))
-	//mzr	.object_functION	(ol)
 	mzr	.object_functOR		(&ol)
 		.step			(S)
 		//.characteristic_size	(0.0002);
 		.characteristic_size	(0.00000001);
-	mzr.argmin();
-	mzr.print(); }
+	mzr.argmin(); mzr.print(); }
 
 	return 0;
  }

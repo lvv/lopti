@@ -17,7 +17,6 @@
 	#include <boost/bind.hpp>
 		//using boost::bind;
 		
-/////////////////////////////////////////////////////////////////////////////////////////   LOFT
 
 			template<typename V>
 class	loft		{  public:				// Lopti Object FuncTor
@@ -30,7 +29,7 @@ class	loft		{  public:				// Lopti Object FuncTor
 			loft_v_t		wrapped_loft_v;
 
 	// CTOR
-	loft		() 			:  wrapped_loft_v(0),		name_("unknown"),      iter_(0)	{ X_opt_ = 0; };
+	//loft		() 			:  wrapped_loft_v(0),		name_("unknown"),      iter_(0)	{ X_opt_ = 0; };
 	loft		(loft_v_t loft_v)	:  wrapped_loft_v(loft_v),	name_(loft_v->name()), iter_(0)	{ X_opt_ = 0; };
 	loft		(const string& s)	:  wrapped_loft_v(0),		name_(s),              iter_(0)	{ X_opt_ = 0; };
 
@@ -50,6 +49,14 @@ class	loft		{  public:				// Lopti Object FuncTor
 		return y;
 	}
 	virtual void		reset		()		{ iter_ = 0;};
+ };
+
+			template<typename V>
+class	plain_fn : public loft<V>		{  public:				// Lopti Object FuncTor
+				typedef		typename V::value_type		fp_t;
+			function<fp_t(V&)>	of;
+	explicit		plain_fn	(function<fp_t(V&)> _of, const string& _name="unknown")	 :  of(_of), loft<V>(_name)  {};
+	virtual fp_t		operator()	(V&  X)			{ assert(this->of); fp_t   y = (this->of)(X); return y; }
  };
 
 
@@ -105,7 +112,7 @@ class	minimizer { public:
 	// do-ers
 	virtual V&			argmin			() 		{  return Xmin_; };
 	virtual void			print			()		{ MSG("%s(%s)  %25t  iter=%d  \t ymin=%g \t Xmin=%20.12g \n") %name() %loft_v->name() %loft_v->iter()  %ymin()  %Xmin();};
-};
+ };
 
 				 template<typename V>
 class	trust_region_minimizer : public minimizer<V>    { public:
@@ -125,7 +132,7 @@ class	trust_region_minimizer : public minimizer<V>    { public:
 
 	virtual minimizer<V>&	rho_begin		(fp_t rho)	{ rho_begin_ = rho;  return *this; };
 	virtual minimizer<V>&	rho_end			(fp_t rho)	{ rho_end_   = rho;  return *this; };
-};
+ };
 
 
 	// of prog inlude <lopti.h> then include all
