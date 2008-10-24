@@ -34,6 +34,15 @@ int main(int argc, char **argv) {
 			of_rosenberg<array1_t>  of_rb1;
 			of_rosenberg<array0_t>  of_rb0;
 
+	{  ////  CONDOR  x PLAIN_FN  ROSENBERG
+	condor_minimizer<array0_t>	mzr			(X0);	// X[0..N-1]
+	mzr	.object_functOR		(new plain_fn<array0_t>(&plain_fn_rosenberg<array0_t>));
+	mzr
+		.rho_begin		(1)
+		//.rho_end             (1e-3);
+		.rho_end		(1e-10);
+	mzr.argmin(); mzr.print();  }
+
 	{  ////  CONDOR  x NAKED ROSENBERG
 	condor_minimizer<array0_t>	mzr			(X0);	// X[0..N-1]
 	mzr	.object_functOR		(&of_rb0)
