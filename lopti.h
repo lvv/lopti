@@ -29,7 +29,6 @@ class	loft		{  public:				// Lopti Object FuncTor
 			loft_v_t		wrapped_loft_v;
 
 	// CTOR
-	//loft		() 			:  wrapped_loft_v(0),		name_("unknown"),      iter_(0)	{ X_opt_ = 0; };
 	loft		(loft_v_t loft_v)	:  wrapped_loft_v(loft_v),	name_(loft_v->name()), iter_(0)	{ X_opt_ = 0; };
 	loft		(const string& s)	:  wrapped_loft_v(0),		name_(s),              iter_(0)	{ X_opt_ = 0; };
 
@@ -39,7 +38,7 @@ class	loft		{  public:				// Lopti Object FuncTor
 	// get-ers
 	virtual const string&	name		()	const	{ return  name_; };
 	virtual int 		size		()	const	{ return  V::size(); };
-	virtual int 		iter		()	const	{ return  iter_; };
+	virtual int 		iter		()	const	{ return  wrapped_loft_v ? wrapped_loft_v->iter(): iter_; };
 	virtual	fp_t 		opt_distance	(V& X)	const	{ return  distance_norm2(X_opt_, X); };
 
 	// do-ers
@@ -111,6 +110,7 @@ class	minimizer { public:
 
 	// do-ers
 	virtual V&			argmin			() 		{  return Xmin_; };
+	//virtual void			print			()		{ MSG("%s(%s)  %25t  iter=%d  \t ymin=%g \t Xmin=%20.12g \n") %name() %loft_v->name() %loft_v->iter()  %ymin()  %Xmin();};
 	virtual void			print			()		{ MSG("%s(%s)  %25t  iter=%d  \t ymin=%g \t Xmin=%20.12g \n") %name() %loft_v->name() %loft_v->iter()  %ymin()  %Xmin();};
  };
 
