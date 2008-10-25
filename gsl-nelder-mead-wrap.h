@@ -30,18 +30,15 @@ class gsl_of_wrap {  public:
 		static double	eval	(const gsl_vector* gX, void * var)	{ V X;    X << gX;    return  (*loft_v)(X); }	
  };
 
-//template<typename V>  typename boost::function<typename V::value_type(V&)>   gsl_of_wrap<V>::of_ptr; // this is in gsl_ow_wrap class, but we need to decl it 1 more time for compiler
-template<typename V>  loft_base<V>* gsl_of_wrap<V>::loft_v; // this is in gsl_ow_wrap class, but we need to decl it 1 more time for compiler
+template<typename V>  loft_base<V>* gsl_of_wrap<V>::loft_v; // this is in gsl_of_wrap class, but we need to decl it 1 more time for compiler
 
                  template<typename V>
 class	nelder_mead_minimizer  :  public minimizer<V> { public:
 				typedef  typename minimizer<V>::fp_t		fp_t;
-				//typedef  typename minimizer<V>::of_ptr_t	of_ptr_t;
 
 				using minimizer<V>::X;  		// without this we woun't see minimizer members
 				using minimizer<V>::max_iter_;
 				using minimizer<V>::verbose_;
-				//using minimizer<V>::oco;
 				using minimizer<V>::loft_v;
 				using minimizer<V>::verbose_;
 				using minimizer<V>::ymin_;

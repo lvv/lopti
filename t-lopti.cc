@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
 
 		{  ////  CONDOR  x PLAIN_FN  ROSENBERG
 		condor_minimizer<array0_t>	mzr			(X0);	// X[0..N-1]
-		mzr	.object_functOR		(new plain_fn<array0_t>(&plain_fn_rosenberg<array0_t>));
+		mzr	.loft		(new plain_fn<array0_t>(&plain_fn_rosenberg<array0_t>));
 		mzr
 			.rho_begin		(1)
 			//.rho_end             (1e-3);
@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
 
 		{  ////  CONDOR  x NAKED ROSENBERG
 		condor_minimizer<array0_t>	mzr			(X0);	// X[0..N-1]
-		mzr	.object_functOR		(&of_rb0)
+		mzr	.loft		(&of_rb0)
 			.rho_begin		(1)
 			//.rho_end             (1e-3);
 			.rho_end		(1e-10);
@@ -69,8 +69,8 @@ int main(int argc, char **argv) {
 		{  ////  CONDOR  logged rosenberg
 		condor_minimizer<array0_t>	mzr			(X0);	// X[0..N-1]
 		of_log<array0_t> ol  (&of_rb0, mzr);
-		mzr	.object_functOR		(&ol)
-		//	.object_functOR		(&of_log<array0_t>(&of_rb0,  mzr))
+		mzr	.loft		(&ol)
+		//	.loft		(&of_log<array0_t>(&of_rb0,  mzr))
 			.rho_begin		(1)
 			//.rho_end             (1e-3);
 			.rho_end		(1e-10);
@@ -81,8 +81,8 @@ int main(int argc, char **argv) {
 		array0_t R = {{1,1}};
 		of_rosenberg<array0_t>  of_rb0;
 		of_log<array0_t> ol  (new rescale<array0_t>(&of_rb0,R), mzr);
-		mzr	.object_functOR		(&ol)
-		//	.object_functOR		(&of_log<array0_t>(&of_rb0,  mzr))
+		mzr	.loft		(&ol)
+		//	.loft		(&of_log<array0_t>(&of_rb0,  mzr))
 			.rho_begin		(1)
 			//.rho_end             (1e-3);
 			.rho_end		(1e-10);
@@ -96,7 +96,7 @@ int main(int argc, char **argv) {
 		array0_t X0 ={{-1.2,1*FACTOR}};
 		condor_minimizer<array0_t>	mzr			(X0);	// X[0..N-1]
 		mzr	.object_functION	(of_log<array0_t>(&of_bsrb0,  mzr))
-			.object_functOR 	(&of_log<array0_t>(&of_bsrb0,  mzr))
+			.loft 	(&of_log<array0_t>(&of_bsrb0,  mzr))
 			.rho_begin		(1)
 			//.rho_end             (1e-3);
 			.rho_end		(1e-10);
@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
 		{  ////  NEWUOA :  2*N + 1  NAKED
 		newuoa_minimizer<array1_t>	mzr			(*(array1_t*)&(X0));	// X[1..N]
 		of_log<array1_t> ol  (&of_rb1, mzr);
-		mzr	.object_functOR		(&of_rb1)
+		mzr	.loft		(&of_rb1)
 			.rho_begin		(1)
 			.rho_end		(4e-11);
 		mzr.argmin(); mzr.print(); }
@@ -134,7 +134,7 @@ int main(int argc, char **argv) {
 		{  ////  NEWUOA :  2*N + 1 
 		newuoa_minimizer<array1_t>	mzr			(*(array1_t*)&(X0));	// X[1..N]
 		of_log<array1_t> ol  (&of_rb1, mzr);
-		mzr	.object_functOR		(&ol)
+		mzr	.loft		(&ol)
 			.rho_begin		(1)
 			.rho_end		(4e-11);
 		mzr.argmin(); mzr.print(); }
@@ -144,7 +144,7 @@ int main(int argc, char **argv) {
 		const int N=array1_t::sz;
 		newuoa_minimizer<array1_t,(N+1)*(N+2)/2>	mzr			(*(array1_t*)&(X0));	// X[1..N]
 		of_log<array1_t> ol  (&of_rb1, mzr);
-		mzr	.object_functOR		(&ol)
+		mzr	.loft		(&ol)
 			.rho_begin		(1)
 			//.rho_end             (4e-4);
 			.rho_end		(4e-11);
@@ -157,7 +157,7 @@ int main(int argc, char **argv) {
 		array0_t		S  = {{ 0.6, 0.6 }};
 		nelder_mead_minimizer<array0_t>	mzr			(X0);	// will ignore BEGIN index
 		of_log<array0_t> ol  (&of_rb0, mzr);
-		mzr	.object_functOR		(&ol)
+		mzr	.loft		(&ol)
 			.step			(S)
 			//.characteristic_size	(0.0002);
 			.characteristic_size	(0.00000001);

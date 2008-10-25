@@ -93,7 +93,7 @@ class	minimizer { public:
 
 
 	// set-ters
-	virtual minimizer<V>&		object_functOR		(loft_v_t  p)	{ loft_v = p; return *this; };
+	virtual minimizer<V>&		loft			(loft_v_t  p)	{ loft_v = p; return *this; };
 	virtual const string		name			() 	const	{  return (format("%s-%d")  %name_  %(V::size()) ).str(); };
 
 	virtual minimizer<V>&		max_iter		(int mx)	{  max_iter_   = mx;	return *this;  };
