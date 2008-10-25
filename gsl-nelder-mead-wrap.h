@@ -23,7 +23,7 @@
                  template<typename V>
 class gsl_of_wrap {  public:
 					typedef		typename V::value_type		fp_t;
-					typedef 	loft<V>*			loft_v_t;
+					typedef 	loft_base<V>*			loft_v_t;
 				static		loft_v_t	 loft_v;
 
 		static void	init	(loft_v_t  _loft_v)			{ loft_v = _loft_v; }	
@@ -31,7 +31,7 @@ class gsl_of_wrap {  public:
  };
 
 //template<typename V>  typename boost::function<typename V::value_type(V&)>   gsl_of_wrap<V>::of_ptr; // this is in gsl_ow_wrap class, but we need to decl it 1 more time for compiler
-template<typename V>  loft<V>* gsl_of_wrap<V>::loft_v; // this is in gsl_ow_wrap class, but we need to decl it 1 more time for compiler
+template<typename V>  loft_base<V>* gsl_of_wrap<V>::loft_v; // this is in gsl_ow_wrap class, but we need to decl it 1 more time for compiler
 
                  template<typename V>
 class	nelder_mead_minimizer  :  public minimizer<V> { public:

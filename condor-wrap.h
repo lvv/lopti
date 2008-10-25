@@ -38,7 +38,7 @@
 class	c_of_t  : public CONDOR::ObjectiveFunction { public:
 
 				typedef  typename V::value_type fp_t;
-				typedef		loft<V>*	loft_v_t;	// virt_ptr to  loft
+				typedef		loft_base<V>*	loft_v_t;	// virt_ptr to  loft_base
 
 			int eval_cnt;
 			bool verbose;

@@ -20,9 +20,9 @@
 		
 
 			template<typename V>
-class	loft		{  public:				// Lopti Object FuncTor
+class	loft_base		{  public:				// Lopti Object FuncTor
 
-				typedef		loft<V>*			loft_v_t;	// virt_ptr to  loft
+				typedef		loft_base<V>*			loft_v_t;	// virt_ptr to  loft_base
 				typedef		typename V::value_type		fp_t;
 			string			name_;
 			V			X_opt_;
@@ -31,8 +31,8 @@ class	loft		{  public:				// Lopti Object FuncTor
 			function<fp_t(V&)>	of;
 
 	// CTOR
-	loft		(loft_v_t loft_v)	:  wrapped_loft_v(loft_v),	name_(loft_v->name()), iter_(0), of(0)	{ X_opt_ = 0; };
-	loft		(const string& s)	:  wrapped_loft_v(0),		name_(s),              iter_(0), of(0)	{ X_opt_ = 0; };
+	loft_base		(loft_v_t loft_v)	:  wrapped_loft_v(loft_v),	name_(loft_v->name()), iter_(0), of(0)	{ X_opt_ = 0; };
+	loft_base		(const string& s)	:  wrapped_loft_v(0),		name_(s),              iter_(0), of(0)	{ X_opt_ = 0; };
 
 	// set-ters
 	void 			opt		(const V& X_answ)	{ X_opt_ = X_answ; };
@@ -53,17 +53,17 @@ class	loft		{  public:				// Lopti Object FuncTor
  };
 
 			template<typename V>
-class	plain_fn : public loft<V>		{  public:				// Lopti Object FuncTor
+class	plain_fn : public loft_base<V>		{  public:				// Lopti Object FuncTor
 				typedef		typename V::value_type		fp_t;
-	explicit		plain_fn	(function<fp_t(V&)> _of, const string& _name="unknown")	 : loft<V>(_name)  { loft<V>::of=_of; };
+	explicit		plain_fn	(function<fp_t(V&)> _of, const string& _name="unknown")	 : loft_base<V>(_name)  { loft_base<V>::of=_of; };
 	virtual fp_t		operator()	(V&  X)		{ assert(!this->of.empty() && ">> NOT DEFINED OBJ FUNC <<"); this->iter_++; fp_t   y = (this->of)(X); return y; }
  };
 
 
                  template<typename V>
 class	minimizer { public:
-				typedef 	loft<V>				loft_t;
-				typedef 	loft<V>*			loft_v_t;
+				typedef 	loft_base<V>				loft_t;
+				typedef 	loft_base<V>*			loft_v_t;
 				typedef		typename V::value_type		fp_t;
 
 			loft_v_t			loft_v;	
