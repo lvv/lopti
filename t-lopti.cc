@@ -62,6 +62,19 @@ int main(int argc, char **argv) {
 		.rho_end		(1e-10);
 	mzr.argmin(); mzr.print();  }	
 
+	{  ////  CONDOR  logged RESCALED rosenberg
+	condor_minimizer<array0_t>	mzr			(X0);	// X[0..N-1]
+	array0_t R = {{1,1}};
+	of_rosenberg<array0_t>  of_rb0;
+	of_log<array0_t> ol  (new rescale<array0_t>(&of_rb0,R), mzr);
+	mzr	.object_functOR		(&ol)
+	//	.object_functOR		(&of_log<array0_t>(&of_rb0,  mzr))
+		.rho_begin		(1)
+		//.rho_end             (1e-3);
+		.rho_end		(1e-10);
+	mzr.argmin(); mzr.print();  }	
+
+
 	{  ////  NEWUOA :  2*N + 1  NAKED
 	newuoa_minimizer<array1_t>	mzr			(*(array1_t*)&(X0));	// X[1..N]
 	of_log<array1_t> ol  (&of_rb1, mzr);

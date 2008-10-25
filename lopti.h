@@ -38,7 +38,7 @@ class	loft		{  public:				// Lopti Object FuncTor
 	void 			opt		(const V& X_answ)	{ X_opt_ = X_answ; };
 
 	// get-ers
-	virtual const string&	name		()	const	{ return  name_; };
+	virtual const string	name		()	const	{ return  name_; };
 	virtual int 		size		()	const	{ return  V::size(); };
 	virtual int 		iter		()	const	{ return  wrapped_loft_v ? wrapped_loft_v->iter(): iter_; };
 	virtual	fp_t 		opt_distance	(V& X)	const	{ return  distance_norm2(X_opt_, X); };
@@ -56,9 +56,9 @@ class	loft		{  public:				// Lopti Object FuncTor
 class	plain_fn : public loft<V>		{  public:				// Lopti Object FuncTor
 				typedef		typename V::value_type		fp_t;
 	explicit		plain_fn	(function<fp_t(V&)> _of, const string& _name="unknown")	 : loft<V>(_name)  { loft<V>::of=_of; };
-	virtual fp_t		operator()	(V&  X)			{ assert(!this->of.empty() && ">> NOT DEFINED OBJ FUNC<<"); this->iter_++; fp_t   y = (this->of)(X); return y; }
-	//virtual fp_t		operator()	(V&  X)			{ /*assert(!this->of.empty() && ">> NOT DEFINED OBJ FUNC<<");*/ fp_t   y = (loft<V>::of)(X); return y; }
+	virtual fp_t		operator()	(V&  X)		{ assert(!this->of.empty() && ">> NOT DEFINED OBJ FUNC <<"); this->iter_++; fp_t   y = (this->of)(X); return y; }
  };
+
 
                  template<typename V>
 class	minimizer { public:
