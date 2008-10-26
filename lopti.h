@@ -111,8 +111,7 @@ class	minimizer { public:
 
 	// do-ers
 	virtual V&			argmin			() 		{  return Xmin_; };
-	//virtual void			print			()		{ MSG("%s(%s)  %25t  iter=%d  \t ymin=%g \t Xmin=%20.12g \n") %name() %loft_v->name() %loft_v->iter()  %ymin()  %Xmin();};
-	virtual void			print			()		{ MSG("%s(%s)  %25t  iter=%d  \t ymin=%g \t Xmin=%20.12g \n") %name() %loft_v->name() %loft_v->iter()  %ymin()  %Xmin();};
+	virtual void			print			()		{ MSG("%s(%s)  %35t  iter=%d  \t ymin=%g \t Xmin=%22.15g \n") %name() %loft_v->name() %loft_v->iter()  %ymin()  %Xmin();};
  };
 
 				 template<typename V>
