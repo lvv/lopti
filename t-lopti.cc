@@ -28,10 +28,9 @@
 
 int main(int argc, char **argv) {
 	
-				typedef array<double,2,1>		array1_t;	
-				typedef array<double,2,0>		array0_t;	
+				typedef 	array<double,2,1>		array1_t;	
+				typedef 	array<double,2,0>		array0_t;	
 
-			array0_t		X0 = {{ -1.2, 1 }};
 			//array0_t		X;
 			of_rosenberg<array1_t>  of_rb1;
 			of_rosenberg<array0_t>  of_rb0;
@@ -50,13 +49,25 @@ int main(int argc, char **argv) {
 			//#define STOP_AT_X_STEP 1e-3
 			#define STOP_AT_X_STEP 1e-10
 				
+			array0_t		_X0 = {{ -1.2, 1 }};
 
 	#ifdef CONDOR
 
 		#ifdef  PLAIN_FN
 		{  ////  CONDOR  x PLAIN_FN  ROSENBERG
-			condor_minimizer<array0_t>	mzr			(X0);	// X[0..N-1]
-			mzr	.loft			(new plain_fn<array0_t> (new plain_fn_rosenberg<array0_t>));
+			//condor_minimizer<array0_t>	mzr			(X0);	// X[0..N-1]
+			//mzr	.loft			(new plain_fn<array0_t> (new plain_fn_rosenberg<array0_t>));
+
+			//const loft_base<array0_t>*	loft =  new plain_fn<array0_t> (&plain_fn_rosenberg<array0_t>);		// ok ptr
+			//const loft_base<array0_t>&	loft = *new plain_fn<array0_t> (&plain_fn_rosenberg<array0_t>);		// ok ref
+			const loft_base<array0_t>&	loft =      plain_fn<array0_t> (&plain_fn_rosenberg<array0_t>);		// ok tmp ref
+			       // loft_base<array0_t>	loft =      plain_fn<array0_t> (&plain_fn_rosenberg<array0_t>);		// ok
+
+			condor_minimizer<array0_t> mzr				(loft);
+			//condor_minimizer<array0_t> mzr				(*new plain_fn<array0_t> (&plain_fn_rosenberg<array0_t>));
+
+			mzr	.X0			(_X0);	// X[0..N-1]	
+
 			mzr	.rho_begin		(1);
 			mzr	.rho_end		(STOP_AT_X_STEP);
 			mzr	.argmin();
@@ -64,19 +75,21 @@ int main(int argc, char **argv) {
 		}
 		#endif
 
-
 		#ifdef  NAKED
 		{  ////  CONDOR  x NAKED ROSENBERG
-			condor_minimizer<array0_t>	mzr			(X0);	// X[0..N-1]
-			//mzr	.loft		(&of_rb0);
-			mzr	.loft		(new of_rosenberg<array0_t>());
+			condor_minimizer<array0_t>	
+			//mzr			= condor_minimizer<array0_t>(of_rosenberg<array0_t>()); 			// tmp dtor-ed
+			//mzr			(*new of_rosenberg<array0_t>());						// good
+			mzr			((  of_rosenberg<array0_t>() ));  		// without "*&"  gcc & icc thinks that this is func-def
+			mzr	.X0		(_X0);
 			mzr	.rho_begin	(1);
 			mzr	.rho_end	(STOP_AT_X_STEP);
 			mzr	.argmin();
-			mzr.print(); 
+			mzr	.print(); 
 		}
 		#endif
 
+/*
 
 		{  ////  CONDOR  logged rosenberg
 		condor_minimizer<array0_t>
@@ -116,7 +129,7 @@ int main(int argc, char **argv) {
 			mzr	.print();
 		}
 		//#endif
-
+*/
 	#endif
 
 
