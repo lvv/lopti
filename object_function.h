@@ -59,16 +59,13 @@ struct	plain_fn : public loft_base<V>		{
 
 /////////////////////////////////////////////////////////////////////////////////////////  OF: ROSENBERG
 			template<typename V>  
-struct	of_rosenberg	: public loft_base<V> { 
+struct	of_rosenberg	: loft_base<V> { 
 					static const int B = 		V::ibg;
 					typedef		typename V::value_type		fp_t;
 					typedef		of_rosenberg<V>	this_t;
-	virtual	this_t&			clone		()	const		{  cout << "rb.clone\n"; return  *new this_t(*this); }
 	explicit 			of_rosenberg	()	: loft_base<V>("rosenberg") 	{ V const  X_answ = {{ 1.0, 1.0 }};   loft_base<V>::opt(X_answ); };
-
-			//virtual  typename V::value_type
-			virtual  fp_t
-	operator() 	(V& X)   {  loft_base<V>::iter_++;      return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
+	virtual	this_t&			clone		()	const		{  cout << "rb.clone\n"; return  *new this_t(*this); }
+	virtual  fp_t			operator() 	(V& X)  {  loft_base<V>::iter_++;      return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
  };
 
 
@@ -77,12 +74,15 @@ template<typename V>  typename V::value_type plain_fn_rosenberg(V& X) { static c
 
 /////////////////////////////////////////////////////////////////////////////////////////  OF: BAD SCALE ROSENBERG
 			template<typename V, int FACTOR>  
-struct	of_bad_scale_rosenberg	 : public loft_base<V> { 
+struct	of_bad_scale_rosenberg	 : loft_base<V> { 
 					typedef		typename V::value_type		fp_t;
 					static	const int B = V::ibg;
-	of_bad_scale_rosenberg() : loft_base<V>("bad_scale_rosenberg") 	{ V const  X_answ = {{ 1.0, 1.0*FACTOR }};   loft_base<V>::opt(X_answ); };
+					typedef			      loft_base<V>*		loft_p_t;
+					typedef 		const loft_base<V>&		loft_cref_t;
+					typedef			of_bad_scale_rosenberg<V,FACTOR> this_t;
+	explicit 		of_bad_scale_rosenberg	() : loft_base<V>("bad_scale_rosenberg") 	{ V const  X_answ = {{ 1.0, 1.0*FACTOR }};   loft_base<V>::opt(X_answ); };
+	virtual	this_t&		clone			()	const		{  cout << "rescale::clone()\n"; return  *new this_t(*this); }
 
-			//virtual  typename V::value_type
 			virtual  fp_t
 	operator() 	(V& X)   {  
 		loft_base<V>::iter_++;
@@ -95,10 +95,14 @@ struct	of_bad_scale_rosenberg	 : public loft_base<V> {
 
 			template<typename V>
 class	rescale :  public loft_base<V>  { public:
-			typedef 		typename V::value_type			fp_t;
-		V R;
+					typedef 		typename V::value_type			fp_t;
+					typedef			      loft_base<V>*		loft_p_t;
+					typedef 		const loft_base<V>&		loft_cref_t;
+					typedef			rescale<V>			this_t;
+			V R;
 					explicit
-	rescale		(loft_base<V>* loft_v, V& _R)  : 	loft_base<V>(loft_v), R(_R)  {};
+	rescale		(const loft_base<V>& loft_v, V& _R)  : 	R(_R)   { loft_base<V>::loft(loft_v); };
+	virtual	this_t&			clone		()	const		{  cout << "rescale::clone()\n"; return  *new this_t(*this); }
 
 	virtual const string	name		()	const	{ return  *new string(this->name_ + " rescaled"); };  // FIXME leak
 	//virtual const string	name		()		{ return  this->name_ = *new string(this->wrapped_loft_v->name_ +  " rescaled"); };
@@ -120,8 +124,8 @@ class	rescale :  public loft_base<V>  { public:
 class	of_log : public loft_base<V> { public:
 					// takes ob_base-type functor, and calling minimizer (to extract its name)
 					// and  logs all evals to file, which name constructed from minimizer-name and functin-name
-					typedef 		typename V::value_type			fp_t;
-					typedef			loft_base<V>*			loft_p_t;
+					typedef 		typename V::value_type		fp_t;
+					typedef			      loft_base<V>*		loft_p_t;
 					typedef 		const loft_base<V>&		loft_cref_t;
 					typedef			of_log<V>			this_t;
 

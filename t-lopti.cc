@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
 
 		#ifdef  NAKED
 		{  ////  CONDOR  x NAKED ROSENBERG
-			condor_minimizer<array0_t>	mzr;	
+		condor_minimizer<array0_t>	mzr;	
 			mzr	.loft		(  of_rosenberg<array0_t>() );
 			mzr	.X0		(_X0);
 			mzr	.rho_begin	(1);
@@ -79,25 +79,22 @@ int main(int argc, char **argv) {
 		#endif
 
 
-		{  ////  CONDOR  logged rosenberg
+		{  ////  condor  LOGGED rosenberg
 		condor_minimizer<array0_t>	mzr;
 			mzr	.X0		(_X0);
 			mzr	.loft		(of_log<array0_t>(of_rosenberg<array0_t>(),  mzr));
-		//				of_log<array0_t>	ol(&of_rb0, mzr);
-		//	mzr	.loft		(&ol);
 			mzr	.rho_begin	(1);
 			mzr	.rho_end	(STOP_AT_X_STEP);
 			mzr	.argmin();
 			mzr	.print();	
 		}	
 
-/*
 
-		{  ////  CONDOR  logged RESCALED rosenberg
+		{  ////  condor  logged RESCALED rosenberg
 		array0_t R = {{1,1}};
-		condor_minimizer<array0_t>
-			mzr			(X0);	// X[0..N-1]
-			mzr	.loft		(new of_log<array0_t>  (new rescale<array0_t>  (new of_rosenberg<array0_t>(), R),  mzr));
+		condor_minimizer<array0_t>	mzr;
+			mzr	.loft		(of_log<array0_t>  (rescale<array0_t>  (of_rosenberg<array0_t>(), R),  mzr));
+			mzr	.X0		(_X0);	// X[0..N-1]
 			mzr	.rho_begin	(1);
 			mzr	.rho_end	(STOP_AT_X_STEP);
 			mzr	.argmin();
@@ -109,19 +106,19 @@ int main(int argc, char **argv) {
 		{  ////  CONDOR (bad_scale_rosenbrock)
 			const int FACTOR=100;
 			array0_t X0 ={{-1.2,1*FACTOR}};
-			condor_minimizer<array0_t>
-			mzr			(X0);	// X[0..N-1]
-			mzr	.loft 		(new of_log<array0_t>  (new of_bad_scale_rosenberg<array0_t, FACTOR>(),  mzr));
+			condor_minimizer<array0_t>	mzr;
+			mzr	.X0		(_X0);	// X[0..N-1]
+			mzr	.loft 		(of_log<array0_t>  (of_bad_scale_rosenberg<array0_t, FACTOR>(),  mzr));
 			mzr	.rho_begin	(1);
 			mzr	.rho_end	(STOP_AT_X_STEP);
 			mzr	.argmin();
 			mzr	.print();
 		}
 		//#endif
-*/
 	#endif
 
 
+/*
 	#ifdef  NEWUOA
 
 	{  ////  NEWUOA :  2*N + 1  NAKED
@@ -176,5 +173,6 @@ int main(int argc, char **argv) {
 	}
 	#endif 
 
+*/
 	return 0;
  }
