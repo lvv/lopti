@@ -13,8 +13,6 @@
 		using std::unary_function;
 	#include <boost/function.hpp>
 		using boost::function;
-	//#include "boost/noncopyable.hpp"
-	//	using boost::noncopyable;
 	#include <boost/bind.hpp>
 		using boost::bind;
 
@@ -28,12 +26,8 @@
 
 int main(int argc, char **argv) {
 	
-				typedef 	array<double,2,1>		array1_t;	
-				typedef 	array<double,2,0>		array0_t;	
-
-			//array0_t		X;
-			of_rosenberg<array1_t>  of_rb1;
-			of_rosenberg<array0_t>  of_rb0;
+				typedef 	array<double,2,1>		V1;	
+				typedef 	array<double,2,0>		V0;	
 
 			///////////////////////////////////////////////// CONFIG 
 			#ifdef  ALL
@@ -52,13 +46,13 @@ int main(int argc, char **argv) {
 			//#define STOP_AT_X_STEP 1e-3
 			#define STOP_AT_X_STEP 1e-10
 				
-			array0_t		_X0 = {{ -1.2, 1 }};
+			V0		_X0 = {{ -1.2, 1 }};
 
 	#ifdef CONDOR
 
 		#ifdef  PLAIN_FN
-		{  condor_minimizer<array0_t> mzr;////  CONDOR  x PLAIN_FN  ROSENBERG
-			mzr	.loft			( plain_fn<array0_t> (&plain_fn_rosenberg<array0_t>, "plain_fn") );
+		{  condor_minimizer<V0> mzr;////  CONDOR  x PLAIN_FN  ROSENBERG
+			mzr	.loft			( plain_fn<V0> (&plain_fn_rosenberg<V0>, "plain_fn") );
 			mzr	.X0			(_X0);	// X[0..N-1]	
 			mzr	.rho_begin		(1);
 			mzr	.rho_end		(STOP_AT_X_STEP);
@@ -68,8 +62,8 @@ int main(int argc, char **argv) {
 		#endif
 
 		#ifdef  NAKED
-		{  condor_minimizer<array0_t>	mzr;	////  CONDOR  x NAKED ROSENBERG
-			mzr	.loft		(  of_rosenberg<array0_t>() );
+		{  condor_minimizer<V0>	mzr;	////  CONDOR  x NAKED ROSENBERG
+			mzr	.loft		(  rosenberg<V0>() );
 			mzr	.X0		(_X0);
 			mzr	.rho_begin	(1);
 			mzr	.rho_end	(STOP_AT_X_STEP);
@@ -79,20 +73,20 @@ int main(int argc, char **argv) {
 		#endif
 
 
-		{  condor_minimizer<array0_t>	mzr;////  condor  LOGGED rosenberg
+		{  condor_minimizer<V0>	mzr;////  condor  LOGGED rosenberg
 			mzr	.X0		(_X0);
-			mzr	.loft		(of_log<array0_t>(of_rosenberg<array0_t>(),  mzr));
+			mzr	.loft		(xg_log<V0>(rosenberg<V0>(),  mzr));
 			mzr	.rho_begin	(1);
 			mzr	.rho_end	(STOP_AT_X_STEP);
 			mzr	.argmin();
 			mzr	.print();	
-		}	
+		}
 
 
-		{  	array0_t R = {{1,1}};
-		condor_minimizer<array0_t>	mzr;////  condor  logged RESCALED rosenberg
-			mzr	.loft		(of_log<array0_t>  (rescale<array0_t>  (of_rosenberg<array0_t>(), R),  mzr));
-			mzr	.X0		(_X0);	// X[0..N-1]
+		{  	V0 R = {{ 1, 0.0100 }};   V0 X = _X0; 
+		condor_minimizer<V0>	mzr;////  condor  logged RESCALED rosenberg
+			mzr	.loft		(xg_log<V0>  (rescale<V0>  (rosenberg<V0>(), R),  mzr));
+			mzr	.X0		(X/=R);	// X[0..N-1]
 			mzr	.rho_begin	(1);
 			mzr	.rho_end	(STOP_AT_X_STEP);
 			mzr	.argmin();
@@ -102,10 +96,10 @@ int main(int argc, char **argv) {
 		
 		#ifdef  OLD_BAD_SCALE_ROSENBROCK
 		{ 	const int FACTOR=100;
-			array0_t _X0 ={{-1.2,1*FACTOR}};
-		condor_minimizer<array0_t>	mzr;
+			V0 _X0 ={{-1.2,1*FACTOR}};
+		condor_minimizer<V0>	mzr;
 			mzr	.X0		(_X0);	// X[0..N-1]
-			mzr	.loft 		(of_log<array0_t>  (of_bad_scale_rosenberg<array0_t, FACTOR>(),  mzr));
+			mzr	.loft 		(xg_log<V0>  (bad_scale_rosenberg<V0, FACTOR>(),  mzr));
 			mzr	.rho_begin	(1);
 			mzr	.rho_end	(STOP_AT_X_STEP);
 			mzr	.argmin();
@@ -118,9 +112,9 @@ int main(int argc, char **argv) {
 
 	#ifdef  NEWUOA
 
-		{ newuoa_minimizer<array1_t>	mzr;		 ////  NEWUOA :  2*N + 1 
-			mzr	.loft		(of_log<array1_t>(of_rosenberg<array1_t>(),mzr));
-			mzr	.X0		(*(array1_t*)&(_X0));	// X[1..N]
+		{ newuoa_minimizer<V1>	mzr;		 ////  NEWUOA :  2*N + 1 
+			mzr	.loft		(xg_log<V1>(rosenberg<V1>(),mzr));
+			mzr	.X0		(*(V1*)&(_X0));	// X[1..N]
 			mzr	.rho_begin	(1);
 			mzr	.rho_end	(STOP_AT_X_STEP);
 			mzr	.argmin		();
@@ -128,10 +122,10 @@ int main(int argc, char **argv) {
 		}
 
 
-		{	const int N=array1_t::sz;
-		newuoa_minimizer<array1_t, (N+1)*(N+2)/2>	mzr; ////  NEWUOA  (N+1)*(N+2)/2
-			mzr	.loft		(of_log<array1_t>(of_rosenberg<array1_t>(),mzr));
-			mzr	.X0		(*(array1_t*)&(_X0));	// X[1..N]
+		{	const int N=V1::sz;
+		newuoa_minimizer<V1, (N+1)*(N+2)/2>	mzr; ////  NEWUOA  (N+1)*(N+2)/2
+			mzr	.loft		(xg_log<V1>(rosenberg<V1>(),mzr));
+			mzr	.X0		(*(V1*)&(_X0));	// X[1..N]
 			mzr	.rho_begin	(1);
 			mzr	.rho_end	(STOP_AT_X_STEP);
 			mzr	.argmin();
@@ -142,9 +136,9 @@ int main(int argc, char **argv) {
 
 
 	#ifdef NM
-		{	array0_t		S  = {{ 0.6, 0.6 }};
-		nelder_mead_minimizer<array0_t>	mzr;	////  NELDER-MEAD
-			mzr	.loft		(of_log<array0_t>(of_rosenberg<array0_t>(),  mzr));
+		{	V0		S  = {{ 0.6, 0.6 }};
+		nelder_mead_minimizer<V0>	mzr;	////  NELDER-MEAD
+			mzr	.loft		(xg_log<V0>(rosenberg<V0>(),  mzr));
 			mzr	.X0		(_X0);  // will ignore BEGIN index
 			mzr	.step		(S);
 			//mzr	.characteristic_size	(0.0002);

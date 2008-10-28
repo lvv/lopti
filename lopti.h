@@ -1,7 +1,3 @@
-// TODO 
-//	rename loft_base to loft
-//	macro for loft member
-//
 	
 	#ifndef LVV_LOPTI_H
 	#define LVV_LOPTI_H
@@ -22,23 +18,54 @@
 	#include <boost/bind.hpp>
 		//using boost::bind;
 		
+                                 #define         MINIMIZER_MEMBERS    \
+					using minimizer<V>::X;  		\
+					using minimizer<V>::X0;			\
+					using minimizer<V>::max_iter_;		\
+					using minimizer<V>::iter_;		\
+					using minimizer<V>::verbose_;		\
+					using minimizer<V>::verbose_;		\
+					using minimizer<V>::ymin_;		\
+					using minimizer<V>::Xmin_;		\
+					using minimizer<V>::name;		\
+					using minimizer<V>::name_;		\
+					using minimizer<V>::found_;		\
+					using minimizer<V>::loft_v;
+
+                                 #define         TR_MINIMIZER_MEMBERS    \
+					using trust_region_minimizer<V>::rho_begin_;	\
+					using trust_region_minimizer<V>::rho_end_;
+
+
+                                 #define         LOFT_MEMBERS    \
+                                        using           loft_base<V>::iter_; \
+                                        using           loft_base<V>::wrapped_loft_v; \
+                                        using           loft_base<V>::name_; \
+                                        using           loft_base<V>::name; \
+                                        using           loft_base<V>::X_opt_; \
+					static	const int B = V::ibg;
+
+				#define 	LOFT_TYPES	\
+					typedef		loft_base<V>*			loft_p_t;	\
+					typedef 	const loft_base<V>&		loft_cref_t;	\
+					typedef		typename V::value_type		fp_t;
+
+				#define		NaN	numeric_limits<fp_t>::quiet_NaN()
 
 			template<typename V>
 struct	loft_base		{									// Lopti Object FuncTor
 
-				typedef		loft_base<V>*			loft_p_t;	// virt_ptr to  loft_base
-				typedef 	const loft_base<V>&		loft_cref_t;	// virt ref
-				typedef		typename V::value_type		fp_t;
+				LOFT_TYPES;
+
 			string			name_;
 			V			X_opt_;
 			int			iter_;
 			loft_p_t		wrapped_loft_v;
 
 	// CTOR
-	explicit		loft_base	()			:  wrapped_loft_v(0),	iter_(0)				{ X_opt_ = 0; };
-	explicit		loft_base	(const string& s)	:  wrapped_loft_v(0),	iter_(0), name_(s)			{ X_opt_ = 0; };
+	explicit		loft_base	()			:  wrapped_loft_v(0),	iter_(0)				{ X_opt_ = NaN; };
+	explicit		loft_base	(const string& s)	:  wrapped_loft_v(0),	iter_(0), name_(s)			{ X_opt_ = NaN; };
 	virtual loft_base<V>&	clone		()	const		{ assert(false); return  *new loft_base<V>(*this); }
-
 
 	// set-ters
 	void 			opt		(const V& X_answ)	{ X_opt_ = X_answ; };
@@ -46,27 +73,24 @@ struct	loft_base		{									// Lopti Object FuncTor
 
 	// get-ers
 	virtual const string	name		()	const		{ return  name_; };
-	virtual int 		size		()	const		{ return  V::size(); }; // TODO to delete
 	virtual int 		iter		()	const		{ return  wrapped_loft_v == 0  ?  iter_  :  wrapped_loft_v->iter(); };
 	virtual	fp_t 		opt_distance	(V& X)	const		{ return  distance_norm2(X_opt_, X); };
 	virtual	bool 		empty		()	const		{ return  wrapped_loft_v == 0; };
 
 	// do-ers
 	virtual fp_t		operator()	(V&  X)			{
-					assert( this->wrapped_loft_v != 0 );
-		fp_t   y = (const_cast<loft_base<V>&> (*this->wrapped_loft_v))(X); 
+					assert( wrapped_loft_v != 0 );
+		fp_t   y = (const_cast<loft_base<V>&> (*wrapped_loft_v))(X); 
 		return y;
 	}
 
-	virtual void		reset		()		{ iter_ = 0; };
+	//virtual void		reset		()		{ iter_ = 0; };
  };
 
 
-                 template<typename V>
-class	minimizer { public:
-				typedef		typename V::value_type		fp_t;
-				typedef		loft_base<V>*			loft_p_t;	// virt_ptr to  loft_base
-				typedef 	const loft_base<V>&		loft_cref_t;	// virt ref
+					 template<typename V>
+struct	minimizer {
+					LOFT_TYPES;
 
 			loft_p_t			loft_v;	
 			int				max_iter_;
@@ -89,7 +113,7 @@ class	minimizer { public:
 		found_ 		(false)
 	{};
 
-	virtual 			~minimizer		()		{};  // it it here so that approprite polimorfic DTOR called 
+	//virtual 			~minimizer		()		{};  // it it here so that approprite polimorfic DTOR called 
 
 
 	// set-ters
@@ -99,15 +123,6 @@ class	minimizer { public:
 	virtual minimizer<V>&		max_iter		(int mx)	{  max_iter_   = mx;	return *this;  };
 	virtual minimizer<V>&		verbose			(bool flag)	{  verbose_ = flag;	return *this;  };
 
-	//virtual minimizer<V>&		rho_begin		(fp_t rho)	= 0;
-	//virtual minimizer<V>&		rho_end			(fp_t rho)	= 0;
-	//virtual minimizer<V>&		step			(V&)		= 0;
-	//virtual minimizer<V>&		characteristic_size	(fp_t)		= 0;
-	
-	//virtual minimizer<V>&		rho_begin		(fp_t rho)	{  assert(false); return *this;  }; // NOP, will be defined in derived
-	//virtual minimizer<V>&		rho_end			(fp_t rho)	{  assert(false); return *this;  }; // (can not use pure virtual)
-	virtual minimizer<V>&		step			(V&)		{  assert(false); return *this;  };  // TODO remove this from base
-	virtual minimizer<V>&		characteristic_size	(fp_t)		{  assert(false); return *this;  };  // TODO remove this from base
 
 	// get-ters
 	virtual const string		name			() 	const	{  return (format("%s-%d")  %name_  %(V::size()) ).str(); };
@@ -123,24 +138,17 @@ class	minimizer { public:
 
 				 template<typename V>
 struct	trust_region_minimizer : minimizer<V>    { 
+					LOFT_TYPES;  MINIMIZER_MEMBERS;
+			fp_t 				rho_begin_, rho_end_;
 
-				typedef  typename minimizer<V>::fp_t			fp_t;
-				using minimizer<V>::name;
-				typedef 	const loft_base<V>&		loft_v_t;
-
-			fp_t 				rho_begin_;	// r(rho) start
-			fp_t 				rho_end_;	// r end
-
-					explicit
-	trust_region_minimizer		(const char* _name= "unknown (trust region type)")
-	: 
-		minimizer<V>(_name),
+	explicit		trust_region_minimizer		(const char* _name= "unknown (trust region type)")
+	:	minimizer<V>(_name),
 		rho_begin_ 	(numeric_limits<fp_t>::quiet_NaN ()),
 		rho_end_   	(numeric_limits<fp_t>::quiet_NaN ())
 	{};
 
-	virtual minimizer<V>&	rho_begin		(fp_t rho)	{ rho_begin_ = rho;  return *this; };
-	virtual minimizer<V>&	rho_end			(fp_t rho)	{ rho_end_   = rho;  return *this; };
+	virtual minimizer<V>&		rho_begin		(fp_t rho)	{ rho_begin_ = rho;  return *this; };
+	virtual minimizer<V>&		rho_end			(fp_t rho)	{ rho_end_   = rho;  return *this; };
  };
 
 

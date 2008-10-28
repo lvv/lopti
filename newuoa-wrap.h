@@ -2,10 +2,10 @@
 	#define LVV_LOPTI_NEWUOA_H
 
 	#include <lopti.h>
-	#define LOPTI_NEWUOA
-	#undef  MINIMIZER                                                                                                                                  
-	#define	MINIMIZER	newuoa_minimizer
-	#undef        NEWUOA
+
+	#ifndef   MINIMIZER                                                                                                                                  
+		#define	MINIMIZER	newuoa_minimizer
+	#endif
 
 	// reverse indexes for fortran compat
 	#define		BMAT(i,j)	BMAT[j][i]
@@ -15,45 +15,21 @@
 	#include        <cmath>
 			using   std::sqrt;  
 	#include        <algorithm>
-			using   std::max;  
-			using   std::min;  
+			using   std::max;  using   std::min;  
 
 	#include	<lvv/math.h>
-			using lvv::pow2;
-			using lvv::pow3;
-			using lvv::abs;
+			using lvv::pow2; using lvv::pow3; using lvv::abs;
 	#include	<lvv/array.h>
-			using lvv::array;
-			using lvv::vector;
-			using lvv::matrix;
+			using lvv::array; using lvv::vector; using lvv::matrix;
 
 	extern "C" void  trsapp_  (int* N, int* NPT, double* XOPT, double* XPT, double* GQ, double* HQ, double* PQ, double* DELTA, double* D, double* W, double* /*W[NP]*/, double* /*W[NP+N]*/, double* /*W[NP+2*N]*/, double* CRVMIN);
 	extern "C" void  biglag_  (int* N, int* NPT, double* XOPT, double* XPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, int* KNEW, double* DSTEP, double* D, double* ALPHA, double* VLAG, double* /*VLAG[NPT+1]*/, double* W, double* /*W[NP]*/, double* /*W[NP+N]*/);
 	extern "C" void  bigden_  (int* N, int* NPT, double* XOPT, double* XPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, int* KOPT, int*  KNEW, double* D, double* W, double* VLAG, double* BETA, double* XNEW, double* /*W[NDIM+1]*/, double* /*W[6*NDIM+1]*/);
 	extern "C" void  update_  (int* N, int* NPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, double* VLAG, double* BETA, int* KNEW, double* W);
 
-
-
 		template<typename V, int NPT=2*V::sz+1>
 struct  newuoa_minimizer:  trust_region_minimizer<V> {
-			typedef  typename minimizer<V>::fp_t	fp_t;
-
-			using minimizer<V>::X;  		// without this we woun't see minimizer members
-			using minimizer<V>::loft_v;
-			using minimizer<V>::max_iter_;
-			using minimizer<V>::iter_;
-			using minimizer<V>::verbose_;
-			using minimizer<V>::verbose_;
-			using minimizer<V>::ymin_;
-			using minimizer<V>::Xmin_;
-			using minimizer<V>::name_;
-			using minimizer<V>::name;
-			using minimizer<V>::iter;
-			using minimizer<V>::ymin;
-			using minimizer<V>::Xmin;
-			using trust_region_minimizer<V>::rho_begin_;
-			using trust_region_minimizer<V>::rho_end_;
-
+						MINIMIZER_MEMBERS;  TR_MINIMIZER_MEMBERS;  LOFT_TYPES;
 	explicit 		newuoa_minimizer	():   trust_region_minimizer<V>("newoua") {};
 	virtual V&		argmin			();
 	virtual const string	name			() 	const	{  return (format("%s-%d-%d") %name_ %(V::size())  %NPT ).str(); };

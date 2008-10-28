@@ -4,9 +4,6 @@
 
 	#include <lopti.h>
 
-	#undef CONDOR
-	#define  LOPTI_CONDOR
-
 	#ifndef		MINIMIZER
 		#define	MINIMIZER	condor_minimizer
 	#endif
@@ -22,32 +19,21 @@
 	#include <condor/Solver.h>
 	#include <condor/tools.h>
 	#include <condor/ObjectiveFunction.h>
-		using CONDOR::sqr;
-		using CONDOR::Vector;
-		using CONDOR::CONDORSolver;
-
+		using CONDOR::sqr; using CONDOR::Vector; using CONDOR::CONDORSolver;
 	#include <lvv/lvv.h>
-		using std::cout;
-		using std::cerr;
-		using std::endl;
 
 	extern int globalPrintLevel;
 
 
 			template<typename V>
 class	c_of_t  : public CONDOR::ObjectiveFunction { public:
-
-					typedef  typename V::value_type fp_t;
-					typedef 	const loft_base<V>&		loft_cref_t;	
-					typedef 	      loft_base<V>*		loft_p_t;		
-
+						LOFT_TYPES;
 				int eval_cnt;
 				bool verbose;
 				loft_p_t loft_v;
-				//loft_base<V>&  loft_v;
 
 	void	init (loft_p_t loft_p, V& X0) {  
-			loft_v =  loft_p;
+			loft_v = loft_p;
 			strcpy(name,"condor_of_wrap");
 			xOptimal.setSize(X0.size());
 			xStart.  setSize(X0.size());
@@ -56,18 +42,6 @@ class	c_of_t  : public CONDOR::ObjectiveFunction { public:
 			eval_cnt = 0;
 			verbose = false;
 	};
-
-	/*void	init (V& X0) {  	
-			xOptimal.setSize(X0.size());
-			xStart.  setSize(X0.size());
-			xStart << X0;
-	};*/
-
-	/*explicit	c_of_t	 (loft_p_t loft_p)    : loft_v(loft_p)  {  			// we use this CTOR to construct
-			strcpy(name,"condor_loft_wrapper");
-			eval_cnt = 0;
-			verbose = false;
-	};*/
 
 	double  eval (CONDOR::Vector cX, int *nerror=NULL) {  		// condor use this to eval
 			V X;	
@@ -89,42 +63,17 @@ class	c_of_t  : public CONDOR::ObjectiveFunction { public:
 /////////////////////////////////////////////////////////////// 
                  template<typename V>
 class	condor_minimizer: public trust_region_minimizer<V> { public:
-					typedef  typename minimizer<V>::fp_t		fp_t;
-					typedef 	const loft_base<V>&		loft_cref_t;	
-					typedef 	      loft_base<V>*		loft_p_t;		
-
-				using minimizer<V>::X;  		// without this we woun't see minimizer members
-				using minimizer<V>::X0;
-				using minimizer<V>::max_iter_;
-				using minimizer<V>::iter_;
-				using minimizer<V>::verbose_;
-				using minimizer<V>::verbose_;
-				using minimizer<V>::ymin_;
-				using minimizer<V>::Xmin_;
-				using minimizer<V>::name;
-				using minimizer<V>::loft_v;
-				using trust_region_minimizer<V>::rho_begin_;
-				using trust_region_minimizer<V>::rho_end_;
-
-			// m-vars
-			//V	Xmin;
+						MINIMIZER_MEMBERS;  TR_MINIMIZER_MEMBERS;  LOFT_TYPES;
 			c_of_t<V>			c_of;	// condor object func wrap	
-			//CONDOR::ObjectiveFunction*	c_of;		
-			//CONDOR::ObjectiveFunction*	c_rof_wrap;	// condor object func rescaled wrap	
-
+									//CONDOR::ObjectiveFunction*	c_of;		
+									//CONDOR::ObjectiveFunction*	c_rof_wrap;	// condor object func rescaled wrap	
 			CONDOR::Vector			cX;		// param in condor format
 			CONDOR::Vector			cR;		// rescale divider
-
-
-			//	void		rescale			(V& R) 		{ cR << R; c_rof_wrap = new CONDOR::CorrectScaleOF(2, c_of, cR); };
+									//	void		rescale			(V& R) 		{ cR << R; c_rof_wrap = new CONDOR::CorrectScaleOF(2, c_of, cR); };
 	explicit 			condor_minimizer	()			: trust_region_minimizer<V>("condor") {};
-
 	virtual	minimizer<V>&	 	verbose			(bool flag)	{ verbose_     = flag; c_of.verbose = flag; return *this; };
-
 	virtual V&		 	argmin			()		{
-						// TODO assert(!loft_v.empty());  
-						assert(!isnan(rho_begin_) && " rho_begin not initialised ");
-						assert(!isnan(rho_end_)   && " rho_end   not initialised ");
+							assert(loft_v != 0 );  assert(!isnan(rho_begin_) && !isnan(rho_end_));
 		c_of.init(loft_v, X);
 		globalPrintLevel = 10;		// off
 		CONDOR::CONDORSolver(rho_begin_, rho_end_, max_iter_,  &c_of);
@@ -133,6 +82,5 @@ class	condor_minimizer: public trust_region_minimizer<V> { public:
 		iter_ = c_of.getNFE(); 
 		return Xmin_;
 	};
-
 };
 	#endif // LVV_LOPTI_CONDOR_H

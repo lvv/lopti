@@ -2,9 +2,6 @@
 	#ifndef LVV_LOPTI_NELDER_MEAD_H
 	#define LVV_LOPTI_NELDER_MEAD_H
 
-	#undef  NM
-	#define	LOPTI_NM
-
 	#ifndef		MINIMIZER
 		#define	MINIMIZER	nelder_mead_minimizer
 	#endif
@@ -20,43 +17,24 @@
 	#include <lvv/lvv.h>
 		using std::cerr;
  
-                 template<typename V>
-class gsl_of_wrap {  public:
-					typedef		typename V::value_type		fp_t;
-					typedef 	loft_base<V>*			loft_v_t;
-				static		loft_v_t	 loft_v;
-
-		static void	init	(loft_v_t  _loft_v)			{ loft_v = _loft_v; }	
+ template<typename V>		struct gsl_of_wrap {
+				LOFT_TYPES;
+				static		loft_p_t	 loft_v;
+		static void	init	(loft_p_t  _loft_v)			{ loft_v = _loft_v; }	
 		static double	eval	(const gsl_vector* gX, void * var)	{ V X;    X << gX;    return  (*loft_v)(X); }	
  };
 
 template<typename V>  loft_base<V>* gsl_of_wrap<V>::loft_v; // this is in gsl_of_wrap class, but we need to decl it 1 more time for compiler
 
                  template<typename V>
-class	nelder_mead_minimizer  :  public minimizer<V> { public:
-				typedef  typename minimizer<V>::fp_t		fp_t;
-
-				using minimizer<V>::X;  		// without this we woun't see minimizer members
-				using minimizer<V>::max_iter_;
-				using minimizer<V>::verbose_;
-				using minimizer<V>::loft_v;
-				using minimizer<V>::verbose_;
-				using minimizer<V>::ymin_;
-				using minimizer<V>::Xmin_;
-				using minimizer<V>::name;
-				using minimizer<V>::iter_;
-				using minimizer<V>::found_;
-
-
-
+struct	nelder_mead_minimizer  :  minimizer<V> {
+						MINIMIZER_MEMBERS;   LOFT_TYPES;
 		gsl_vector*			gX;	
 		gsl_vector* 			gS;	
 		const gsl_multimin_fminimizer_type *gsl_minimizer_type_ptr;
 		gsl_multimin_fminimizer*	gsl_minimizer;
 		gsl_multimin_function		minex_func;
 		double 				characteristic_size_;
-
-
 
 	explicit 		nelder_mead_minimizer	() : minimizer<V>("nelder-mead"), gsl_minimizer_type_ptr (gsl_multimin_fminimizer_nmsimplex) {};
 
@@ -120,7 +98,6 @@ class	nelder_mead_minimizer  :  public minimizer<V> { public:
 		Xmin_  <<  gsl_minimizer->x;
 		return Xmin_;
 	}
-
 
  };
 	#endif // LVV_LOPTI_NELDER_MEAD_H

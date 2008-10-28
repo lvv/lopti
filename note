@@ -1,0 +1,18 @@
+
+
+		// plot:  opt_dist (iter)
+		//*log_file << format("# :gnuplot+: \"pipe\" using 1:(log10($2)) with lines title \"%s(%s)\",  \n")  %title % wrapped_loft_v->name();
+
+		// splot:  path 
+		/*
+		#undef	 GP_F
+		#define  GP_F "set view 0,0,1.7;  splot [-2:1.5][-0.5:2] log(100 * (y - x*x)**2 + (1 - x)**2),  "
+		*log_file << format(
+			"# :gnuplot2: set font \"arial,6\"; set dgrid3d;  set key off;"
+			"set contour surface;  set cntrparam levels 20;  set isosample 40;"
+			GP_F "\"pipe\" using 4:5:2:1 with labels title \"%s(%s)\" ; \n" 
+		)  %title % wrapped_loft_v->name();
+		 
+		// col header
+		*log_file << "# iter \t y=f(X) \t |y-opt| \t X\n";
+		*/
