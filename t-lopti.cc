@@ -42,6 +42,7 @@ int main(int argc, char **argv) {
 				#define NM
 				#define NAKED
 				#define PLAIN_FN
+				#define  OLD_BAD_SCALE_ROSENBROCK
 			#endif
 
 			#if  ! defined(NEWUOA) && ! defined(NM)  && !defined(CONDOR)
@@ -56,8 +57,7 @@ int main(int argc, char **argv) {
 	#ifdef CONDOR
 
 		#ifdef  PLAIN_FN
-		{  ////  CONDOR  x PLAIN_FN  ROSENBERG
-		condor_minimizer<array0_t> mzr;
+		{  condor_minimizer<array0_t> mzr;////  CONDOR  x PLAIN_FN  ROSENBERG
 			mzr	.loft			( plain_fn<array0_t> (&plain_fn_rosenberg<array0_t>, "plain_fn") );
 			mzr	.X0			(_X0);	// X[0..N-1]	
 			mzr	.rho_begin		(1);
@@ -68,8 +68,7 @@ int main(int argc, char **argv) {
 		#endif
 
 		#ifdef  NAKED
-		{  ////  CONDOR  x NAKED ROSENBERG
-		condor_minimizer<array0_t>	mzr;	
+		{  condor_minimizer<array0_t>	mzr;	////  CONDOR  x NAKED ROSENBERG
 			mzr	.loft		(  of_rosenberg<array0_t>() );
 			mzr	.X0		(_X0);
 			mzr	.rho_begin	(1);
@@ -80,8 +79,7 @@ int main(int argc, char **argv) {
 		#endif
 
 
-		{  ////  condor  LOGGED rosenberg
-		condor_minimizer<array0_t>	mzr;
+		{  condor_minimizer<array0_t>	mzr;////  condor  LOGGED rosenberg
 			mzr	.X0		(_X0);
 			mzr	.loft		(of_log<array0_t>(of_rosenberg<array0_t>(),  mzr));
 			mzr	.rho_begin	(1);
@@ -91,9 +89,8 @@ int main(int argc, char **argv) {
 		}	
 
 
-		{  ////  condor  logged RESCALED rosenberg
-		array0_t R = {{1,1}};
-		condor_minimizer<array0_t>	mzr;
+		{  	array0_t R = {{1,1}};
+		condor_minimizer<array0_t>	mzr;////  condor  logged RESCALED rosenberg
 			mzr	.loft		(of_log<array0_t>  (rescale<array0_t>  (of_rosenberg<array0_t>(), R),  mzr));
 			mzr	.X0		(_X0);	// X[0..N-1]
 			mzr	.rho_begin	(1);
@@ -103,10 +100,9 @@ int main(int argc, char **argv) {
 		}	
 
 		
-		//#ifdef  OLD_BAD_SCALE_ROSENBROCK
-		{  ////  CONDOR (bad_scale_rosenbrock)
-		const int FACTOR=100;
-		array0_t _X0 ={{-1.2,1*FACTOR}};
+		#ifdef  OLD_BAD_SCALE_ROSENBROCK
+		{ 	const int FACTOR=100;
+			array0_t _X0 ={{-1.2,1*FACTOR}};
 		condor_minimizer<array0_t>	mzr;
 			mzr	.X0		(_X0);	// X[0..N-1]
 			mzr	.loft 		(of_log<array0_t>  (of_bad_scale_rosenberg<array0_t, FACTOR>(),  mzr));
@@ -115,27 +111,14 @@ int main(int argc, char **argv) {
 			mzr	.argmin();
 			mzr	.print();
 		}
-		//#endif
+		#endif
+
 	#endif
 
 
 	#ifdef  NEWUOA
 
-		#ifdef NAKED
-		{  ////  NEWUOA :  2*N + 1  NAKED
-		newuoa_minimizer<array1_t> 	mzr;
-			mzr	.X0		(*(array1_t*)&(_X0));	// X[1..N]
-			mzr	.loft		(of_rosenberg<array1_t>());
-			mzr	.rho_begin	(1);
-			mzr	.rho_end	(STOP_AT_X_STEP);
-			mzr	.argmin		();
-			mzr	.print		();
-		}
-		#endif
-
-
-		{  ////  NEWUOA :  2*N + 1 
-		newuoa_minimizer<array1_t>	mzr;		
+		{ newuoa_minimizer<array1_t>	mzr;		 ////  NEWUOA :  2*N + 1 
 			mzr	.loft		(of_log<array1_t>(of_rosenberg<array1_t>(),mzr));
 			mzr	.X0		(*(array1_t*)&(_X0));	// X[1..N]
 			mzr	.rho_begin	(1);
@@ -144,34 +127,31 @@ int main(int argc, char **argv) {
 			mzr	.print		();
 		}
 
-	/*
 
-		{  ////  NEWUOA  (N+1)*(N+2)/2
-			const int N=array1_t::sz;
-			newuoa_minimizer<array1_t,(N+1)*(N+2)/2>	mzr			(*(array1_t*)&(X0));	// X[1..N]
-			of_log<array1_t> ol  (&of_rb1, mzr);
-			mzr	.loft		(&ol);
+		{	const int N=array1_t::sz;
+		newuoa_minimizer<array1_t, (N+1)*(N+2)/2>	mzr; ////  NEWUOA  (N+1)*(N+2)/2
+			mzr	.loft		(of_log<array1_t>(of_rosenberg<array1_t>(),mzr));
+			mzr	.X0		(*(array1_t*)&(_X0));	// X[1..N]
 			mzr	.rho_begin	(1);
 			mzr	.rho_end	(STOP_AT_X_STEP);
 			mzr	.argmin();
 			mzr	.print();
 		}
-		#endif
+
+	#endif
 
 
-		#ifdef NM
-		{  ////  NELDER-MEAD
-			array0_t		S  = {{ 0.6, 0.6 }};
-			nelder_mead_minimizer<array0_t>	mzr			(X0);	// will ignore BEGIN index
-			of_log<array0_t> ol  (&of_rb0, mzr);
-			mzr	.loft		(&ol);
+	#ifdef NM
+		{	array0_t		S  = {{ 0.6, 0.6 }};
+		nelder_mead_minimizer<array0_t>	mzr;	////  NELDER-MEAD
+			mzr	.loft		(of_log<array0_t>(of_rosenberg<array0_t>(),  mzr));
+			mzr	.X0		(_X0);  // will ignore BEGIN index
 			mzr	.step		(S);
 			//mzr	.characteristic_size	(0.0002);
 			mzr	.characteristic_size	(STOP_AT_X_STEP);
 			mzr.argmin();
 			mzr.print();
 		}
-	*/
 	#endif 
 
 	return 0;
