@@ -98,8 +98,14 @@ class	minimizer { public:
 	virtual minimizer<V>&		X0			(V& _X) 	{  X  = _X;	return *this;  };
 	virtual minimizer<V>&		max_iter		(int mx)	{  max_iter_   = mx;	return *this;  };
 	virtual minimizer<V>&		verbose			(bool flag)	{  verbose_ = flag;	return *this;  };
-	virtual minimizer<V>&		rho_begin		(fp_t rho)	{  assert(false); return *this;  }; // NOP, will be defined in derived
-	virtual minimizer<V>&		rho_end			(fp_t rho)	{  assert(false); return *this;  }; // (can not use pure virtual)
+
+	//virtual minimizer<V>&		rho_begin		(fp_t rho)	= 0;
+	//virtual minimizer<V>&		rho_end			(fp_t rho)	= 0;
+	//virtual minimizer<V>&		step			(V&)		= 0;
+	//virtual minimizer<V>&		characteristic_size	(fp_t)		= 0;
+	
+	//virtual minimizer<V>&		rho_begin		(fp_t rho)	{  assert(false); return *this;  }; // NOP, will be defined in derived
+	//virtual minimizer<V>&		rho_end			(fp_t rho)	{  assert(false); return *this;  }; // (can not use pure virtual)
 	virtual minimizer<V>&		step			(V&)		{  assert(false); return *this;  };  // TODO remove this from base
 	virtual minimizer<V>&		characteristic_size	(fp_t)		{  assert(false); return *this;  };  // TODO remove this from base
 
@@ -116,7 +122,7 @@ class	minimizer { public:
  };
 
 				 template<typename V>
-class	trust_region_minimizer : public minimizer<V>    { public:
+struct	trust_region_minimizer : minimizer<V>    { 
 
 				typedef  typename minimizer<V>::fp_t			fp_t;
 				using minimizer<V>::name;
