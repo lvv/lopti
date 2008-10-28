@@ -36,15 +36,13 @@ struct	loft_base		{									// Lopti Object FuncTor
 
 	// CTOR
 	explicit		loft_base	()			:  wrapped_loft_v(0),	iter_(0)				{ X_opt_ = 0; };
-	// like copy-CTOR  
-	//explicit		loft_base	(loft_cref_t loft_cref)	:  wrapped_loft_v(&loft_cref.clone()),	iter_(0), name_(loft_cref.name())	{cout << "loft_base::loft_base(cref) \n"; X_opt_ = 0; };
 	explicit		loft_base	(const string& s)	:  wrapped_loft_v(0),	iter_(0), name_(s)			{ X_opt_ = 0; };
-	virtual loft_base<V>&	clone		()	const		{ cout << "base.clone\n"; assert(false); return  *new loft_base<V>(*this); }
+	virtual loft_base<V>&	clone		()	const		{ assert(false); return  *new loft_base<V>(*this); }
 
 
 	// set-ters
 	void 			opt		(const V& X_answ)	{ X_opt_ = X_answ; };
-	virtual void		loft		(loft_cref_t loft_cref)	{ cout << "loft_base::loft clone: \n"; wrapped_loft_v = &loft_cref.clone();	name_ = loft_cref.name(); };
+	virtual void		loft		(loft_cref_t loft_cref)	{ wrapped_loft_v = &loft_cref.clone();	name_ = loft_cref.name(); };
 
 	// get-ers
 	virtual const string	name		()	const		{ return  name_; };
@@ -55,7 +53,6 @@ struct	loft_base		{									// Lopti Object FuncTor
 
 	// do-ers
 	virtual fp_t		operator()	(V&  X)			{
-		cout << "base.name(): " << name() << "\n";
 					assert( this->wrapped_loft_v != 0 );
 		fp_t   y = (const_cast<loft_base<V>&> (*this->wrapped_loft_v))(X); 
 		return y;
@@ -81,18 +78,6 @@ class	minimizer { public:
 			bool				found_;
 			string				name_;
 
-				/*explicit 		
-	minimizer		(loft_v_t  ref, const string& _name = "unknown")  
-	:
-		loft_v		(ref.clone()),
-		max_iter_	(500),
-		ymin_    	(numeric_limits<fp_t>::quiet_NaN ()),
-		iter_    	(0),
-		verbose_ 	(false),
-		found_ 		(false),
-		name_		(_name)
-	{};*/
-
 				explicit 		
 	minimizer		(const string& _name = "unknown")  
 	:
@@ -108,7 +93,7 @@ class	minimizer { public:
 
 
 	// set-ters
-	virtual minimizer<V>&		loft			(loft_cref_t  ref){ cout << "minimizer::loft()\n"; loft_v = &ref.clone(); return *this; };
+	virtual minimizer<V>&		loft			(loft_cref_t  ref){ loft_v = &ref.clone(); return *this; };
 
 	virtual minimizer<V>&		X0			(V& _X) 	{  X  = _X;	return *this;  };
 	virtual minimizer<V>&		max_iter		(int mx)	{  max_iter_   = mx;	return *this;  };

@@ -40,6 +40,8 @@ int main(int argc, char **argv) {
 				#define CONDOR
 				#define NEWUOA
 				#define NM
+				#define NAKED
+				#define PLAIN_FN
 			#endif
 
 			#if  ! defined(NEWUOA) && ! defined(NM)  && !defined(CONDOR)
@@ -55,8 +57,7 @@ int main(int argc, char **argv) {
 
 		#ifdef  PLAIN_FN
 		{  ////  CONDOR  x PLAIN_FN  ROSENBERG
-
-			condor_minimizer<array0_t> mzr;
+		condor_minimizer<array0_t> mzr;
 			mzr	.loft			( plain_fn<array0_t> (&plain_fn_rosenberg<array0_t>, "plain_fn") );
 			mzr	.X0			(_X0);	// X[0..N-1]	
 			mzr	.rho_begin		(1);
@@ -104,9 +105,9 @@ int main(int argc, char **argv) {
 		
 		//#ifdef  OLD_BAD_SCALE_ROSENBROCK
 		{  ////  CONDOR (bad_scale_rosenbrock)
-			const int FACTOR=100;
-			array0_t X0 ={{-1.2,1*FACTOR}};
-			condor_minimizer<array0_t>	mzr;
+		const int FACTOR=100;
+		array0_t _X0 ={{-1.2,1*FACTOR}};
+		condor_minimizer<array0_t>	mzr;
 			mzr	.X0		(_X0);	// X[0..N-1]
 			mzr	.loft 		(of_log<array0_t>  (of_bad_scale_rosenberg<array0_t, FACTOR>(),  mzr));
 			mzr	.rho_begin	(1);
@@ -118,61 +119,60 @@ int main(int argc, char **argv) {
 	#endif
 
 
-/*
 	#ifdef  NEWUOA
 
-	{  ////  NEWUOA :  2*N + 1  NAKED
-		//of_log<array1_t> ol  (&of_rb1, mzr);
-		//mzr	.loft		(&of_rb1)
-		newuoa_minimizer<array1_t>
-		mzr			(*(array1_t*)&(X0));	// X[1..N]
-		mzr	.loft		(new of_rosenberg<array1_t>());
-		mzr	.rho_begin	(1);
-		mzr	.rho_end	(STOP_AT_X_STEP);
-		mzr	.argmin		();
-		mzr	.print		();
-	}
+		#ifdef NAKED
+		{  ////  NEWUOA :  2*N + 1  NAKED
+		newuoa_minimizer<array1_t> 	mzr;
+			mzr	.X0		(*(array1_t*)&(_X0));	// X[1..N]
+			mzr	.loft		(of_rosenberg<array1_t>());
+			mzr	.rho_begin	(1);
+			mzr	.rho_end	(STOP_AT_X_STEP);
+			mzr	.argmin		();
+			mzr	.print		();
+		}
+		#endif
 
 
-	{  ////  NEWUOA :  2*N + 1 
-		newuoa_minimizer<array1_t>	mzr			(*(array1_t*)&(X0));	// X[1..N]
-		of_log<array1_t> ol  (&of_rb1, mzr);
-		mzr	.loft		(&ol);
-		//mzr	.loft		(new of_log<array1_t>(new of_rosenberg<array1_t>(),mzr));
-		mzr	.rho_begin	(1);
-		mzr	.rho_end	(STOP_AT_X_STEP);
-		mzr	.argmin		();
-		mzr	.print		();
-	}
+		{  ////  NEWUOA :  2*N + 1 
+		newuoa_minimizer<array1_t>	mzr;		
+			mzr	.loft		(of_log<array1_t>(of_rosenberg<array1_t>(),mzr));
+			mzr	.X0		(*(array1_t*)&(_X0));	// X[1..N]
+			mzr	.rho_begin	(1);
+			mzr	.rho_end	(STOP_AT_X_STEP);
+			mzr	.argmin		();
+			mzr	.print		();
+		}
+
+	/*
+
+		{  ////  NEWUOA  (N+1)*(N+2)/2
+			const int N=array1_t::sz;
+			newuoa_minimizer<array1_t,(N+1)*(N+2)/2>	mzr			(*(array1_t*)&(X0));	// X[1..N]
+			of_log<array1_t> ol  (&of_rb1, mzr);
+			mzr	.loft		(&ol);
+			mzr	.rho_begin	(1);
+			mzr	.rho_end	(STOP_AT_X_STEP);
+			mzr	.argmin();
+			mzr	.print();
+		}
+		#endif
 
 
-	{  ////  NEWUOA  (N+1)*(N+2)/2
-		const int N=array1_t::sz;
-		newuoa_minimizer<array1_t,(N+1)*(N+2)/2>	mzr			(*(array1_t*)&(X0));	// X[1..N]
-		of_log<array1_t> ol  (&of_rb1, mzr);
-		mzr	.loft		(&ol);
-		mzr	.rho_begin	(1);
-		mzr	.rho_end	(STOP_AT_X_STEP);
-		mzr	.argmin();
-		mzr	.print();
-	}
-	#endif
-
-
-	#ifdef NM
-	{  ////  NELDER-MEAD
-		array0_t		S  = {{ 0.6, 0.6 }};
-		nelder_mead_minimizer<array0_t>	mzr			(X0);	// will ignore BEGIN index
-		of_log<array0_t> ol  (&of_rb0, mzr);
-		mzr	.loft		(&ol);
-		mzr	.step		(S);
-		//mzr	.characteristic_size	(0.0002);
-		mzr	.characteristic_size	(STOP_AT_X_STEP);
-		mzr.argmin();
-		mzr.print();
-	}
+		#ifdef NM
+		{  ////  NELDER-MEAD
+			array0_t		S  = {{ 0.6, 0.6 }};
+			nelder_mead_minimizer<array0_t>	mzr			(X0);	// will ignore BEGIN index
+			of_log<array0_t> ol  (&of_rb0, mzr);
+			mzr	.loft		(&ol);
+			mzr	.step		(S);
+			//mzr	.characteristic_size	(0.0002);
+			mzr	.characteristic_size	(STOP_AT_X_STEP);
+			mzr.argmin();
+			mzr.print();
+		}
+	*/
 	#endif 
 
-*/
 	return 0;
  }

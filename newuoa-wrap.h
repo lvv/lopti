@@ -35,7 +35,7 @@
 
 
 		template<typename V, int NPT=2*V::sz+1>
-class newuoa_minimizer:  public trust_region_minimizer<V> { public:
+struct  newuoa_minimizer:  trust_region_minimizer<V> {
 			typedef  typename minimizer<V>::fp_t	fp_t;
 
 			using minimizer<V>::X;  		// without this we woun't see minimizer members
@@ -54,7 +54,7 @@ class newuoa_minimizer:  public trust_region_minimizer<V> { public:
 			using trust_region_minimizer<V>::rho_begin_;
 			using trust_region_minimizer<V>::rho_end_;
 
-	explicit 		newuoa_minimizer	(V& _X):   trust_region_minimizer<V>(_X, "newoua") {};
+	explicit 		newuoa_minimizer	():   trust_region_minimizer<V>("newoua") {};
 	virtual V&		argmin			();
 	virtual const string	name			() 	const	{  return (format("%s-%d-%d") %name_ %(V::size())  %NPT ).str(); };
 };

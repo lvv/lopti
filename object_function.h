@@ -52,7 +52,7 @@ struct	plain_fn : public loft_base<V>		{
 					typedef		typename V::value_type		fp_t;
 				function<fp_t(V&)>	of;
 	explicit		plain_fn	(function<fp_t(V&)> _of, const string& _name)	 : loft_base<V>(_name) , of(_of)   {};
-	virtual plain_fn<V>&	clone		()	const		{  cout << "plain_fn.clone\n";  return  *new plain_fn<V>(*this); }
+	virtual plain_fn<V>&	clone		()	const		{  return  *new plain_fn<V>(*this); }
 	virtual fp_t		operator()	(V&  X)	  { assert(!of.empty() && ">> NOT DEFINED OBJ FUNC <<");  this->iter_++;   fp_t y = (of)(X); return y; }
  };
 
@@ -64,7 +64,7 @@ struct	of_rosenberg	: loft_base<V> {
 					typedef		typename V::value_type		fp_t;
 					typedef		of_rosenberg<V>	this_t;
 	explicit 			of_rosenberg	()	: loft_base<V>("rosenberg") 	{ V const  X_answ = {{ 1.0, 1.0 }};   loft_base<V>::opt(X_answ); };
-	virtual	this_t&			clone		()	const		{  cout << "rb.clone\n"; return  *new this_t(*this); }
+	virtual	this_t&			clone		()	const		{  return  *new this_t(*this); }
 	virtual  fp_t			operator() 	(V& X)  {  loft_base<V>::iter_++;      return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
  };
 
@@ -81,7 +81,7 @@ struct	of_bad_scale_rosenberg	 : loft_base<V> {
 					typedef 		const loft_base<V>&		loft_cref_t;
 					typedef			of_bad_scale_rosenberg<V,FACTOR> this_t;
 	explicit 		of_bad_scale_rosenberg	() : loft_base<V>("bad_scale_rosenberg") 	{ V const  X_answ = {{ 1.0, 1.0*FACTOR }};   loft_base<V>::opt(X_answ); };
-	virtual	this_t&		clone			()	const		{  cout << "rescale::clone()\n"; return  *new this_t(*this); }
+	virtual	this_t&		clone			()	const		{  return  *new this_t(*this); }
 
 			virtual  fp_t
 	operator() 	(V& X)   {  
@@ -102,7 +102,7 @@ class	rescale :  public loft_base<V>  { public:
 			V R;
 					explicit
 	rescale		(const loft_base<V>& loft_v, V& _R)  : 	R(_R)   { loft_base<V>::loft(loft_v); };
-	virtual	this_t&			clone		()	const		{  cout << "rescale::clone()\n"; return  *new this_t(*this); }
+	virtual	this_t&			clone		()	const		{  return  *new this_t(*this); }
 
 	virtual const string	name		()	const	{ return  *new string(this->name_ + " rescaled"); };  // FIXME leak
 	//virtual const string	name		()		{ return  this->name_ = *new string(this->wrapped_loft_v->name_ +  " rescaled"); };
@@ -131,7 +131,7 @@ class	of_log : public loft_base<V> { public:
 
 				shared_ptr<ofstream>	log_file;
 
-	virtual	this_t&			clone		()	const		{  cout << "of_log::clone()\n"; return  *new this_t(*this); }
+	virtual	this_t&			clone		()	const		{  return  *new this_t(*this); }
 
 
 					explicit
@@ -140,7 +140,8 @@ class	of_log : public loft_base<V> { public:
 	//:	log_file(new ofstream(("log/" +  (&mzr)->name() + "(" + loft_base<V>::name() + ")" ).c_str()))
 	{
 		loft_base<V>::loft(_loft_v),  		// init parent 
-		cout << "filename:  log/" +  (&mzr)->name() + "(" + loft_base<V>::name() + ")" << endl;
+		
+						assert(log_file == 0 );
 		log_file = shared_ptr<ofstream>(new ofstream(("log/" +  (&mzr)->name() + "(" + loft_base<V>::name() + ")" ).c_str()));
 									assert (log_file->good());
 		//this->wrapped_loft_v->reset();
@@ -164,7 +165,7 @@ class	of_log : public loft_base<V> { public:
 		*/
 	};
 
-	~of_log		() { if(log_file.unique())   log_file->close(); };  // can not close file at DTOR.  On copy ctor,  of_log obj will be destoyed several times
+	~of_log		() { if(log_file.use_count()<=1)   log_file->close(); };  // can not close file at DTOR.  On copy ctor,  of_log obj will be destoyed several times
 	//void close		() { log_file->close(); };  // can not close file at DTOR.  On copy ctor,  of_log obj will be destoyed several times
 
 
@@ -172,7 +173,7 @@ class	of_log : public loft_base<V> { public:
 		fp_t   y = (*this->wrapped_loft_v)(X); 
 								assert(log_file->good());
 		// 1 - iter no(gp: splot label);  2 - hight (y);  3 - |X-opt| ignored;  4,5 - X coord;  
-		*log_file << format("%d \t %g \t %g \t %22.15g \n")   % (this->wrapped_loft_v->iter())  % this->wrapped_loft_v->opt_distance(X)   %y   %X; 
+		*log_file << format("%d \t %g \t %g \t %22.15g \n")   % (this->wrapped_loft_v->iter())  % this->wrapped_loft_v->opt_distance(X)   %y   %X  << flush;  
 		return  y;
 	};
  };
