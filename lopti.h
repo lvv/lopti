@@ -26,75 +26,52 @@
 			template<typename V>
 struct	loft_base		{									// Lopti Object FuncTor
 
-				//typedef		loft_base<V>*			loft_v_t;	// virt_ptr to  loft_base
-				typedef 	const loft_base<V>&		loft_v_t;		// virt ref
+				typedef		loft_base<V>*			loft_p_t;	// virt_ptr to  loft_base
+				typedef 	const loft_base<V>&		loft_cref_t;	// virt ref
 				typedef		typename V::value_type		fp_t;
 			string			name_;
 			V			X_opt_;
 			int			iter_;
-			//loft_base<V>&		wrapped_loft_v;
-			loft_v_t		wrapped_loft_v;
+			loft_p_t		wrapped_loft_v;
 
 	// CTOR
-	explicit		loft_base	(loft_v_t loft_v)	:  wrapped_loft_v(loft_v),	name_(loft_v.name()), iter_(0)	{ X_opt_ = 0; };
-	explicit		loft_base	(const string& s)	:  wrapped_loft_v(*this), 	name_(s),             iter_(0)	{ X_opt_ = 0; };
+	explicit		loft_base	()			:  wrapped_loft_v(0),	iter_(0)				{ X_opt_ = 0; };
+	// like copy-CTOR  
+	//explicit		loft_base	(loft_cref_t loft_cref)	:  wrapped_loft_v(&loft_cref.clone()),	iter_(0), name_(loft_cref.name())	{cout << "loft_base::loft_base(cref) \n"; X_opt_ = 0; };
+	explicit		loft_base	(const string& s)	:  wrapped_loft_v(0),	iter_(0), name_(s)			{ X_opt_ = 0; };
 	virtual loft_base<V>&	clone		()	const		{ cout << "base.clone\n"; assert(false); return  *new loft_base<V>(*this); }
 
 
 	// set-ters
 	void 			opt		(const V& X_answ)	{ X_opt_ = X_answ; };
+	virtual void		loft		(loft_cref_t loft_cref)	{ cout << "loft_base::loft clone: \n"; wrapped_loft_v = &loft_cref.clone();	name_ = loft_cref.name(); };
 
 	// get-ers
-	virtual const string	name		()	const	{ return  name_; };
-	virtual int 		size		()	const	{ return  V::size(); }; // TODO to delete
-	virtual int 		iter		()	const	{ return  wrapped_loft_v.empty()  ?  iter_  :  wrapped_loft_v.iter(); };
-	virtual	fp_t 		opt_distance	(V& X)	const	{ return  distance_norm2(X_opt_, X); };
-	//virtual	bool 		empty		()	const	{ return  &wrapped_loft_v == this; };
-	virtual	bool 		empty		()	const	{ return  &wrapped_loft_v == this; };
+	virtual const string	name		()	const		{ return  name_; };
+	virtual int 		size		()	const		{ return  V::size(); }; // TODO to delete
+	virtual int 		iter		()	const		{ return  wrapped_loft_v == 0  ?  iter_  :  wrapped_loft_v->iter(); };
+	virtual	fp_t 		opt_distance	(V& X)	const		{ return  distance_norm2(X_opt_, X); };
+	virtual	bool 		empty		()	const		{ return  wrapped_loft_v == 0; };
 
 	// do-ers
 	virtual fp_t		operator()	(V&  X)			{
 		cout << "base.name(): " << name() << "\n";
-					assert(! this->wrapped_loft_v.empty());
-		fp_t   y = (const_cast<loft_base<V>&> (this->wrapped_loft_v))(X); 
+					assert( this->wrapped_loft_v != 0 );
+		fp_t   y = (const_cast<loft_base<V>&> (*this->wrapped_loft_v))(X); 
 		return y;
 	}
 
 	virtual void		reset		()		{ iter_ = 0; };
  };
 
-			template<typename V>
-struct	plain_fn : public loft_base<V>		{  	
-					typedef		typename V::value_type		fp_t;
-				function<fp_t(V&)>	of;
-	explicit		plain_fn	(function<fp_t(V&)> _of, const string& _name="unknown")	 : loft_base<V>(_name) , of(_of)   {};
-	virtual plain_fn<V>&	clone		()	const		{  cout << "plain_fn.clone\n";  return  *new plain_fn<V>(*this); }
-	virtual fp_t		operator()	(V&  X)	  { assert(!of.empty() && ">> NOT DEFINED OBJ FUNC <<");  this->iter_++;   fp_t y = (of)(X); return y; }
- };
-
-			template<typename V>  
-struct	of_rosenberg	: public loft_base<V> { 
-					static const int B = 		V::ibg;
-					typedef		typename V::value_type		fp_t;
-
-	explicit 			of_rosenberg	()	: loft_base<V>("rosenberg") 	{ V const  X_answ = {{ 1.0, 1.0 }};   loft_base<V>::opt(X_answ); };
-	virtual	of_rosenberg<V>&	clone		()	const		{  cout << "rb.clone\n"; return  *new of_rosenberg<V>(*this); }
-
-			//virtual  typename V::value_type
-			virtual  fp_t
-	operator() 	(V& X)   {  loft_base<V>::iter_++;      return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
- };
-
-
 
                  template<typename V>
 class	minimizer { public:
-				typedef 	loft_base<V>			loft_t;
-				//typedef 	loft_base<V>*			loft_v_t;
-				typedef 	const loft_base<V>&		loft_v_t;
 				typedef		typename V::value_type		fp_t;
+				typedef		loft_base<V>*			loft_p_t;	// virt_ptr to  loft_base
+				typedef 	const loft_base<V>&		loft_cref_t;	// virt ref
 
-			loft_v_t			loft_v;	
+			loft_p_t			loft_v;	
 			int				max_iter_;
 			bool				verbose_;
 			V				X;
@@ -104,7 +81,7 @@ class	minimizer { public:
 			bool				found_;
 			string				name_;
 
-				explicit 		
+				/*explicit 		
 	minimizer		(loft_v_t  ref, const string& _name = "unknown")  
 	:
 		loft_v		(ref.clone()),
@@ -114,13 +91,25 @@ class	minimizer { public:
 		verbose_ 	(false),
 		found_ 		(false),
 		name_		(_name)
+	{};*/
+
+				explicit 		
+	minimizer		(const string& _name = "unknown")  
+	:
+		name_		(_name),
+		max_iter_	(500),
+		ymin_    	(numeric_limits<fp_t>::quiet_NaN ()),
+		iter_    	(0),
+		verbose_ 	(false),
+		found_ 		(false)
 	{};
 
 	virtual 			~minimizer		()		{};  // it it here so that approprite polimorfic DTOR called 
 
 
 	// set-ters
-	//virtual minimizer<V>&		loft			(loft_v_t  p)	{ loft_v = p; return *this; };
+	virtual minimizer<V>&		loft			(loft_cref_t  ref){ cout << "minimizer::loft()\n"; loft_v = &ref.clone(); return *this; };
+
 	virtual minimizer<V>&		X0			(V& _X) 	{  X  = _X;	return *this;  };
 	virtual minimizer<V>&		max_iter		(int mx)	{  max_iter_   = mx;	return *this;  };
 	virtual minimizer<V>&		verbose			(bool flag)	{  verbose_ = flag;	return *this;  };
@@ -138,8 +127,7 @@ class	minimizer { public:
 
 	// do-ers
 	virtual V&			argmin			() 		{  return Xmin_; };
-	//virtual void			print			()		{ MSG("%s(%s)  %35t  iter=%d  \t ymin=%g \t Xmin=%22.15g \n") %name() %loft_v->name() %loft_v->iter()  %ymin()  %Xmin();};
-	virtual void			print			()		{ MSG("%s(%s)  %35t  iter=%d  \t ymin=%g \t Xmin=%22.15g \n") %name() %loft_v.name() %loft_v.iter()  %ymin()  %Xmin();};
+	virtual void			print			()		{ MSG("%s(%s)  %35t  iter=%d  \t ymin=%g \t Xmin=%22.15g \n") %name() %loft_v->name() %loft_v->iter()  %ymin()  %Xmin();};
  };
 
 				 template<typename V>
@@ -153,9 +141,9 @@ class	trust_region_minimizer : public minimizer<V>    { public:
 			fp_t 				rho_end_;	// r end
 
 					explicit
-	//trust_region_minimizer		(V& _X, const char* _name= "unknown (trust region type)"):  
-	trust_region_minimizer		(loft_v_t _loft_v, const char* _name= "unknown (trust region type)"):  
-		minimizer<V>	(_loft_v, _name),
+	trust_region_minimizer		(const char* _name= "unknown (trust region type)")
+	: 
+		minimizer<V>(_name),
 		rho_begin_ 	(numeric_limits<fp_t>::quiet_NaN ()),
 		rho_end_   	(numeric_limits<fp_t>::quiet_NaN ())
 	{};

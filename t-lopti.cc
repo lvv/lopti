@@ -55,19 +55,10 @@ int main(int argc, char **argv) {
 
 		#ifdef  PLAIN_FN
 		{  ////  CONDOR  x PLAIN_FN  ROSENBERG
-			//condor_minimizer<array0_t>	mzr			(X0);	// X[0..N-1]
-			//mzr	.loft			(new plain_fn<array0_t> (new plain_fn_rosenberg<array0_t>));
 
-			//const loft_base<array0_t>*	loft =  new plain_fn<array0_t> (&plain_fn_rosenberg<array0_t>);		// ok ptr
-			//const loft_base<array0_t>&	loft = *new plain_fn<array0_t> (&plain_fn_rosenberg<array0_t>);		// ok ref
-			const loft_base<array0_t>&	loft =      plain_fn<array0_t> (&plain_fn_rosenberg<array0_t>);		// ok tmp ref
-			       // loft_base<array0_t>	loft =      plain_fn<array0_t> (&plain_fn_rosenberg<array0_t>);		// ok
-
-			condor_minimizer<array0_t> mzr				(loft);
-			//condor_minimizer<array0_t> mzr				(*new plain_fn<array0_t> (&plain_fn_rosenberg<array0_t>));
-
+			condor_minimizer<array0_t> mzr;
+			mzr	.loft			( plain_fn<array0_t> (&plain_fn_rosenberg<array0_t>, "plain_fn") );
 			mzr	.X0			(_X0);	// X[0..N-1]	
-
 			mzr	.rho_begin		(1);
 			mzr	.rho_end		(STOP_AT_X_STEP);
 			mzr	.argmin();
@@ -77,10 +68,8 @@ int main(int argc, char **argv) {
 
 		#ifdef  NAKED
 		{  ////  CONDOR  x NAKED ROSENBERG
-			condor_minimizer<array0_t>	
-			//mzr			= condor_minimizer<array0_t>(of_rosenberg<array0_t>()); 			// tmp dtor-ed
-			//mzr			(*new of_rosenberg<array0_t>());						// good
-			mzr			((  of_rosenberg<array0_t>() ));  		// without "*&"  gcc & icc thinks that this is func-def
+			condor_minimizer<array0_t>	mzr;	
+			mzr	.loft		(  of_rosenberg<array0_t>() );
 			mzr	.X0		(_X0);
 			mzr	.rho_begin	(1);
 			mzr	.rho_end	(STOP_AT_X_STEP);
@@ -89,12 +78,11 @@ int main(int argc, char **argv) {
 		}
 		#endif
 
-/*
 
 		{  ////  CONDOR  logged rosenberg
-		condor_minimizer<array0_t>
-			mzr			(X0);	// X[0..N-1]
-			mzr	.loft		(new of_log<array0_t>(new of_rosenberg<array0_t>(),  mzr));
+		condor_minimizer<array0_t>	mzr;
+			mzr	.X0		(_X0);
+			mzr	.loft		(of_log<array0_t>(of_rosenberg<array0_t>(),  mzr));
 		//				of_log<array0_t>	ol(&of_rb0, mzr);
 		//	mzr	.loft		(&ol);
 			mzr	.rho_begin	(1);
@@ -103,6 +91,7 @@ int main(int argc, char **argv) {
 			mzr	.print();	
 		}	
 
+/*
 
 		{  ////  CONDOR  logged RESCALED rosenberg
 		array0_t R = {{1,1}};

@@ -45,7 +45,32 @@ of_chebyquad		(V& X) 		{			// The Chebyquad test problem (Fletcher, 1965)
  }
 
 
+/////////////////////////////////////////////////////////////////////////////////////////  ADAPTER: PLAIN_FN
+
+			template<typename V>
+struct	plain_fn : public loft_base<V>		{  	
+					typedef		typename V::value_type		fp_t;
+				function<fp_t(V&)>	of;
+	explicit		plain_fn	(function<fp_t(V&)> _of, const string& _name)	 : loft_base<V>(_name) , of(_of)   {};
+	virtual plain_fn<V>&	clone		()	const		{  cout << "plain_fn.clone\n";  return  *new plain_fn<V>(*this); }
+	virtual fp_t		operator()	(V&  X)	  { assert(!of.empty() && ">> NOT DEFINED OBJ FUNC <<");  this->iter_++;   fp_t y = (of)(X); return y; }
+ };
+
+
 /////////////////////////////////////////////////////////////////////////////////////////  OF: ROSENBERG
+			template<typename V>  
+struct	of_rosenberg	: public loft_base<V> { 
+					static const int B = 		V::ibg;
+					typedef		typename V::value_type		fp_t;
+					typedef		of_rosenberg<V>	this_t;
+	virtual	this_t&			clone		()	const		{  cout << "rb.clone\n"; return  *new this_t(*this); }
+	explicit 			of_rosenberg	()	: loft_base<V>("rosenberg") 	{ V const  X_answ = {{ 1.0, 1.0 }};   loft_base<V>::opt(X_answ); };
+
+			//virtual  typename V::value_type
+			virtual  fp_t
+	operator() 	(V& X)   {  loft_base<V>::iter_++;      return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
+ };
+
 
 template<typename V>  typename V::value_type plain_fn_rosenberg(V& X) { static const int B = V::ibg;   return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
 
@@ -93,19 +118,28 @@ class	rescale :  public loft_base<V>  { public:
 
 			template<typename V>
 class	of_log : public loft_base<V> { public:
-		// takes ob_base-type functor, and calling minimizer (to extract its name)
-		// and  logs all evals to file, which name constructed from minimizer-name and functin-name
-		typedef 		typename V::value_type			fp_t;
+					// takes ob_base-type functor, and calling minimizer (to extract its name)
+					// and  logs all evals to file, which name constructed from minimizer-name and functin-name
+					typedef 		typename V::value_type			fp_t;
+					typedef			loft_base<V>*			loft_p_t;
+					typedef 		const loft_base<V>&		loft_cref_t;
+					typedef			of_log<V>			this_t;
 
-		shared_ptr<ofstream>	log_file;
+				shared_ptr<ofstream>	log_file;
+
+	virtual	this_t&			clone		()	const		{  cout << "of_log::clone()\n"; return  *new this_t(*this); }
+
 
 					explicit
-	of_log	 (loft_base<V>* loft_v, minimizer<V>& mzr)	
-	:	loft_base<V>(loft_v),  		// init parent 
-		log_file(new ofstream(("log/" +  (&mzr)->name() + "(" + loft_base<V>::name() + ")" ).c_str()))
+	of_log	 (loft_cref_t _loft_v, minimizer<V>& mzr)	
+	//:	loft_base<V>(loft_v),  		// init parent 
+	//:	log_file(new ofstream(("log/" +  (&mzr)->name() + "(" + loft_base<V>::name() + ")" ).c_str()))
 	{
+		loft_base<V>::loft(_loft_v),  		// init parent 
+		cout << "filename:  log/" +  (&mzr)->name() + "(" + loft_base<V>::name() + ")" << endl;
+		log_file = shared_ptr<ofstream>(new ofstream(("log/" +  (&mzr)->name() + "(" + loft_base<V>::name() + ")" ).c_str()));
 									assert (log_file->good());
-		this->wrapped_loft_v->reset();
+		//this->wrapped_loft_v->reset();
 		// SHOULD BE set grid; plot "1" using 1:(log10($2)) with lines,"2" using 1:(log10($2)) w l,"3" using 1:(log10($2)) w l
 
 		// plot:  opt_dist (iter)
@@ -126,7 +160,7 @@ class	of_log : public loft_base<V> { public:
 		*/
 	};
 
-	~of_log		() { log_file->close(); };  // can not close file at DTOR.  On copy ctor,  of_log obj will be destoyed several times
+	~of_log		() { if(log_file.unique())   log_file->close(); };  // can not close file at DTOR.  On copy ctor,  of_log obj will be destoyed several times
 	//void close		() { log_file->close(); };  // can not close file at DTOR.  On copy ctor,  of_log obj will be destoyed several times
 
 
