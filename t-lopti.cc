@@ -26,8 +26,8 @@
 
 int main(int argc, char **argv) {
 	
-				typedef 	array<double,2,1>		V1;	
-				typedef 	array<double,2,0>		V0;	
+				typedef 	array<double,_N,1>		V1;	
+				typedef 	array<double,_N,0>		V0;	
 
 			///////////////////////////////////////////////// CONFIG 
 			#ifdef  ALL
@@ -41,6 +41,8 @@ int main(int argc, char **argv) {
 
 			#if  ! defined(NEWUOA) && ! defined(NM)  && !defined(CONDOR)
 				#define CONDOR
+				#define NEWUOA
+				#define NM
 			#endif
 
 			#if  ! defined(FN) 
@@ -145,7 +147,7 @@ int main(int argc, char **argv) {
 
 
 	#ifdef NM
-		{	V0		S  = {{ 0.6, 0.6 }};
+		{	V0		S = {{0.6}}; //{{ 0.6, 0.6 }};
 		nelder_mead_minimizer<V0>	mzr;	////  NELDER-MEAD
 			mzr	.loft		(xg_log<V0>(FN<V0>(),  mzr));
 			mzr	.X0		(_X0);  // will ignore BEGIN index

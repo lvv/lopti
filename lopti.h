@@ -106,7 +106,7 @@ struct	minimizer {
 	minimizer		(const string& _name = "unknown")  
 	:
 		name_		(_name),
-		max_iter_	(500),
+		max_iter_	(1500),
 		ymin_    	(numeric_limits<fp_t>::quiet_NaN ()),
 		iter_    	(0),
 		verbose_ 	(false),

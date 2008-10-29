@@ -47,31 +47,31 @@ of_chebyquad		(V& X) 		{			// The Chebyquad test problem (Fletcher, 1965)
 			template<typename V> 
 struct  chebyquad: loft_base<V>		{	 LOFT_TYPES;  LOFT_MEMBERS;  CLONER(chebyquad)		// The Chebyquad test problem (Fletcher, 1965) 
 
-			chebyquad		()	: loft_base<V>("chebyquad") 	{ V const  X_answ = {{ -1, -1 }};   opt(X_answ); };
+			chebyquad		()	: loft_base<V>("chebyquad") 	{ V const  X_answ = {{ -1}};   opt(X_answ); };
 
 	fp_t		operator() 		(V& X)  {
 
 			iter_++;
 			const int N = V::size();
-			matrix <fp_t, V::sz, V::sz+1, 0, 0>		Y;
+			matrix <fp_t, V::sz, V::sz+1, 0+B, 0+B>		Y;
 
-			for (int J=0; J<N; J++)  {
-				Y[0][J] = 1.0;
-				Y[1][J] = 2.0*X[J]-1.0;
+			for (int J=0+B; J<N+B; J++)  {
+				Y[0+B][J] = 1.0;
+				Y[1+B][J] = 2.0*X[J]-1.0;
 			}
 
-			for (int I=0+1; I<N; I++) 
-				for (int J=0; J<N; J++)
-					Y[I+1][J]=2.0*Y[1][J]*Y[I][J]-Y[I-1][J];
+			for (int I=0+1+B; I<N+B; I++) 
+				for (int J=0+B; J<N+B; J++)
+					Y[I+1][J]=2.0*Y[1+B][J]*Y[I][J]-Y[I-1][J];
 
 			fp_t 	F  = 0.0;
 			int	IW = 1;
 
-			for (int I=0; I<N+1; I++)  {
+			for (int I=0+B; I<N+1+B; I++)  {
 				fp_t  SUM = 0.0;
-				for (int J=0; J<N; J++) 	SUM += Y[I][J];
+				for (int J=0+B; J<N+B; J++) 	SUM += Y[I][J];
 				SUM = SUM/N;
-				if (IW > 0)  SUM += 1.0/((I+1)*(I+1)-2*(I+1));
+				if (IW > 0)  SUM += 1.0/((I+1-B)*(I+1-B)-2*(I+1-B));
 				IW =-IW;
 				F += SUM*SUM;
 			}
