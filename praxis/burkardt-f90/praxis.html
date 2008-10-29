@@ -1,0 +1,100 @@
+<HTML>
+
+  <HEAD>
+    <TITLE>
+      PRAXIS - Scalar Function Optimization
+    </TITLE>
+  </HEAD>
+
+  <BODY bgcolor="#EEEEEE" link="#CC0000" alink="#FF3300" vlink="#000055">
+
+    <H1>
+      PRAXIS - Scalar Function Optimization
+    </H1>
+
+    <P>
+      <B>PRAXIS</B> is Richard Brent's "principal axis" code for seeking 
+      an N-dimensional point X which minimizes a given scalar function 
+      <B>F(X)</B>.  The code is a refinement of Powell's method of 
+      conjugate search directions.
+    </P>
+
+    <P>
+      <DL>
+        <DT>
+          Reference 1:
+        </DT>
+        <DD>
+          Richard Brent,<BR>
+          Algorithms for Minimization without Derivatives,</BR>
+          Prentice Hall, 1973<BR>
+          Reprinted by Dover, 2002.
+        </DD>
+      </DL>
+    </P>
+
+    <P>
+      Files you may copy include:
+      <UL>
+        <LI>
+          <A HREF = "praxis.f90">praxis.f90</A>, the source code.
+        </LI>
+        <LI>
+          <A HREF = "praxis_prb.f90">praxis_prb.f90</A>, sample calling routine.
+        </LI>
+        <LI>
+          <A HREF = "praxis_prb.out">praxis_prb.out</A>, sample output.
+        </LI>
+      </UL>
+    </P>
+
+    <P>
+      The list of routines includes:
+      <UL>
+        <LI>
+          <B>FLIN</B> is the function of one variable to be minimized by MINNY.
+        </LI>
+        <LI>
+          <B>MINFIT</B> computes the singular value decomposition of an array.
+        </LI>
+        <LI>
+          <B>MINNY</B> minimizes a scalar function of N variables along a line.
+        </LI>
+        <LI>
+          <B>PRAXIS</B> seeks an N-dimensional minimizer X of a scalar function F(X).
+        </LI>
+        <LI>
+          <B>PRINT2</B> prints certain data about the progress of the iteration.
+        </LI>
+        <LI>
+          <B>QUAD</B> seeks to minimize the scalar function F along a particular curve.
+        </LI>
+        <LI>
+          <B>R_SWAP</B> switches two real values.
+        </LI>
+        <LI>
+          <B>RMAT_PRINT</B> prints out a matrix.
+        </LI>
+        <LI>
+          <B>RVEC_PRINT</B> prints a real vector, with an optional title.
+        </LI>
+        <LI>
+          <B>SORT</B> sorts a vector D and adjusts the corresponding columns of a matrix V.
+        </LI>
+      </UL>
+
+    </P>
+
+    <P>
+      Return to the <A HREF = "../f_src.html">FORTRAN software page</A>.
+    </P>
+
+    <HR>
+
+    <I>
+      Last revised on 26 February 2002.
+    </I>
+
+  </BODY>
+
+</HTML>
