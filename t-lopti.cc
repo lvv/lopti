@@ -42,6 +42,7 @@ int main(int argc, char **argv) {
 				#define CONDOR
 				#define NEWUOA
 				#define NM
+				#define HJ
 			#endif
 
 			#if  ! defined(FN) 
@@ -53,10 +54,16 @@ int main(int argc, char **argv) {
 			#endif
 			
 			//#define STOP_AT_X_STEP 1e-3
-			#define		STOP_AT_X_STEP 1e-10
-			#define 	RHO_BEGIN	0.1
+			#define		STOP_AT_X_STEP 1e-15
+			//#define 	RHO_BEGIN	0.1
 				
 			V0		_X0 = {{ -1.2, 1 }};
+			#if 	FN == chebyquad
+				for (int i=0; i <_N; i++)   _X0[i] = (i+1.)/(i+2.);
+				const double RHO_BEGIN = 0.2* _X0[0];
+				cout << "X0: "<< _X0 << endl;
+			#endif
+
 
 	#ifdef CONDOR
 
@@ -90,7 +97,6 @@ int main(int argc, char **argv) {
 			mzr	.print(); 
 		}
 		#endif
-
 
 		#ifdef  RESCALE
 		{  	V0 R = {{ 1, 0.0100 }};   V0 X = _X0; 
@@ -142,6 +148,19 @@ int main(int argc, char **argv) {
 			mzr	.step		(S);
 			//mzr	.characteristic_size	(0.0002);
 			mzr	.characteristic_size	(STOP_AT_X_STEP);
+			mzr.argmin();
+			mzr.print();
+		}
+	#endif 
+
+	#ifdef HJ
+		{	V0  S;   S.assign(0.03); //{{ 0.6, 0.6 }};
+		hook_jeevs_minimizer<V0>	mzr;	////  NELDER-MEAD
+			mzr	.loft		(xg_log<V0>(FN<V0>(),  mzr));
+			mzr	.X0		(_X0);  // will ignore BEGIN index
+			mzr	.step		(S);
+			//mzr	.characteristic_size	(0.0002);
+			mzr	.tau		(1e-30);
 			mzr.argmin();
 			mzr.print();
 		}

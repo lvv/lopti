@@ -31,7 +31,7 @@ struct  chebyquad: loft_base<V>		{	 LOFT_TYPES;  LOFT_MEMBERS;  CLONER(chebyquad
 				Y[1+B][J] = 2.0*X[J]-1.0;
 			}
 
-			for (int I=0+1+B; I<N+B; I++) 
+			for (int I=1+B; I<N+B; I++) 
 				for (int J=0+B; J<N+B; J++)
 					Y[I+1][J]=2.0*Y[1+B][J]*Y[I][J]-Y[I-1][J];
 
@@ -54,19 +54,19 @@ struct  chebyquad: loft_base<V>		{	 LOFT_TYPES;  LOFT_MEMBERS;  CLONER(chebyquad
 template<typename V>	struct	plain_fn : loft_base<V>		{  				LOFT_TYPES;  LOFT_MEMBERS;  CLONER(plain_fn)
 						function<fp_t(V&)>	of;
 	explicit	plain_fn	(function<fp_t(V&)> _of, const string& _name)	 : loft_base<V>(_name) , of(_of)   {};
-	fp_t		operator()	(V&  X)	  { assert(!of.empty() && ">> NOT DEFINED OBJ FUNC <<");  iter_++;   fp_t y = (of)(X); return y; }
+	fp_t	operator()	(V&  X)	  { assert(!of.empty() && ">> NOT DEFINED OBJ FUNC <<");  iter_++;   fp_t y = (of)(X); return y; }
  };
  /////////////////////////////////////////////////////////////////////////////////////////  OF: ROSENBERG
 template<typename V>	struct	rosenberg  : loft_base<V> { 				LOFT_TYPES;  LOFT_MEMBERS;  CLONER(rosenberg)
-			rosenberg		()	: loft_base<V>("rosenberg") 	{ V const  X_answ = {{ 1.0, 1.0 }};   opt(X_answ); };
-	fp_t		operator() 		(V& X)  {  iter_++;      return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
+	rosenberg	()	: loft_base<V>("rosenberg") 	{ V const  X_answ = {{ 1.0, 1.0 }};   opt(X_answ); };
+	fp_t	operator() 		(V& X)  {  iter_++;      return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
  };
 
  template<typename V>   typename V::value_type    plain_fn_rosenberg  (V& X) { const int B = V::ibg;   return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
  /////////////////////////////////////////////////////////////////////////////////////////  OF: BAD SCALE ROSENBERG
 template<typename V, int FACTOR>	struct	bad_scale_rosenberg	 : loft_base<V> { 	LOFT_TYPES;  LOFT_MEMBERS;  CLONER(bad_scale_rosenberg);
-			bad_scale_rosenberg	() : loft_base<V>("bad_scale_rosenberg") { V const  X_answ = {{ 1.0, 1.0*FACTOR }};   opt(X_answ); };
-	fp_t		operator() 		(V& X)   {  iter_++; return  100 * pow2(X[1+B]/FACTOR-pow2(X[0+B])) + pow2(1-X[0+B]); };
+	bad_scale_rosenberg() : loft_base<V>("bad_scale_rosenberg") { V const  X_answ = {{ 1.0, 1.0*FACTOR }};   opt(X_answ); };
+	fp_t	operator() 		(V& X)   {  iter_++; return  100 * pow2(X[1+B]/FACTOR-pow2(X[0+B])) + pow2(1-X[0+B]); };
  };
  /////////////////////////////////////////////////////////////////////////////////////////  WRAPPER: RESCALE
 template<typename V>	struct	rescale :  loft_base<V> 	{				LOFT_TYPES;  LOFT_MEMBERS;  CLONER(rescale)

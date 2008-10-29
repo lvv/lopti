@@ -62,7 +62,7 @@ class	c_of_t  : public CONDOR::ObjectiveFunction { public:
 
 /////////////////////////////////////////////////////////////// 
                  template<typename V>
-class	condor_minimizer: public trust_region_minimizer<V> { public:
+struct	condor_minimizer: trust_region_minimizer<V>   {
 						MINIMIZER_MEMBERS;  TR_MINIMIZER_MEMBERS;  LOFT_TYPES;
 			c_of_t<V>			c_of;	// condor object func wrap	
 									//CONDOR::ObjectiveFunction*	c_of;		

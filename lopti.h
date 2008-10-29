@@ -158,6 +158,7 @@ struct	trust_region_minimizer : minimizer<V>    {
 		#include	<lopti/condor-wrap.h>
 		#include   	<lopti/newuoa-wrap.h>
 		#include	<lopti/gsl-nelder-mead-wrap.h>
+		#include	<lopti/hook-jeevs.h>
 	#endif 
 
 	#endif 
