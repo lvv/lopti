@@ -14,45 +14,16 @@
 	#define CLONER(T)	 virtual T&  clone()  const   {  return  *new T(*this); }
 
  /////////////////////////////////////////////////////////////////////////////////////////  OF: CHEBYQUAD
-	/*		template<typename V>  typename V::value_type
-of_chebyquad		(V& X) 		{			// The Chebyquad test problem (Fletcher, 1965) 
-	
-	const int N = V::size();
-	typedef  typename V::value_type fp_t;
 
-	matrix <fp_t, V::sz, V::sz+1>		Y;
-
-     	for (int J=1; J<=N; J++)  {
-		Y[1][J] = 1.0;
-		Y[2][J] = 2.0*X[J]-1.0;
-	}
-
-     	for (int I=2; I<=N; I++) 
-		for (int J=1; J<=N; J++)
-			Y[I+1][J]=2.0*Y[2][J]*Y[I][J]-Y[I-1][J];
-
-     	fp_t 	F  = 0.0;
-     	int	NP = N+1;
-     	int	IW = 1;
-
-     	for (int I=1; I<=NP; I++)  {
-		fp_t  SUM=0.0;
-		for (int J=1; J<=N; J++) 	SUM += Y[I][J];
-		SUM = SUM/N;
-		if (IW > 0)  SUM += 1.0/(I*I-2*I);
-		IW =-IW;
-	   	F += SUM*SUM; }
-	return F;
- }*/
 			template<typename V> 
 struct  chebyquad: loft_base<V>		{	 LOFT_TYPES;  LOFT_MEMBERS;  CLONER(chebyquad)		// The Chebyquad test problem (Fletcher, 1965) 
 
-			chebyquad		()	: loft_base<V>("chebyquad") 	{ V const  X_answ = {{ -1}};   opt(X_answ); };
+			chebyquad		()	: loft_base<V>("chebyquad") 	{};
 
 	fp_t		operator() 		(V& X)  {
 
 			iter_++;
-			const int N = V::size();
+
 			matrix <fp_t, V::sz, V::sz+1, 0+B, 0+B>		Y;
 
 			for (int J=0+B; J<N+B; J++)  {

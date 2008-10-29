@@ -43,7 +43,8 @@
 							using           loft_base<V>::name_; \
 							using           loft_base<V>::name; \
 							using           loft_base<V>::X_opt_; \
-							static	const int B = V::ibg;
+							static	const int B = V::ibg; \
+							static const int N = V::sz;
 
 						#define 	LOFT_TYPES	\
 							typedef		loft_base<V>*			loft_p_t;	\
@@ -63,8 +64,8 @@ struct	loft_base		{									// Lopti Object FuncTor
 			loft_p_t		wrapped_loft_v;
 
 	// CTOR
-	explicit		loft_base	()			:  wrapped_loft_v(0),	iter_(0)				{ X_opt_ = NaN; };
-	explicit		loft_base	(const string& s)	:  wrapped_loft_v(0),	iter_(0), name_(s)			{ X_opt_ = NaN; };
+	explicit		loft_base	()			:  wrapped_loft_v(0),	iter_(0)				{ X_opt_ = -1; };
+	explicit		loft_base	(const string& s)	:  wrapped_loft_v(0),	iter_(0), name_(s)			{ X_opt_ = -1; };
 	virtual loft_base<V>&	clone		()	const		{ assert(false); return  *new loft_base<V>(*this); }
 
 	// set-ters
@@ -106,7 +107,7 @@ struct	minimizer {
 	minimizer		(const string& _name = "unknown")  
 	:
 		name_		(_name),
-		max_iter_	(1500),
+		max_iter_	(10000),
 		ymin_    	(numeric_limits<fp_t>::quiet_NaN ()),
 		iter_    	(0),
 		verbose_ 	(false),
