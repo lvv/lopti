@@ -14,7 +14,7 @@
 	#define CLONER(T)	 virtual T&  clone()  const   {  return  *new T(*this); }
 
  /////////////////////////////////////////////////////////////////////////////////////////  OF: CHEBYQUAD
-			template<typename V>  typename V::value_type
+	/*		template<typename V>  typename V::value_type
 of_chebyquad		(V& X) 		{			// The Chebyquad test problem (Fletcher, 1965) 
 	
 	const int N = V::size();
@@ -41,60 +41,82 @@ of_chebyquad		(V& X) 		{			// The Chebyquad test problem (Fletcher, 1965)
 		SUM = SUM/N;
 		if (IW > 0)  SUM += 1.0/(I*I-2*I);
 		IW =-IW;
-	   	F += SUM*SUM;
-	}
-
+	   	F += SUM*SUM; }
 	return F;
- }
+ }*/
+			template<typename V> 
+struct  chebyquad: loft_base<V>		{	 LOFT_TYPES;  LOFT_MEMBERS;  CLONER(chebyquad)		// The Chebyquad test problem (Fletcher, 1965) 
+
+			chebyquad		()	: loft_base<V>("chebyquad") 	{ V const  X_answ = {{ -1, -1 }};   opt(X_answ); };
+
+	fp_t		operator() 		(V& X)  {
+
+			iter_++;
+			const int N = V::size();
+			matrix <fp_t, V::sz, V::sz+1, 0, 0>		Y;
+
+			for (int J=0; J<N; J++)  {
+				Y[0][J] = 1.0;
+				Y[1][J] = 2.0*X[J]-1.0;
+			}
+
+			for (int I=0+1; I<N; I++) 
+				for (int J=0; J<N; J++)
+					Y[I+1][J]=2.0*Y[1][J]*Y[I][J]-Y[I-1][J];
+
+			fp_t 	F  = 0.0;
+			int	IW = 1;
+
+			for (int I=0; I<N+1; I++)  {
+				fp_t  SUM = 0.0;
+				for (int J=0; J<N; J++) 	SUM += Y[I][J];
+				SUM = SUM/N;
+				if (IW > 0)  SUM += 1.0/((I+1)*(I+1)-2*(I+1));
+				IW =-IW;
+				F += SUM*SUM;
+			}
+
+			return F;
+	}
+ };
  /////////////////////////////////////////////////////////////////////////////////////////  ADAPTER: PLAIN_FN
 template<typename V>	struct	plain_fn : loft_base<V>		{  				LOFT_TYPES;  LOFT_MEMBERS;  CLONER(plain_fn)
 						function<fp_t(V&)>	of;
-	explicit		plain_fn	(function<fp_t(V&)> _of, const string& _name)	 : loft_base<V>(_name) , of(_of)   {};
-	virtual fp_t		operator()	(V&  X)	  { assert(!of.empty() && ">> NOT DEFINED OBJ FUNC <<");  iter_++;   fp_t y = (of)(X); return y; }
+	explicit	plain_fn	(function<fp_t(V&)> _of, const string& _name)	 : loft_base<V>(_name) , of(_of)   {};
+	fp_t		operator()	(V&  X)	  { assert(!of.empty() && ">> NOT DEFINED OBJ FUNC <<");  iter_++;   fp_t y = (of)(X); return y; }
  };
  /////////////////////////////////////////////////////////////////////////////////////////  OF: ROSENBERG
 template<typename V>	struct	rosenberg  : loft_base<V> { 				LOFT_TYPES;  LOFT_MEMBERS;  CLONER(rosenberg)
-	explicit 		rosenberg		()	: loft_base<V>("rosenberg") 	{ V const  X_answ = {{ 1.0, 1.0 }};   opt(X_answ); };
-	virtual  fp_t		operator() 		(V& X)  {  iter_++;      return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
+			rosenberg		()	: loft_base<V>("rosenberg") 	{ V const  X_answ = {{ 1.0, 1.0 }};   opt(X_answ); };
+	fp_t		operator() 		(V& X)  {  iter_++;      return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
  };
 
  template<typename V>   typename V::value_type    plain_fn_rosenberg  (V& X) { const int B = V::ibg;   return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
  /////////////////////////////////////////////////////////////////////////////////////////  OF: BAD SCALE ROSENBERG
 template<typename V, int FACTOR>	struct	bad_scale_rosenberg	 : loft_base<V> { 	LOFT_TYPES;  LOFT_MEMBERS;  CLONER(bad_scale_rosenberg);
-	explicit 		bad_scale_rosenberg	() : loft_base<V>("bad_scale_rosenberg") { V const  X_answ = {{ 1.0, 1.0*FACTOR }};   opt(X_answ); };
-	virtual  fp_t		operator() 		(V& X)   {  iter_++; return  100 * pow2(X[1+B]/FACTOR-pow2(X[0+B])) + pow2(1-X[0+B]); };
+			bad_scale_rosenberg	() : loft_base<V>("bad_scale_rosenberg") { V const  X_answ = {{ 1.0, 1.0*FACTOR }};   opt(X_answ); };
+	fp_t		operator() 		(V& X)   {  iter_++; return  100 * pow2(X[1+B]/FACTOR-pow2(X[0+B])) + pow2(1-X[0+B]); };
  };
  /////////////////////////////////////////////////////////////////////////////////////////  WRAPPER: RESCALE
 template<typename V>	struct	rescale :  loft_base<V> 	{				LOFT_TYPES;  LOFT_MEMBERS;  CLONER(rescale)
 				V R;
-	explicit		rescale		(loft_cref_t loft_v, V& _R)  : 	R(_R)  {  X_opt_ = loft_v.X_opt_; X_opt_ /= _R;   loft(loft_v); cout << "rescaled opt: " << X_opt_ << endl <<  "opt: " << loft_v.X_opt_ << endl;  };
-	virtual const string	name		()	const	{ return  name_ + " rescaled"; };
-
-	fp_t			operator()	(V&  X)			{
-		iter_++;  
-		V XR = X; // so that here are no side effects of modified X
-		XR *= R;
-							cout << iter_ << "\t" << X;
-		fp_t   y = (*wrapped_loft_v)(XR); 
-							cout << "\t" << y << endl;
-		return y;
-	};
-	
-	// distance in normalized coord
-	virtual	fp_t 		opt_distance	(V& X)	const	{ V XR = X;   XR*=R;    return  distance_norm2(wrapped_loft_v->X_opt_, XR); };
+			rescale		(loft_cref_t loft_v, V& _R)  : 	R(_R)  {  X_opt_ = loft_v.X_opt_; X_opt_ /= _R;   loft(loft_v); cout << "rescaled opt: " << X_opt_ << endl <<  "opt: " << loft_v.X_opt_ << endl;  };
+	const string	name		()	const	{ return  name_ + " rescaled"; };
+	fp_t		operator()	(V&  X)		{ iter_++;  	V XR = X;  XR *= R;    return  (*wrapped_loft_v)(XR); };
+	fp_t 		opt_distance	(V& X)	const	{ V XR = X;   XR*=R;    return  distance_norm2(wrapped_loft_v->X_opt_, XR); }; // distance in normalized coord
  };
  /////////////////////////////////////////////////////////////////////////////////////////  WRAPPER:  XG_LOG (xgraphic)
 template<typename V>	struct	xg_log : loft_base<V> 		{				LOFT_TYPES;   LOFT_MEMBERS;  CLONER(xg_log)
 				shared_ptr<ofstream>	log_file;  // need smart ptr becase xg_log dtor-ed on coping
-	explicit 	xg_log	 (loft_cref_t _loft_v, minimizer<V>& mzr)	{
+	xg_log	 (loft_cref_t _loft_v, minimizer<V>& mzr)	{
 		loft(_loft_v);													assert(log_file == 0 );
 		log_file = shared_ptr<ofstream>(new ofstream(("log/" +  (&mzr)->name() + "(" + name() + ")" ).c_str()));	assert(log_file->good());
 	};
 
-	virtual fp_t		operator()	(V&  X)			{
+	fp_t		operator()	(V&  X)			{
 		fp_t   y = (*wrapped_loft_v)(X); 			assert(log_file->good());
 		// 1 - iter no(gp: splot label);  2 - hight (y);  3 - |X-opt| ignored;  4,5 - X coord;  
-		*log_file << format("%d \t %g \t %g \t %22.15g \n")   % (wrapped_loft_v->iter())  % wrapped_loft_v->opt_distance(X)   %y   %X  << flush;  
+		*log_file << format("%d \t %g \t %g \t %22.15g \n")   % (wrapped_loft_v->iter())   %y   % wrapped_loft_v->opt_distance(X)  %X  << flush;  
 		return  y;
 	};
  };

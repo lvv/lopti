@@ -17,40 +17,40 @@
 		using boost::function;
 	#include <boost/bind.hpp>
 		//using boost::bind;
-		
-                                 #define         MINIMIZER_MEMBERS    \
-					using minimizer<V>::X;  		\
-					using minimizer<V>::X0;			\
-					using minimizer<V>::max_iter_;		\
-					using minimizer<V>::iter_;		\
-					using minimizer<V>::verbose_;		\
-					using minimizer<V>::verbose_;		\
-					using minimizer<V>::ymin_;		\
-					using minimizer<V>::Xmin_;		\
-					using minimizer<V>::name;		\
-					using minimizer<V>::name_;		\
-					using minimizer<V>::found_;		\
-					using minimizer<V>::loft_v;
+				
+						 #define         MINIMIZER_MEMBERS    \
+							using minimizer<V>::X;  		\
+							using minimizer<V>::X0;			\
+							using minimizer<V>::max_iter_;		\
+							using minimizer<V>::iter_;		\
+							using minimizer<V>::verbose_;		\
+							using minimizer<V>::verbose_;		\
+							using minimizer<V>::ymin_;		\
+							using minimizer<V>::Xmin_;		\
+							using minimizer<V>::name;		\
+							using minimizer<V>::name_;		\
+							using minimizer<V>::found_;		\
+							using minimizer<V>::loft_v;
 
-                                 #define         TR_MINIMIZER_MEMBERS    \
-					using trust_region_minimizer<V>::rho_begin_;	\
-					using trust_region_minimizer<V>::rho_end_;
+						 #define         TR_MINIMIZER_MEMBERS    \
+							using trust_region_minimizer<V>::rho_begin_;	\
+							using trust_region_minimizer<V>::rho_end_;
 
 
-                                 #define         LOFT_MEMBERS    \
-                                        using           loft_base<V>::iter_; \
-                                        using           loft_base<V>::wrapped_loft_v; \
-                                        using           loft_base<V>::name_; \
-                                        using           loft_base<V>::name; \
-                                        using           loft_base<V>::X_opt_; \
-					static	const int B = V::ibg;
+						 #define         LOFT_MEMBERS    \
+							using           loft_base<V>::iter_; \
+							using           loft_base<V>::wrapped_loft_v; \
+							using           loft_base<V>::name_; \
+							using           loft_base<V>::name; \
+							using           loft_base<V>::X_opt_; \
+							static	const int B = V::ibg;
 
-				#define 	LOFT_TYPES	\
-					typedef		loft_base<V>*			loft_p_t;	\
-					typedef 	const loft_base<V>&		loft_cref_t;	\
-					typedef		typename V::value_type		fp_t;
+						#define 	LOFT_TYPES	\
+							typedef		loft_base<V>*			loft_p_t;	\
+							typedef 	const loft_base<V>&		loft_cref_t;	\
+							typedef		typename V::value_type		fp_t;
 
-				#define		NaN	numeric_limits<fp_t>::quiet_NaN()
+						#define		NaN	numeric_limits<fp_t>::quiet_NaN()
 
 			template<typename V>
 struct	loft_base		{									// Lopti Object FuncTor
@@ -80,7 +80,7 @@ struct	loft_base		{									// Lopti Object FuncTor
 	// do-ers
 	virtual fp_t		operator()	(V&  X)			{
 					assert( wrapped_loft_v != 0 );
-		fp_t   y = (const_cast<loft_base<V>&> (*wrapped_loft_v))(X); 
+		fp_t   y = (const_cast<loft_base<V>&> (*wrapped_loft_v))(X);  //  FIXME delete case
 		return y;
 	}
 

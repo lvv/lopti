@@ -75,6 +75,15 @@ int main(int argc, char **argv) {
 
 		{  condor_minimizer<V0>	mzr;////  condor  LOGGED rosenberg
 			mzr	.X0		(_X0);
+			mzr	.loft		(xg_log<V0>(chebyquad<V0>(),  mzr));
+			mzr	.rho_begin	(1);
+			mzr	.rho_end	(STOP_AT_X_STEP);
+			mzr	.argmin();
+			mzr	.print();	
+		}
+
+		{  condor_minimizer<V0>	mzr;////  condor  LOGGED rosenberg
+			mzr	.X0		(_X0);
 			mzr	.loft		(xg_log<V0>(rosenberg<V0>(),  mzr));
 			mzr	.rho_begin	(1);
 			mzr	.rho_end	(STOP_AT_X_STEP);
