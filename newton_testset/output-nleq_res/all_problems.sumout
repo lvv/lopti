@@ -1,0 +1,64 @@
+problem                                          rcode #iter  #fcn  #jac      resnorm  cpu-time
+Rosenbrock Function                                  0    16    19    14     0.00E+00     0.000
+Powell Singular Function                             0    26    53    17     0.49E-09     0.000
+Powell Badly Scaled Function                         0    15    18    11     0.63E-10     0.000
+Wood Function                                        3     3     8     3     0.33E+03     0.000
+Helical Valley Function                              0    95   100    91     0.77E-11     0.000
+Watson Function                                      2   101   106   100     0.35E-01     0.000
+Chebyquad Function, n=7                              0    11    18     6     0.52E-12     0.000
+Chebyquad Function, n=9                              3    13    16    14     0.48E-01     0.000
+Brown Almost Linear Function                         3     1     3     2     0.52E+01     0.000
+Discrete Boundary Function                           0     4     7     1     0.68E-11     0.000
+Discrete Integral Function                           0     4     7     1     0.16E-10     0.000
+Trigonometric Function                               3     5     7     6     0.26E-01     0.000
+Variably Dimensioned Function                        0    14    17    12     0.73E-05     0.000
+Broyden Tridiagonal Function                         0    12    15     1     0.26E-10     0.000
+Broyden Banded Function                              3     4     8     4     0.88E+00     0.000
+Chemical Equilibrium 1                               0     5     8     5     0.00E+00     0.000
+Chemical Equilibrium 2                               0    25    52    17     0.51E+04     0.000
+Chemical Equilibrium 3, Variante 1                   0    19    23    16     0.43E-09     0.000
+Chemical Equilibrium 3, Variante 2                   0    15    22    10     0.55E-11     0.000
+SST pollution, 0 dim., sst1=360                      3     2     7     2     0.35E+06     0.000
+SST pollution, 0 dim., sst1=3250                     3     3     7     3     0.19E+08     0.000
+Distillation Column, Hydrocarbon-6                   0    13    16     5     0.14E-04     0.000
+Distillation Column, Hydrocarbon-20                  2   101   103   101     0.11E+03     0.000
+Distillation Column, Hydrocarbon-40                  2   101   103   101     0.21E+04     0.000
+Distillation Column, Methanol-8                      0     9    12     2     0.27E-05     0.000
+Semiconductor boundary condition                     3     0     9     1     0.47E+07     0.000
+Exponentional/Sine function                          3     0     3     1     0.19E+01     0.000
+Combustion of Propane - Full formulation             3     0     3     1     0.12E+23     0.000
+Combustion of Propane - Reduced formulation          0    13    20     7     0.79E-12     0.000
+Intersection of an Ellipsoid with a Hyperboloid      0     8    11     4     0.50E-11     0.000
+Esterification Reaction                              3     2     3     3     0.45E+07     0.000
+Flow in a Driven Cavity                              0    12    18     3     0.28E-10     0.000
+Flow in a Channel                                    0    11    14     5     0.21E-07     0.000
+Gupta Problem                                        0    88    90    85     0.31E-12     0.000
+Human Heart Dipole                                   0    75    79    70     0.48E-11     0.000
+Incompressible Elastic Rods                          1     0     1     1     0.10E+00     0.000
+Dew Point Temperature                                0    13    16     8     0.27E-10     0.000
+Partial Oxidation of Methane with Oxygen             3     9    10    10     0.34E+05     0.000
+Swirling Flow between Disks                          3     9    16     6     0.23E-03     0.000
+Solid Fuel Ignition                                  0     4     7     1     0.66E-10     0.000
+Sulphur Dioxide to Sulphur Trioxide                  2   101   103   101     0.41E-01     0.000
+Compressibility factor from the RK equation          3     8    11     8     0.44E-02     0.000
+Chem. Reactor Equil. Conversion, Shacham 1983        0    12    24     7     0.14E-08     0.000
+Chemical Reactor Steady State, Shacham 1983          0     6     9     2     0.90E-10     0.000
+Cutlips steady state for reaction rate equations     3     3     7     3     0.51E-01     0.000
+Hodgkin Huxley 1                                     0    20    93     0     0.15E-10     0.000
+Inf Reflux                                           3     1     2     2     0.14E-01     0.000
+Order 10 to 11                                       0     5     8     1     0.49E+00     0.000
+Chemical equil. from a Partial Methane Oxidation     0     6     9     1     0.24E-09     0.000
+Typical Rect. Singly Reinforced Concrete Beam        3     1    29     0     0.33E+06     0.000
+Wallis Function of 1685                              3     1     3     2     0.61E+01     0.000
+Inters. of Ellipsoid with a Hyperboloid - red.       0     7    22     0     0.98E-10     0.000
+Esterification Reaction - reduced system             3     8    33     0     0.13E+04     0.000
+Gupta problem - reduced system                       0     8    24     0     0.17E-08     0.000
+Dew Point Temperature - reduced system               0    10    33     0     0.88E-10     0.000
+Part. Oxid. of Methane with Oxygen - reduced         0     8    21     0     0.10E-08     0.000
+Sulphur Dioxide to Sulphur Trioxide - reduced        0     8    15     0     0.50E-15     0.000
+
+
+ Number of problem solved:                     33
+ Numer of problems failed:                     24
+ Total number of Function evaluations:       1501
+ Total number of Jacobian evaluations:        878

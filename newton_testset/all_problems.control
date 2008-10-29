@@ -1,0 +1,139 @@
+*global
+ solver 1                       1=nleq1, 2=nleq2, 3=nleq_err, 4=nleq_res
+ rtol 1.0d-10
+ end
+Rosenbrock                      Rosenbrock Function
+ end
+PowellSingular                  Powell Singular Function
+ end
+PowellBadlyScaled               Powell Badly Scaled Function
+ end
+Wood                            Wood Function
+ end
+HelicalValley                   Helical Valley Function
+ end
+Watson                          Watson Function
+ end
+Chebyquad                       Chebyquad Function, n=7
+ dimension 7
+ end
+Chebyquad                       Chebyquad Function, n=9
+ dimension 9
+ end
+BrownAlmLin                     Brown Almost Linear Function
+ end
+DiscreteBoundary                Discrete Boundary Function
+ end
+DiscreteIntegral                Discrete Integral Function
+ end
+Trigonometric                   Trigonometric Function
+ end
+VariablyDim                     Variably Dimensioned Function
+ end
+BroydenTridiag                  Broyden Tridiagonal Function
+ end
+BroydenBanded                   Broyden Banded Function
+ end
+ChemEqui1                       Chemical Equilibrium 1
+ end
+ChemEqui2                       Chemical Equilibrium 2
+ xstart 2
+ end
+ChemEqui3                       Chemical Equilibrium 3, Variante 1
+ par(1) 1.0
+ end
+ChemEqui3                       Chemical Equilibrium 3, Variante 2
+ par(1) 2.0
+ end
+sst                             SST pollution, 0 dim., sst1=360
+ par(1) 1.0
+ end
+sst                             SST pollution, 0 dim., sst1=3250
+ par(1) 2.0
+ end
+DistillColumn                   Distillation Column, Hydrocarbon-6
+ par(1) 1.0
+ dimension 29
+ end
+DistillColumn                   Distillation Column, Hydrocarbon-20
+ par(1) 2.0
+ dimension 99
+ end
+DistillColumn                   Distillation Column, Hydrocarbon-40
+ par(1) 4.0
+ dimension 199
+ end
+DistillColumn                   Distillation Column, Methanol-8
+ par(1) 3.0
+ dimension 31
+ end
+LargeExp                        Semiconductor boundary condition
+ end
+ExpSin                          Exponentional/Sine function
+ end
+dcpffj                          Combustion of Propane - Full formulation
+ xstart 2
+ end
+dcprfj                          Combustion of Propane - Reduced formulation
+ end
+delhfj                          Intersection of an Ellipsoid with a Hyperboloid
+ end
+destfj                          Esterification Reaction
+ end
+dfdcfj                          Flow in a Driven Cavity
+ end
+dficfj                          Flow in a Channel
+ end
+dgupfj                          Gupta Problem
+ end
+dhhdfj                          Human Heart Dipole
+ end
+dierfj                          Incompressible Elastic Rods
+ xstart 1
+ end
+disofj                          Dew Point Temperature
+ end
+dmetfj                          Partial Oxidation of Methane with Oxygen
+ xstart 2
+ end
+dsfdfj                          Swirling Flow between Disks
+ end
+dsfifj                          Solid Fuel Ignition
+ end
+dsulfj                          Sulphur Dioxide to Sulphur Trioxide
+ end
+CompFacRK                       Compressibility factor from the RK equation
+ end
+CREquiConv4                     Chem. Reactor Equil. Conversion, Shacham 1983
+ end
+CRSteadyState5                  Chemical Reactor Steady State, Shacham 1983
+ xstart 5
+ end
+Cutlip                          Cutlips steady state for reaction rate equations
+ end
+HodgkinHuxley1                  Hodgkin Huxley 1
+ end
+InfReflux                       Inf Reflux
+ end
+Order10to11                     Order 10 to 11
+ end
+PartMethaneOx                   Chemical equil. from a Partial Methane Oxidation
+ xstart 3
+ end
+ReinforcedBeam                  Typical Rect. Singly Reinforced Concrete Beam
+ xstart 1
+ end
+Wallis1685                      Wallis Function of 1685
+ end
+InterSEllHy                     Inters. of Ellipsoid with a Hyperboloid - red.
+ end
+EsterificRea                    Esterification Reaction - reduced system
+ end
+Gupta                           Gupta problem - reduced system
+ end
+DewPoint                        Dew Point Temperature - reduced system
+ end
+PartOxiOfMet                    Part. Oxid. of Methane with Oxygen - reduced
+ end
+SulpDiox                        Sulphur Dioxide to Sulphur Trioxide - reduced
+ end
