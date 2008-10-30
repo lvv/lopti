@@ -81,7 +81,7 @@ struct	loft_base		{									// Lopti Object FuncTor
 	// do-ers
 	virtual fp_t		operator()	(V&  X)			{
 					assert( wrapped_loft_v != 0 );
-		fp_t   y = (const_cast<loft_base<V>&> (*wrapped_loft_v))(X);  //  FIXME delete case
+		fp_t   y = (*wrapped_loft_v)(X);  //  TODO delete case
 		return y;
 	}
 
