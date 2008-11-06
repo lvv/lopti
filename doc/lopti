@@ -1,0 +1,36 @@
+LOPTI - C++ optimization library.
+=================================
+
+LOPTI original purpose was (and still is) to be a wrapper to
+existing solvers presenting to library user consistent and simple API.  Also
+feature flexible means of manipulation and modification of object function. 
+All available solvers are open source and and most are included with LOPTI.
+
+
+.Available Solvers
+[grid="all"]
+`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.~~~~~~~~~~~~~.~~~~~~~~~~~~~~~`~~~~~~~~~~~~~~~~~~~~~~~~~~~`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Solver                         , Type        , Use Derivative, Origin                   , Dependency
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Condor                         , Trust Region, No            , "Based on Powel's UOBYQA",                       "Source available at http://google.com"
+NEWUOA                         , Trust Region, No            , "2002, Latest from Powel successor to UOBYQA",   "none (converted fortran source included)"
+GSL Nelder-Mead (Simplex)      , Direct      , No            , "1965<<1>>"                         , "GNU Sciantific Library package (available at any linux distro)"
+Hook-Jeevs                     , Direct      , No            , "1962, C implementation by Sergey Kiselev at netlib.net"    , "none (converted to native LOPTI implementation)"
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sample use:
+
+[c]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+include::example.cc[tabsize=8]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+=== LOFT
+Object function are so called Lopti Object FuncTor (LOFT)  which are callable objects ether representing object function
+or wrapper for other LOFTs.  LOFT allow to wrap object
+function in any number and combination of LOFT, such as rescaler, logger, noise-adder,
+adapter, constrain-adder-by-barrier-function,  etc. 
+
+
+=== Refrences
++ [[[1]]] J.A. Nelder and R. Mead, 'A simplex method for function minimization', Computer Journal vol. 7 (1965), 308-315.
+// vim: set filetype=asciidoc nu:
