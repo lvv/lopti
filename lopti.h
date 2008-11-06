@@ -1,6 +1,6 @@
 	
-	#ifndef LVV_LOPTI_H
-	#define LVV_LOPTI_H
+	#ifndef LOPTI_H
+	#define LOPTI_H
 
 	#include <lvv/lvv.h>
 	#include <lvv/array.h>
@@ -8,7 +8,7 @@
 	#include <limits>
 		using 	std::numeric_limits;
 
-	// functional 
+	// functional  		// TODO: try to remove 
 	#include <functional>
 		using std::binder1st;
 		using std::unary_function;
@@ -17,10 +17,12 @@
 		using boost::function;
 	#include <boost/bind.hpp>
 		//using boost::bind;
+
+namespace lopti {
 				
 						 #define         MINIMIZER_MEMBERS    \
 							using minimizer<V>::X;  		\
-							using minimizer<V>::X0;			\
+							using minimizer<V>::x0;			\
 							using minimizer<V>::max_iter_;		\
 							using minimizer<V>::iter_;		\
 							using minimizer<V>::verbose_;		\
@@ -35,58 +37,6 @@
 						 #define         TR_MINIMIZER_MEMBERS    \
 							using trust_region_minimizer<V>::rho_begin_;	\
 							using trust_region_minimizer<V>::rho_end_;
-
-
-						 #define         LOFT_MEMBERS    \
-							using           loft_base<V>::iter_; \
-							using           loft_base<V>::wrapped_loft_v; \
-							using           loft_base<V>::name_; \
-							using           loft_base<V>::name; \
-							using           loft_base<V>::X_opt_; \
-							static	const int B = V::ibg; \
-							static const int N = V::sz;
-
-						#define 	LOFT_TYPES	\
-							typedef		loft_base<V>*			loft_p_t;	\
-							typedef 	const loft_base<V>&		loft_cref_t;	\
-							typedef		typename V::value_type		fp_t;
-
-						#define		NaN	numeric_limits<fp_t>::quiet_NaN()
-
-			template<typename V>
-struct	loft_base		{									// Lopti Object FuncTor
-
-				LOFT_TYPES;
-
-			string			name_;
-			V			X_opt_;
-			int			iter_;
-			loft_p_t		wrapped_loft_v;
-
-	// CTOR
-	explicit		loft_base	()			:  wrapped_loft_v(0),	iter_(0)				{ X_opt_ = -1; };
-	explicit		loft_base	(const string& s)	:  wrapped_loft_v(0),	iter_(0), name_(s)			{ X_opt_ = -1; };
-	virtual loft_base<V>&	clone		()	const		{ assert(false); return  *new loft_base<V>(*this); }
-
-	// set-ters
-	void 			opt		(const V& X_answ)	{ X_opt_ = X_answ; };
-	virtual void		loft		(loft_cref_t loft_cref)	{ wrapped_loft_v = &loft_cref.clone();	name_ = loft_cref.name(); };
-
-	// get-ers
-	virtual const string	name		()	const		{ return  name_; };
-	virtual int 		iter		()	const		{ return  wrapped_loft_v == 0  ?  iter_  :  wrapped_loft_v->iter(); };
-	virtual	fp_t 		opt_distance	(V& X)	const		{ return  distance_norm2(X_opt_, X); };
-	virtual	bool 		empty		()	const		{ return  wrapped_loft_v == 0; };
-
-	// do-ers
-	virtual fp_t		operator()	(V&  X)			{
-					assert( wrapped_loft_v != 0 );
-		fp_t   y = (*wrapped_loft_v)(X);  //  TODO delete case
-		return y;
-	}
-
-	//virtual void		reset		()		{ iter_ = 0; };
- };
 
 
 					 template<typename V>
@@ -120,7 +70,7 @@ struct	minimizer {
 	// set-ters
 	virtual minimizer<V>&		loft			(loft_cref_t  ref){ loft_v = &ref.clone(); return *this; };
 
-	virtual minimizer<V>&		X0			(V& _X) 	{  X  = _X;	return *this;  };
+	virtual minimizer<V>&		x0			(V& _X) 	{  X  = _X;	return *this;  };
 	virtual minimizer<V>&		max_iter		(int mx)	{  max_iter_   = mx;	return *this;  };
 	virtual minimizer<V>&		verbose			(bool flag)	{  verbose_ = flag;	return *this;  };
 
@@ -154,11 +104,12 @@ struct	trust_region_minimizer : minimizer<V>    {
 
 
 	// of prog inlude <lopti.h> then include all
-	#ifndef MINIMIZER
-		#include	<lopti/condor-wrap.h>
-		#include   	<lopti/newuoa-wrap.h>
-		#include	<lopti/gsl-nelder-mead-wrap.h>
-		#include	<lopti/hook-jeevs.h>
-	#endif 
+//	#ifndef MINIMIZER
+//		#include	<lopti/condor-wrap.h>
+//		#include   	<lopti/newuoa-wrap.h>
+//		#include	<lopti/gsl-nelder-mead-wrap.h>
+//		#include	<lopti/hook-jeevs.h>
+//	#endif 
 
-	#endif 
+	} // namespace lopti
+	#endif  // LOPTI_H

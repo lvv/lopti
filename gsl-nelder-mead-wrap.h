@@ -1,6 +1,6 @@
 
-	#ifndef LVV_LOPTI_NELDER_MEAD_H
-	#define LVV_LOPTI_NELDER_MEAD_H
+	#ifndef LOPTI_NELDER_MEAD_H
+	#define LOPTI_NELDER_MEAD_H
 
 	#ifndef		MINIMIZER
 		#define	MINIMIZER	nelder_mead_minimizer
@@ -16,6 +16,9 @@
 
 	#include <lvv/lvv.h>
 		using std::cerr;
+
+	
+	namespace lopti {
  
  template<typename V>		struct gsl_of_wrap {
 				LOFT_TYPES;
@@ -40,7 +43,7 @@ struct	nelder_mead_minimizer  :  minimizer<V> {
 
 	~nelder_mead_minimizer () { gsl_multimin_fminimizer_free(gsl_minimizer);  gsl_vector_free(gX);   gsl_vector_free(gS);  };
 
-	virtual minimizer<V>&		step			(V& S)		{
+	virtual minimizer<V>&		step0			(V& S)		{
 		gS = gsl_vector_alloc(V::size()); 
 		gS << S; 
 		gsl_minimizer = gsl_multimin_fminimizer_alloc(gsl_minimizer_type_ptr, V::size());
@@ -100,4 +103,5 @@ struct	nelder_mead_minimizer  :  minimizer<V> {
 	}
 
  };
-	#endif // LVV_LOPTI_NELDER_MEAD_H
+	}	// namespace  lopti
+	#endif // LOPTI_NELDER_MEAD_H

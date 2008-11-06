@@ -3,22 +3,21 @@ include  ../lvv/include.mk
 	
 LDFLAGS += -lgsl -lgslcblas -L /usr/local/lib -lcondor newuoa/*.o -lgfortran 
 CXXFLAGS += -I /home/lvv/NF/
-XGRAPHIC = xgraphic  -mark -markcol=-1  -g2 -logy -leg -legpos=3  -legsiz=1 -legtyp=2 -titgen="Convergance speed for dirivative-free algorithms" -titx="Objective function evaluation count" -tity="Distance to optimum:  log10 ( | X - X_opt | )" 
+XGRAPHIC = xgraphic  -scat -markcol=-1  -g2 -logy -leg -legpos=3  -legsiz=1 -legtyp=2 -titgen="Convergance speed for dirivative-free algorithms" -titx="Objective function evaluation count" -tity="Distance to optimum:  log10 ( | X - X_opt | )" 
 
 .DEFAULT_GOAL := t-lopti-r
 #.PHONY: t-lopti-r
 
 t-lopti-xg: t-lopti log/condor
 	$<
-	cd log; LANG=C.iso88591 $(XGRAPHIC) *
+	cd log; LANG=C.iso88591 $(XGRAPHIC) `find  -type f \( -newer ../$< -o -cmin -1 \) -printf "%f\n"`
 
 log/condor: t-lopti 
-	rm -f log/*
 
-
+t-lopti-ps: t-lopti.ps
 t-lopti.ps: t-lopti t-lopti-r 
 	$<
-	cd log; $(XGRAPHIC) -pscoltex=../$@ *
+	cd log; $(XGRAPHIC) -pscoltex=../$@  `find  -type f \( -newer ../$< -o -cmin -1 \) -printf "%f\n"`
 	gsview $@
 
 t-lopti: t-lopti.cc *.cc *.h

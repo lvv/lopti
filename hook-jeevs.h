@@ -1,37 +1,12 @@
- /************************************************************************
- *      function HJMIN - find local minimum of a given function
- *	   	        by the Hook-Jeevse method
- *
- * Input
- *	double hjmin(X,h0,funct)
- *	VECTOR X 			On input contains the initial
- *					guess to the minimum location
- *					On return has the vector
- *					specifying for the minimum location
- *	const VECTOR h0			Initial values for the steps along
- *					each directions
- *	double f(const VECTOR x)	Procedure to compute a function
- *					value at the specified point
- *
- * Output
- *	Hjmin returns the function value at the point of minimum
- *
- * Algorithm
- *	Hook-Jeevse method of direct search for a function minimum
- *	The method is of the 0. order (i.e. requiring no gradient computation)
- *	See
- *	B.Bondi. Methods of optimization. An Introduction - M.,
- *	"Radio i sviaz", 1988 - 127 p. (in Russian)
- *	
- *
- * Notes
- *	static VECTORs S and BASE are used as work arrays. They are not
- *	destroyed (freed) on exit so that next call to Hjmin could use
- *	them if they are still appropriate for that call.
- *
- ************************************************************************/
- 
 
+	#ifndef LOPTI_HOOK_JEEVS_H
+	#define LOPTI_HOOK_JEEVS_H
+
+	#include <lopti.h>
+
+	#ifndef		MINIMIZER
+		#define	MINIMIZER	hook_jeevs_minimizer
+	#endif
 
 	#include <cassert>
 	#include <algorithm>
@@ -41,9 +16,8 @@
 	#include <lvv/array.h>
 		using namespace lvv;
 		using lvv::array;
-	//#include <lvv/math.S>
-	//using lvv::powi;
 
+namespace lopti  {
 					// Examine the function f in the vicinity of the BASE point
 					// by making tentative steps fro/back along the every coordinate.
 					// When the function is found to decrease, the point BASE is correspondingly
@@ -59,35 +33,33 @@ struct   hook_jeevs_minimizer   : minimizer<V>  {
 	hook_jeevs_minimizer	()			: minimizer<V>("hook-jeevs"), tau_(10*EPSILON) {};
 	virtual	minimizer<V>&	 	tau		(fp_t _tau)	{ tau_ = _tau; return *this; };
 
-	virtual minimizer<V>&		step(V& _S)	 { S=_S; return *this; };
+	virtual minimizer<V>&		step0(V& _S)	 { S=_S; return *this; };
 
 	V&		 	argmin			()		{
 					const fp_t	threshold = 1e-12;	   // Threshold for the function   
 					const fp_t	step_reduce_factor = 10;	// decay to be treated as significant                  
-					fp_t  f_min;				   // Min function value found     
+					//fp_t  ymin_;				   // Min function value found     
 
 		BASE = X ;
-		f_base = f_min = (*loft_v) (X);
+		f_base = ymin_ = (*loft_v) (X);
 
 
 		for (;;) {										   // Main iteration loop        // X is a next approximation to min             
-			if (examination() < f_min - threshold) {					   // Function falled markedly     
-				do {									   // Perform search on patter     // BASE - pattern, X - new min appr 
-					typename V::iterator  base_it =  BASE.begin();
-					typename V::iterator  min_it =  X.begin();
+			if (examination() < ymin_ - threshold) {					   // Function falled markedly     
+				do	{									   // Perform search on patter     // BASE - pattern, X - new min appr 
+						V t;
+						((t = BASE)  *= 2.) -= X;
 
-					for (int i = BASE.ibegin();  i < BASE.iend();  i++) {
-						 fp_t t = (*base_it - *min_it) + *base_it;
+						X = BASE;
+						BASE = t;
 
-						*min_it++ = *base_it;
-						*base_it++ = t;
-					}
-					f_min = f_base;
+
+					ymin_ = f_base;
 					f_base = (*loft_v) (BASE);
-				}	while (examination() < f_min - threshold);	// Continue search until f doesn't  decrease         
+				}	while (examination() < ymin_ - threshold);	// Continue search until f doesn't  decrease         
 
 				BASE = X;
-				f_base = f_min;						// Save the best approx found   
+				f_base = ymin_;						// Save the best approx found   
 
 			} else {							// Function didn't fall markedly 
 				// upon examination near BASE    
@@ -102,7 +74,7 @@ struct   hook_jeevs_minimizer   : minimizer<V>  {
 
 				if (success) {
 					found_ = true;
-					ymin_  =  f_min;
+					ymin_ = f_base;
 					return  X;
 				}
 			}
@@ -112,11 +84,11 @@ struct   hook_jeevs_minimizer   : minimizer<V>  {
 
   private:
 
-	V	S;				//  Steps along axes        
-	V	BASE;				//  Base point              
-	fp_t	f_base;				//  Function value at it    
+			V	S;				//  Steps along axes        
+			V	BASE;				//  Base point              
+			fp_t	f_base;				//  Function value at it    
 
-	fp_t examination() {
+	fp_t   examination() {
 		
 		for (int  i = BASE.ibegin();  i < BASE.iend(); i++) {	// Perform step along a coordinate              
 			 fp_t basi_old = BASE[i];		   // Old coordinate value         
@@ -137,5 +109,7 @@ struct   hook_jeevs_minimizer   : minimizer<V>  {
 		return f_base;
 	 }
 
-
  }; // class 
+
+	} // namespace lopti
+	#endif  // LOPTI_H

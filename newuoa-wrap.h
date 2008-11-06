@@ -1,5 +1,5 @@
-	#ifndef LVV_LOPTI_NEWUOA_H
-	#define LVV_LOPTI_NEWUOA_H
+	#ifndef LOPTI_NEWUOA_H
+	#define LOPTI_NEWUOA_H
 
 	#include <lopti.h>
 
@@ -21,6 +21,9 @@
 			using lvv::pow2; using lvv::pow3; using lvv::abs;
 	#include	<lvv/array.h>
 			using lvv::array; using lvv::vector; using lvv::matrix;
+
+
+	namespace lopti {
 
 	extern "C" void  trsapp_  (int* N, int* NPT, double* XOPT, double* XPT, double* GQ, double* HQ, double* PQ, double* DELTA, double* D, double* W, double* /*W[NP]*/, double* /*W[NP+N]*/, double* /*W[NP+2*N]*/, double* CRVMIN);
 	extern "C" void  biglag_  (int* N, int* NPT, double* XOPT, double* XPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, int* KNEW, double* DSTEP, double* D, double* ALPHA, double* VLAG, double* /*VLAG[NPT+1]*/, double* W, double* /*W[NP]*/, double* /*W[NP+N]*/);
@@ -708,4 +711,5 @@ new_rho_490:
 	return X;
 }; // newuoa
 
-	#endif // LVV_LOPTI_NEWUOA_H
+	} // namespace lopti
+	#endif // LOPTI_NEWUOA_H

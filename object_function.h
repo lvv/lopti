@@ -1,3 +1,6 @@
+	
+	#ifndef LOPTI_OF_H
+	#define LOPTI_OF_H
 
 	#include <boost/shared_ptr.hpp>
 		using boost::shared_ptr; // used as ofstream ptr
@@ -11,7 +14,59 @@
 
  namespace lopti {
 
-	#define CLONER(T)	 virtual T&  clone()  const   {  return  *new T(*this); }
+						#define CLONER(T)	 virtual T&  clone()  const   {  return  *new T(*this); }
+
+
+						 #define         LOFT_MEMBERS    \
+							using           loft_base<V>::iter_; \
+							using           loft_base<V>::wrapped_loft_v; \
+							using           loft_base<V>::name_; \
+							using           loft_base<V>::name; \
+							using           loft_base<V>::X_opt_; \
+							static	const int B = V::ibg; \
+							static const int N = V::sz;
+
+						#define 	LOFT_TYPES	\
+							typedef		loft_base<V>*			loft_p_t;	\
+							typedef 	const loft_base<V>&		loft_cref_t;	\
+							typedef		typename V::value_type		fp_t;
+
+						#define		NaN	numeric_limits<fp_t>::quiet_NaN()
+			template<typename V>
+struct	loft_base		{									// Lopti Object FuncTor
+
+				LOFT_TYPES;
+
+			string			name_;
+			V			X_opt_;
+			int			iter_;
+			loft_p_t		wrapped_loft_v;
+
+	// CTOR
+	explicit		loft_base	()			:  wrapped_loft_v(0),	iter_(0)				{ X_opt_ = -1; };
+	explicit		loft_base	(const string& s)	:  wrapped_loft_v(0),	iter_(0), name_(s)			{ X_opt_ = -1; };
+	virtual loft_base<V>&	clone		()	const		{ assert(false); return  *new loft_base<V>(*this); }
+
+	// set-ters
+	void 			opt		(const V& X_answ)	{ X_opt_ = X_answ; };
+	virtual void		loft		(loft_cref_t loft_cref)	{ wrapped_loft_v = &loft_cref.clone();	name_ = loft_cref.name(); };
+
+	// get-ers
+	virtual const string	name		()	const		{ return  name_; };
+	virtual int 		iter		()	const		{ return  wrapped_loft_v == 0  ?  iter_  :  wrapped_loft_v->iter(); };
+	virtual	fp_t 		opt_distance	(V& X)	const		{ return  distance_norm2(X_opt_, X); };
+	virtual	bool 		empty		()	const		{ return  wrapped_loft_v == 0; };
+
+	// do-ers
+	virtual fp_t		operator()	(V&  X)			{
+					assert( wrapped_loft_v != 0 );
+		fp_t   y = (*wrapped_loft_v)(X);
+		return y;
+	}
+
+	//virtual void		reset		()		{ iter_ = 0; };
+ };
+
 
  /////////////////////////////////////////////////////////////////////////////////////////  OF: CHEBYQUAD
 
@@ -51,9 +106,9 @@ struct  chebyquad: loft_base<V>		{	 LOFT_TYPES;  LOFT_MEMBERS;  CLONER(chebyquad
 	}
  };
  /////////////////////////////////////////////////////////////////////////////////////////  ADAPTER: PLAIN_FN
-template<typename V>	struct	plain_fn : loft_base<V>		{  				LOFT_TYPES;  LOFT_MEMBERS;  CLONER(plain_fn)
+template<typename V>	struct	make_loft : loft_base<V>		{  				LOFT_TYPES;  LOFT_MEMBERS;  CLONER(make_loft)
 						function<fp_t(V&)>	of;
-	explicit	plain_fn	(function<fp_t(V&)> _of, const string& _name)	 : loft_base<V>(_name) , of(_of)   {};
+	explicit	make_loft	(function<fp_t(V&)> _of, const string& _name)	 : loft_base<V>(_name) , of(_of)   {};
 	fp_t	operator()	(V&  X)	  { assert(!of.empty() && ">> NOT DEFINED OBJ FUNC <<");  iter_++;   fp_t y = (of)(X); return y; }
  };
  /////////////////////////////////////////////////////////////////////////////////////////  OF: ROSENBERG
@@ -77,6 +132,7 @@ template<typename V>	struct	rescale :  loft_base<V> 	{				LOFT_TYPES;  LOFT_MEMB
 	fp_t 		opt_distance	(V& X)	const	{ V XR = X;   XR*=R;    return  distance_norm2(wrapped_loft_v->X_opt_, XR); }; // distance in normalized coord
  };
  /////////////////////////////////////////////////////////////////////////////////////////  WRAPPER:  XG_LOG (xgraphic)
+template<typename V> class minimizer;
 template<typename V>	struct	xg_log : loft_base<V> 		{				LOFT_TYPES;   LOFT_MEMBERS;  CLONER(xg_log)
 				shared_ptr<ofstream>	log_file;  // need smart ptr becase xg_log dtor-ed on coping
 	xg_log	 (loft_cref_t _loft_v, minimizer<V>& mzr)	{
@@ -93,3 +149,4 @@ template<typename V>	struct	xg_log : loft_base<V> 		{				LOFT_TYPES;   LOFT_MEMB
  };
 
  }; // namespace lopti
+ #endif // LOPTI_OF_H

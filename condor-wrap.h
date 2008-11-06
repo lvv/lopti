@@ -1,8 +1,9 @@
 	
-	#ifndef LVV_LOPTI_CONDOR_H
-	#define LVV_LOPTI_CONDOR_H
+	#ifndef LOPTI_CONDOR_H
+	#define LOPTI_CONDOR_H
 
 	#include <lopti.h>
+	#include <lopti/object_function.h>
 
 	#ifndef		MINIMIZER
 		#define	MINIMIZER	condor_minimizer
@@ -24,7 +25,7 @@
 
 	extern int globalPrintLevel;
 
-
+namespace lopti {
 			template<typename V>
 class	c_of_t  : public CONDOR::ObjectiveFunction { public:
 						LOFT_TYPES;
@@ -83,4 +84,5 @@ struct	condor_minimizer: trust_region_minimizer<V>   {
 		return Xmin_;
 	};
 };
-	#endif // LVV_LOPTI_CONDOR_H
+	} // namespace lopti
+	#endif // LOPTI_CONDOR_H
