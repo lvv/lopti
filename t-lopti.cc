@@ -149,7 +149,7 @@ int main(int argc, char **argv) {
 
 	#ifdef NM
 		{	V0  S;   S.assign(0.1); //{{ 0.6, 0.6 }};
-		nelder_mead_minimizer<V0>	mzr;	////  NELDER-MEAD
+		gsl_nelder_mead_minimizer<V0>	mzr;	////  NELDER-MEAD
 			mzr	.loft		(xg_log<V0>(FN<V0>(),  mzr));
 			mzr	.x0		(_X0);  // will ignore BEGIN index
 			mzr	.step0		(S);

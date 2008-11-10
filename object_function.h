@@ -11,6 +11,12 @@
 		using std::ios;
 		using std::ofstream;
 
+	#include <lvv/array.h>
+		using lvv::array;
+		using lvv::matrix;
+
+	#include <boost/function.hpp>
+		using boost::function;
 
  namespace lopti {
 

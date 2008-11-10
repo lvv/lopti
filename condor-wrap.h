@@ -2,7 +2,7 @@
 	#ifndef LOPTI_CONDOR_H
 	#define LOPTI_CONDOR_H
 
-	#include <lopti.h>
+	#include <lopti/lopti.h>
 	#include <lopti/object_function.h>
 
 	#ifndef		MINIMIZER

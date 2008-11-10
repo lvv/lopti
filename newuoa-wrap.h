@@ -1,7 +1,7 @@
 	#ifndef LOPTI_NEWUOA_H
 	#define LOPTI_NEWUOA_H
 
-	#include <lopti.h>
+	#include <lopti/lopti.h>
 
 	#ifndef   MINIMIZER                                                                                                                                  
 		#define	MINIMIZER	newuoa_minimizer

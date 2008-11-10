@@ -3,7 +3,7 @@
 	#define LOPTI_NELDER_MEAD_H
 
 	#ifndef		MINIMIZER
-		#define	MINIMIZER	nelder_mead_minimizer
+		#define	MINIMIZER	gsl_nelder_mead_minimizer
 	#endif
 
 	#include <lvv/convert-gsl.h>
@@ -30,7 +30,7 @@
 template<typename V>  loft_base<V>* gsl_of_wrap<V>::loft_v; // this is in gsl_of_wrap class, but we need to decl it 1 more time for compiler
 
                  template<typename V>
-struct	nelder_mead_minimizer  :  minimizer<V> {
+struct	gsl_nelder_mead_minimizer  :  minimizer<V> {
 						MINIMIZER_MEMBERS;   LOFT_TYPES;
 		gsl_vector*			gX;	
 		gsl_vector* 			gS;	
@@ -39,9 +39,9 @@ struct	nelder_mead_minimizer  :  minimizer<V> {
 		gsl_multimin_function		minex_func;
 		double 				characteristic_size_;
 
-	explicit 		nelder_mead_minimizer	() : minimizer<V>("nelder-mead"), gsl_minimizer_type_ptr (gsl_multimin_fminimizer_nmsimplex) {};
+	explicit 		gsl_nelder_mead_minimizer	() : minimizer<V>("nelder-mead"), gsl_minimizer_type_ptr (gsl_multimin_fminimizer_nmsimplex) {};
 
-	~nelder_mead_minimizer () { gsl_multimin_fminimizer_free(gsl_minimizer);  gsl_vector_free(gX);   gsl_vector_free(gS);  };
+	~gsl_nelder_mead_minimizer () { gsl_multimin_fminimizer_free(gsl_minimizer);  gsl_vector_free(gX);   gsl_vector_free(gS);  };
 
 	virtual minimizer<V>&		step0			(V& S)		{
 		gS = gsl_vector_alloc(V::size()); 

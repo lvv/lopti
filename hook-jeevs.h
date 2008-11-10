@@ -2,7 +2,7 @@
 	#ifndef LOPTI_HOOK_JEEVS_H
 	#define LOPTI_HOOK_JEEVS_H
 
-	#include <lopti.h>
+	#include <lopti/lopti.h>
 
 	#ifndef		MINIMIZER
 		#define	MINIMIZER	hook_jeevs_minimizer

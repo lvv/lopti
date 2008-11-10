@@ -17,6 +17,8 @@
 		using boost::function;
 	#include <boost/bind.hpp>
 		//using boost::bind;
+	
+	#include <lopti/object_function.h>
 
 namespace lopti {
 				
