@@ -3,16 +3,21 @@ LOPTI - C++ optimization library.
 Leonid Volnitsky <leonid@volnitsky.com>
 v0.2 Nov 2008
 
-LOPTI is 3-part optimization library.  1st part is a interface to external and
-built-in solvers and on front-end it presents to library user consistent and
-simple API.  2nd part is collection of solvers. 3rd part collection of object
-function and object function modifiers. 
-All available solvers are open source and and most are included with LOPTI.
-
 NOTE: This document is work in progress, only about 20% is complete and there is no logical sequence yet.
 
-.Visualization with xgraphics
-image:xgr001.gif["Visualization with xgraphics", width="450", align="center", link="xgr001.gif"]
++++<div style="float: right; margin-left: 2em">+++
+image:xgr001.gif["Visualization with xgraphics", width="400", link="xgr001.gif"]
+
+LOPTI is open source C++ optimization library. There are three major parts.
+1st and main part is solver-driver which either wraps external solver or uses
+LOPTI native solvers and presents to library user consistent and simple
+optimization API.  2nd part is collection of solvers.  All current solver are
+open source (GPL or BSD like licences).  Some of them (Condor) are unchanged
+and treated as black-box.  Some of them (NEWUOA - fortran source) went through
+heavy modification to interface with LOPTI.  And other (Hook-Jeevs) were
+completely rewritten into LOPTI native solver.  3rd part is collection of
+object function and object function modifiers. 
++++</div>+++
 
 .Available Solvers
 [grid="all"]
@@ -20,9 +25,9 @@ image:xgr001.gif["Visualization with xgraphics", width="450", align="center", li
 Solver                         , Type        , Use Derivative, Origin                   , Dependency
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Condor                         , Trust Region, No            , "Based on Powel's UOBYQA",                       "Source available at http://XXXXXXXXXXX.com"
-NEWUOA                         , Trust Region, No            , "2002, Latest from Powel successor to UOBYQA",   "none (converted fortran source included)"
-GSL Nelder-Mead (Simplex)      , Direct      , No            , "1965<<1>>"                         , "GNU Scientific Library package (available for all linux distro)"
-Hook-Jeevs                     , Direct      , No            , "1962, C implementation by Sergey Kiselev at netlib.net"    , "none (converted to native LOPTI implementation)"
+NEWUOA                         , Trust Region, No            , "2002, latest from Powel, successor to UOBYQA",   "none (converted fortran source included)"
+GSL Nelder-Mead (Simplex)      , Direct      , No            , "1965<<1>>"                                     , "GNU Scientific Library (package available for most linux distro)"
+Hook-Jeevs                     , Direct      , No            , "1962, C implementation by Sergey Kiselev"      , "none (converted to native LOPTI implementation)"
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sample use:
