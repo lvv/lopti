@@ -3,6 +3,7 @@
 	#include <lopti/hook-jeevs.h>
 		using lopti::hook_jeevs_minimizer;
 		using lopti::make_loft;
+
 	typedef   array<double,2>   A;		// see boost::array
 double   rosenberg_fn (A& X)    {  return  100 * pow2(X[1]-pow2(X[0])) + pow2(1-X[0]);  };
 

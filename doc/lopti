@@ -3,7 +3,7 @@ LOPTI - C++ optimization library.
 Leonid Volnitsky <leonid@volnitsky.com>
 v0.2 Nov 2008
 
-NOTE: This document is work in progress, only about 20% is complete and there is no logical sequence yet.
+WARNING: This document is work in progress, only about 20% is complete and there is no logical sequence yet.
 
 +++<div style="float: right; margin-left: 2em">+++
 image:xgr001.gif["Visualization with xgraphics", width="400", link="xgr001.gif"]
@@ -36,13 +36,22 @@ Sample use:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 include::example.cc[]
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-	
 
 == LOFT
 Object function are so called Lopti Object FuncTor (LOFT)  which are callable objects either representing object function
 or wrapper for other LOFTs.  LOFT allow to wrap object
 function in any number and combination of LOFT, such as rescaler, logger, noise-adder,
 adapter, constrain-adder-by-barrier-function,  etc. 
+
+== TODO
+- docs
+- convert dependacy from `lvv::array` to `boost::array`
+- remove all depenancies on <lvv/*.h>
+- remove `using` from headers
+- add `zib nlqe1` solver
+- add `zib newton_test` funtions
+- add `gsl bfgs` solver
+- add `assert` / `throw` on use uninilized data in `minimizer` class
 
 == References
 + [[[1]]] J.A. Nelder and R. Mead, 'A simplex method for function minimization', Computer Journal vol. 7 (1965), 308-315.

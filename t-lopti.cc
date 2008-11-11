@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
 
 	#ifdef CONDOR
 
-		{  condor_minimizer<V0>	mzr;////  condor  LOGGED chebyquad
+		{  condor_minimizer<V0>	mzr;////  condor  LOGGED 
 			mzr	.x0		(_X0);
 			mzr	.loft		(xg_log<V0>(FN<V0>(),  mzr));
 			mzr	.rho_begin	(RHO_BEGIN);
@@ -84,8 +84,9 @@ int main(int argc, char **argv) {
 		}
 
 		#ifdef  PLAIN_FN
-		{  condor_minimizer<V0> mzr;////  CONDOR  x PLAIN_FN  ROSENBERG
-			mzr	.loft			( make_loft<V0> (&plain_fn_rosenberg<V0>, "make_loft") );
+		{  condor_minimizer<V0> mzr;////  CONDOR  x PLAIN_FN  ROSENBERG		// TODO: why results deffrent from loft?
+			//mzr	.loft			( make_loft<V0> (&plain_fn_rosenberg<V0>, "make_loft") );
+			mzr	.loft			( make_loft<V0> (&bind (&plain_fn_rosenberg<V0>, _1) ));
 			mzr	.x0			(_X0);	// X[0..N-1]	
 			mzr	.rho_begin		(1);
 			mzr	.rho_end		(STOP_AT_X_STEP);
