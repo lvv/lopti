@@ -132,7 +132,7 @@ template<typename V, int FACTOR>	struct	bad_scale_rosenberg	 : loft_base<V> { 	L
  /////////////////////////////////////////////////////////////////////////////////////////  WRAPPER: RESCALE
 template<typename V>	struct	rescale :  loft_base<V> 	{				LOFT_TYPES;  LOFT_MEMBERS;  CLONER(rescale)
 				V R;
-			rescale		(loft_cref_t loft_v, V& _R)  : 	R(_R)  {  X_opt_ = loft_v.X_opt_; X_opt_ /= _R;   loft(loft_v); cout << "rescaled opt: " << X_opt_ << endl <<  "opt: " << loft_v.X_opt_ << endl;  };
+			rescale		(loft_cref_t loft_v, V& _R)  : 	R(_R)  {  X_opt_ = loft_v.X_opt_; X_opt_ /= _R;   loft(loft_v); /*cout << "rescaled opt: " << X_opt_ << endl <<  "opt: " << loft_v.X_opt_ << endl;*/  };
 	const string	name		()	const	{ return  name_ + " rescaled"; };
 	fp_t		operator()	(V&  X)		{ iter_++;  	V XR = X;  XR *= R;    return  (*wrapped_loft_v)(XR); };
 	fp_t 		opt_distance	(V& X)	const	{ V XR = X;   XR*=R;    return  distance_norm2(wrapped_loft_v->X_opt_, XR); }; // distance in normalized coord
@@ -143,6 +143,7 @@ template<typename V>	struct	xg_log : loft_base<V> 		{				LOFT_TYPES;   LOFT_MEMB
 				shared_ptr<ofstream>	log_file;  // need smart ptr becase xg_log dtor-ed on coping
 	xg_log	 (loft_cref_t _loft_v, minimizer<V>& mzr)	{
 		loft(_loft_v);													assert(log_file == 0 );
+		// FIXME: test if there is a "log" dir
 		log_file = shared_ptr<ofstream>(new ofstream(("log/" +  (&mzr)->name() + "(" + name() + ")" ).c_str()));	assert(log_file->good());
 	};
 

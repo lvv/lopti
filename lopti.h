@@ -96,8 +96,10 @@ struct	trust_region_minimizer : minimizer<V>    {
 
 	explicit		trust_region_minimizer		(const char* _name= "unknown (trust region type)")
 	:	minimizer<V>(_name),
-		rho_begin_ 	(numeric_limits<fp_t>::quiet_NaN ()),
-		rho_end_   	(numeric_limits<fp_t>::quiet_NaN ())
+		rho_begin_ 	(1),
+		rho_end_   	(numeric_limits<fp_t>::min())
+		//rho_begin_ 	(numeric_limits<fp_t>::quiet_NaN ()),
+		//rho_end_   	(numeric_limits<fp_t>::quiet_NaN ())
 	{};
 
 	virtual minimizer<V>&		rho_begin		(fp_t rho)	{ rho_begin_ = rho;  return *this; };

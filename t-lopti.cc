@@ -16,7 +16,7 @@
 	#include <boost/bind.hpp>
 		using boost::bind;
 
-	#include	<lopti/object_function.h>
+	//#include	<lopti/object_function.h>
 	//#include	<lopti/lopti.h>
 	#include	<lopti/condor-wrap.h>
 	#include   	<lopti/newuoa-wrap.h>
@@ -49,7 +49,6 @@ int main(int argc, char **argv) {
 
 			//#define STOP_AT_X_STEP 1e-3
 			#define		STOP_AT_X_STEP 1e-15
-			//#define 	RHO_BEGIN	0.1
 				
 			#if 	( FN == rosenberg )
 		//		#undef _N
@@ -68,6 +67,8 @@ int main(int argc, char **argv) {
 				for (int i=0; i <_N; i++)   _X0[i] = (i+1.)/(i+2.);
 				const double RHO_BEGIN = 0.2* _X0[0];
 				cout << "x0: "<< _X0 << endl;
+			#elif
+				#define 	RHO_BEGIN	0.1
 			#endif
 
 			
@@ -111,7 +112,7 @@ int main(int argc, char **argv) {
 		condor_minimizer<V0>	mzr;////  condor  logged RESCALED rosenberg
 			mzr	.loft		(xg_log<V0>  (rescale<V0>  (rosenberg<V0>(), R),  mzr));
 			mzr	.x0		(X/=R);	// X[0..N-1]
-			mzr	.rho_begin	(RH_BEGIN);
+			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
 			mzr	.argmin();
 			mzr	.print(); 
