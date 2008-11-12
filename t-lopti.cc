@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
 		#ifdef  RESCALE
 		{  	V0 R = {{ 1, 0.0100 }};   V0 X = _X0; 
 		condor_minimizer<V0>	mzr;////  condor  logged RESCALED rosenberg
-			mzr	.loft		(xg_log<V0>  (rescale<V0>  (rosenberg<V0>(), R),  mzr));
+			mzr	.loft		(xg_log<V0>  (rescale<V0>  ( trace<V0>(rosenberg<V0>()), R),  mzr));
 			mzr	.x0		(X/=R);	// X[0..N-1]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);

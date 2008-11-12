@@ -43,6 +43,35 @@ or wrapper for other LOFTs.  LOFT allow to wrap object
 function in any number and combination of LOFT, such as rescaler, logger, noise-adder,
 adapter, constrain-adder-by-barrier-function,  etc. 
 
+=== make_loft() - create loft from any callable object
+`make_loft(loft l,)` +
+
+TODO: write
+
+=== trace() - pregress tracer
+`trace(loft l,)` +
+
+Prints on screen eval-number, seconds of last eval, X and f-value
+
+=== xg_log() - xgraphic logger
+`xg_log(loft l, minimizer<V> m)` +
+
+Logs eval-numer, f-value and X on every loft evaluation. Programm `xgraphic` is
+open source visualization utility with can be dirctly input this file.  Log
+file name is composed from loft name and minimizer name and file creaded under `./log/`
+
+=== rescale() - normalizer
+`rescale<V>(loft L, V rescale_vector)` +
+
+Most solvers work much better if function first drivative (and second?) have
+about the same order in all directions.  `rescale` convert wrapped loft
+function into such nomalized function with rescaling
+vector.  When solver request to evaluate loft on X, `rescale` gives wrapped
+loft(real object function),  vector  X*rescale_vector. When you use `rescale`,
+don't forget to rescale X0 too:  X0 = X0/rescale_vector
+
+
+
 == TODO
 - docs
 - convert dependacy from `lvv::array` to `boost::array`

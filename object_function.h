@@ -11,6 +11,9 @@
 		using std::ios;
 		using std::ofstream;
 
+	#include <lvv/timer.h>
+		using lvv::Timer;
+
 	#include <lvv/array.h>
 		using lvv::array;
 		using lvv::matrix;
@@ -138,7 +141,8 @@ template<typename V>	struct	rescale :  loft_base<V> 	{				LOFT_TYPES;  LOFT_MEMB
 	fp_t 		opt_distance	(V& X)	const	{ V XR = X;   XR*=R;    return  distance_norm2(wrapped_loft_v->X_opt_, XR); }; // distance in normalized coord
  };
  /////////////////////////////////////////////////////////////////////////////////////////  WRAPPER:  XG_LOG (xgraphic)
-template<typename V> class minimizer;
+ template<typename V> class minimizer;
+
 template<typename V>	struct	xg_log : loft_base<V> 		{				LOFT_TYPES;   LOFT_MEMBERS;  CLONER(xg_log)
 				shared_ptr<ofstream>	log_file;  // need smart ptr becase xg_log dtor-ed on coping
 	xg_log	 (loft_cref_t _loft_v, minimizer<V>& mzr)	{
@@ -151,6 +155,24 @@ template<typename V>	struct	xg_log : loft_base<V> 		{				LOFT_TYPES;   LOFT_MEMB
 		fp_t   y = (*wrapped_loft_v)(X); 			assert(log_file->good());
 		// 1 - iter no(gp: splot label);  2 - hight (y);  3 - |X-opt| ignored;  4,5 - X coord;  
 		*log_file << format("%d \t %g \t %g \t %22.15g \n")   % (wrapped_loft_v->iter())   %y   % wrapped_loft_v->opt_distance(X)  %X  << flush;  
+		return  y;
+	};
+ };
+
+template<typename V>	struct	trace : loft_base<V> 		{				  CLONER(trace); LOFT_TYPES;   LOFT_MEMBERS;
+	Timer	timer;
+	trace	 (loft_cref_t _loft_v)	{ loft(_loft_v);	};
+
+	fp_t		operator()	(V&  X)			{
+
+		if (wrapped_loft_v->iter()==1)   cout << format("# (iter)              X[*]               ==F-value\n");
+		cout << format("(%d) \t %10.6g")   % (wrapped_loft_v->iter())  %X;
+
+		//MSG("(%d/%.1fs") % cnt++  %timer();                                                                                                                
+		//for(int i=0; i<param_size; ++i)      MSG("%=10.6g")   %param[i];
+
+		fp_t   y = (*wrapped_loft_v)(X); 			
+		cout << format("\t(%.1gs)   ==%18.13g\n")  %timer()    %y<< flush;  
 		return  y;
 	};
  };
