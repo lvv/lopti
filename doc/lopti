@@ -32,6 +32,10 @@ LOPTI mainly is interface and all the user-needed code is in C++ headers. All na
 So "installation" is just cp-ing to compiler-include-search-directory or don't "install" at all and just use `CXXFLAGS=-I{nbsp}<lopti-dir>`
 For installation external solvers see corresponding section bellow. 
 
+----------------
+git clone git@github.com:lvv/lopti.git
+----------------
+
 == Minimizer Class
 
 === Data Types

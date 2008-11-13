@@ -1,0 +1,7 @@
+See  lopti/doc/lopti.html or txt version: doc/lopti.
+
+if there is no lopti/doc/lopti.html
+
+	# install asciidoc, if not installed
+	cd lopti/doc/
+	make lopti.html
