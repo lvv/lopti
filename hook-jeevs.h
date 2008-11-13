@@ -11,10 +11,10 @@
 	#include <cassert>
 	#include <algorithm>
 	#include <iterator>
-		using namespace std;
+		//using namespace std;
 
 	#include <lvv/array.h>
-		using namespace lvv;
+		//using namespace lvv;
 		using lvv::array;
 
 namespace lopti  {

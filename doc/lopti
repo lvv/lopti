@@ -19,23 +19,117 @@ completely rewritten into LOPTI native solver.  3rd part is collection of
 object function and object function modifiers. 
 +++</div>+++
 
-.Available Solvers
-[grid="all"]
-`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.~~~~~~~~~~~~~.~~~~~~~~~~~~~~~`~~~~~~~~~~~~~~~~~~~~~~~~~~~`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Solver                         , Type        , Use Derivative, Origin                   , Dependency
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Condor                         , Trust Region, No            , "Based on Powel's UOBYQA",                       "Source available at http://XXXXXXXXXXX.com"
-NEWUOA                         , Trust Region, No            , "2002, latest from Powel, successor to UOBYQA",   "none (converted fortran source included)"
-GSL Nelder-Mead (Simplex)      , Direct      , No            , "1965<<1>>"                                     , "GNU Scientific Library (package available for most linux distro)"
-Hook-Jeevs                     , Direct      , No            , "1962, C implementation by Sergey Kiselev"      , "none (converted to native LOPTI implementation)"
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+== Quick Start
 Sample use:
 
 [c]
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 include::example.cc[]
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+== Install
+LOPTI mainly is interface and all the user-needed code is in C++ headers. All native solvers are simple enough for headers-only code too. 
+So "installation" is just cp-ing to compiler-include-search-directory or don't "install" at all and just use `CXXFLAGS=-I{nbsp}<lopti-dir>`
+For installation external solvers see corresponding section bellow. 
+
+== Minimizer Class
+
+=== Data Types
+All solvers (and OF loft) are template with 1st parameter (we will call it `V`)  being vector type used for parameter, step0, X0 and argmin vector. 
+As of now,  the only type usable is `lvv::array<>`.  It will be changed to any random access container having members:
+
+- `value_type`
+- `size()`
+- `begin()`
+- `end()`
+
+=== Common Interface
+
+- Default constructor (no arguments)
+- `X0(V)` - initial point
+- `S0(V)` - initial step size
+- `V argmin()` - solution optimum point
+- `fp_t  ymin()` - solution minimum value
+- `int  iter()` - number of iterations
+
+Type  `lvv::array<>` is ...
+
+	
+=== Termination Criteria
+- `max_iter(int)`  - defaults to `10000`
+- `rho_end(fp_t)` - defaults to `1/infinity`
+- `characteristic_size(fp_t)`
+
+
+== Solvers
+.Available Solvers
+[grid="all"]
+`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.~~~~~~~~~~~~~.~~~~~~~~~~~~~~~`~~~~~~~~~~~~~~~~~~~~~~~~~~~`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Solver                         , Type        , Use Derivative, Origin                   , Dependency
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+NEWUOA                         , Trust Region, No            , "2002, latest from Powell, successor to UOBYQA",   "none (converted fortran source included)"
+GSL Nelder-Mead (Simplex)      , Direct      , No            , "1965<<1>>"                                     , "GNU Scientific Library (package available for most linux distro)"
+Condor                         , Trust Region, No            , "Written by Dr. Ir. Frank Vanden Berghen, based on Powell's UOBYQA",                       "Source available at http://www.applied-mathematics.net/"
+Hook-Jeevs                     , Direct      , No            , "1962, C implementation by Sergey Kiselev"      , "none (converted to native LOPTI implementation)"
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+=== GNU Scientific Library
+http://www.gnu.org/software/gsl/[GSL] is high quality
+library intended for scientific computing.  But using it is not simple, at least for simple things.
+For example, GSL algorithms use extensively GSL vector and
+to create a GSL vector with values {1, 2, 3}, you need
+need something complex like this: 
+
+[c]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      	double c_vector[3] = { 1.0, 2.0, 3.0 };
+      	gsl_vector *vector;
+	vector = gsl_vector_alloc (3);
+	for (int i=0; i<3; i++)
+	       gsl_vector_set (vector, i, c_vector[i]);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+One reason for this complexity is that GSL needs flexible vectors and matrices
+(with slices, strides, views) for linear algebra.  C++ made possible flexible
+and simple vector, bug GSL is written in C. The complexities of external
+libraries was major reason why LOPTI was created. 
+
+==== GSL Nelder-Mead (simplex)
+Termination criteria is set with member function `characteristic_size(double x)`
+Solver iteration is not equal to eval-count, it is about 1.5*eval-count.
+Rarely but it can happens, algorithm can get stuck, you can unstuck it by restarting form stuck point.
+Only `double` vector,  index should start from 0. 
+
+=== Trust Region solvers
+
+TR solvers work by approximating OF with quadratic model function, which is constructed
+to pass through evaluated points near current minimum (basis).  Near means: at
+distance less then `rho`, which is dynamically changed by solver for each
+iteration.  To build an exact model `NP=(N+1)(N+2)`  evaluated points are needed, so TR
+solvers at first `NP` iterations just evaluate `NP` points near `X0`. You can notice
+this slow start on convergence charts.  For high `N` (>10) this can be really slow start. 
+Instead of exact model it is possible with some (NEWUOA) solvers to use approximate model with less then `(N+1)(N+2)` points. 
+
+Uses member `rho_begin(fp_t)` instead of `step0(V)`, defaults to
+0.2.  Because `rho` is scalar (applied equally to all directions) it is good
+idea to normalize object junction with <<rescale>>.  Termination criteria is `rho_end(fp_t)`,
+defaults to 1/infinity.  
+
+=== NEWUOA
+Optional second template parameters is number of points used for building model, defaults to `2*N+1` (approximate quadratic model). 
+If exact model used for N > 14, NEWUOA crashes (index out of range). 
+Only `double` vector,  index should start from `1`. 
+
+
+=== Condor
+Can use only exact  model, so use is very problematic for N > 10. 
+Sometimes can get stuck at high precision, it is not clear if it is rounding error or algorithm limitation. 
+Only `double` vector,  index should start from 0. 
+
+==== Hook-Jeevs
+Native LOPTI solver, converted from Sergey Kiselev implementation. Very old and
+usually slow solver.  But sometimes can outperform all other at not trivial high dimensions tasks.
+Any V type, any index start.
 
 == LOFT
 Object function are so called Lopti Object FuncTor (LOFT)  which are callable objects either representing object function
@@ -48,7 +142,7 @@ adapter, constrain-adder-by-barrier-function,  etc.
 
 TODO: write
 
-=== trace() - pregress tracer
+=== trace() - progress tracer
 `trace(loft l,)` +
 
 Prints on screen eval-number, seconds of last eval, X and f-value
@@ -56,16 +150,17 @@ Prints on screen eval-number, seconds of last eval, X and f-value
 === xg_log() - xgraphic logger
 `xg_log(loft l, minimizer<V> m)` +
 
-Logs eval-numer, f-value and X on every loft evaluation. Programm `xgraphic` is
-open source visualization utility with can be dirctly input this file.  Log
-file name is composed from loft name and minimizer name and file creaded under `./log/`
+Logs eval-number, f-value and X on every loft evaluation. Program `xgraphic` is
+open source visualization utility with can be directly input this file.  Log
+file name is composed from loft name and minimizer name and file created under `./log/`
 
+[[rescale]]
 === rescale() - normalizer
 `rescale<V>(loft L, V rescale_vector)` +
 
-Most solvers work much better if function first drivative (and second?) have
+Most solvers work much better if function first derivative (and second?) have
 about the same order in all directions.  `rescale` convert wrapped loft
-function into such nomalized function with rescaling
+function into such normalized function with rescaling
 vector.  When solver request to evaluate loft on X, `rescale` gives wrapped
 loft(real object function),  vector  X*rescale_vector. When you use `rescale`,
 don't forget to rescale X0 too:  X0 = X0/rescale_vector
@@ -74,13 +169,13 @@ don't forget to rescale X0 too:  X0 = X0/rescale_vector
 
 == TODO
 - docs
-- convert dependacy from `lvv::array` to `boost::array`
-- remove all depenancies on <lvv/*.h>
+- convert dependency from `lvv::array` to `boost::array`
+- remove all dependencies on <lvv/*.h>
 - remove `using` from headers
 - add `zib nlqe1` solver
-- add `zib newton_test` funtions
+- add `zib newton_test` functions
 - add `gsl bfgs` solver
-- add `assert` / `throw` on use uninilized data in `minimizer` class
+- add `assert` / `throw` on use uninitialized data in `minimizer` class
 
 == References
 + [[[1]]] J.A. Nelder and R. Mead, 'A simplex method for function minimization', Computer Journal vol. 7 (1965), 308-315.
