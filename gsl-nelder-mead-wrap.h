@@ -6,6 +6,11 @@
 		#define	MINIMIZER	gsl_nelder_mead_minimizer
 	#endif
 
+	#ifndef		V_IBEGIN
+		#define	V_IBEGIN 0
+	#endif
+	
+
 	#include <lvv/convert-gsl.h>
 		using lvv::array;
 	#include <lopti/lopti.h>

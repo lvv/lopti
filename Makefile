@@ -1,12 +1,37 @@
 
 include  ../lvv/include.mk
 	
+PREFIX ?= /usr/local
+VERSION = 0.2
+FCFLAGS += -g -O2
+#FCFLAGS = -frange-check -fbounds-check -O0 -ggdb3
 LDFLAGS += -lgsl -lgslcblas -L /usr/local/lib -lcondor newuoa/*.o -lgfortran 
 CXXFLAGS += -I /home/lvv/NF/
 XGRAPHIC = xgraphic  -scat -markcol=-1  -g2 -logy -leg -legpos=3  -legsiz=1 -legtyp=2 -titgen="Convergance speed for dirivative-free algorithms" -titx="Objective function evaluation count" -tity="Distance to optimum:  log10 ( | X - X_opt | )" 
 
-.DEFAULT_GOAL := t-lopti-r
-#.PHONY: t-lopti-r
+#.DEFAULT_GOAL := t-lopti-r
+#.PHONY: t-lopti-r all
+
+install: liblopti.so
+	mkdir -p		$(PREFIX)/include/lopti/
+	cp -v *.h external/*.h 	$(PREFIX)/include/lopti/
+	mkdir -p		$(PREFIX)/lib/
+	cp -v liblopti.so*	$(PREFIX)/lib/
+
+clean:
+	rm -f liblopti.so.*
+	rm -f {,newuoa/}*.o
+	rm -f doc/*.{html,css}
+	rm -f t-lopti
+
+test:	t-lopti
+	./t-lopti
+ 
+liblopti.so:
+	$(FC) $(FCFLAGS) -fPIC -c newuoa/{bigden,biglag,calfun,trsapp,update}.f
+	gcc -shared -Wl,-soname,liblopti.so.0 -o liblopti.so.$(VERSION) *.o
+	ln -sf liblopti.so.$(VERSION) liblopti.so.0
+	ln -sf liblopti.so.0 liblopti.so
 
 t-lopti-xg: t-lopti log/condor
 	$<
@@ -32,16 +57,14 @@ t-nm: t.cc  gsl-nelder-mead-wrap.h
 	$(CXX) $(CXXFLAGS) -DOPTI=NM  $< -o $@ $(LDFLAGS)
 
 git-install:
-	cd /usr/local &&  git checkout lvvlib 
-	mkdir -p /usr/local/include/lvvlib/
-	cp *.h   /usr/local/include/lvvlib/
-	cd /usr/local &&  git add /usr/local/include/lvvlib
+	cd /usr/local &&  git checkout lopti
+	make install
+	cd /usr/local &&  git add /usr/local/include/lopti
 	cd /usr/local &&  git commit -a -m up
 	cd /usr/local &&  git checkout installed
-	cd /usr/local &&  git merge lvvlib
+	cd /usr/local &&  git merge lopti
 
 
-#FCFLAGS = -frange-check -fbounds-check -O0 -ggdb3
 
 t-newuoa: newuoa/t-newuoa.cc newuoa-wrap.h  lopti.h
 	#	rm -f *.o

@@ -8,6 +8,11 @@
 		#define	MINIMIZER	newuoa_minimizer
 	#endif
 
+	#ifndef		V_IBEGIN
+		#define	V_IBEGIN 1
+	#endif
+	
+
 	// reverse indexes for fortran compat
 	#define		BMAT(i,j)	BMAT[j][i]
 	#define		ZMAT(i,j)	ZMAT[j][i]
@@ -21,7 +26,7 @@
 	#include	<lvv/math.h>
 			using lvv::pow2; using lvv::pow3; using lvv::abs;
 	#include	<lvv/array.h>
-			using lvv::array; using lvv::vector; using lvv::matrix;
+			using lvv::array;  using lvv::matrix;
 
 
 	namespace lopti {
@@ -57,10 +62,10 @@ newuoa_minimizer<V,NPT>::argmin () {
 	V		XNEW;
 	V		GQ;
 	V		D;
-	vector<double,NPT>		FVAL;
-	vector<double,NPT>		PQ;
-	vector<double,NDIM>		VLAG;
-	vector<double,(N*NP)/2>		HQ;
+	lvv::vector<double,NPT>		FVAL;
+	lvv::vector<double,NPT>		PQ;
+	lvv::vector<double,NDIM>		VLAG;
+	lvv::vector<double,(N*NP)/2>		HQ;
 
 	matrix<double,NDIM,N>		BMAT;
 	matrix<double,NPT,N>		XPT;  

@@ -1,4 +1,5 @@
 
+	// NOTE: there is 2nd implementation:  http://www.netlib.org/opt/hooke.c
 	#ifndef LOPTI_HOOK_JEEVS_H
 	#define LOPTI_HOOK_JEEVS_H
 
@@ -30,7 +31,7 @@ struct   hook_jeevs_minimizer   : minimizer<V>  {
 					#define  EPSILON 0.000001
 						fp_t	tau_;	   // Termination criterium        
 
-	hook_jeevs_minimizer	()			: minimizer<V>("hook-jeevs"), tau_(10*EPSILON) {};
+	hook_jeevs_minimizer	()			: minimizer<V>("hook-jeevs"), tau_(10*EPSILON) { S.assign(0.2);};
 	virtual	minimizer<V>&	 	tau		(fp_t _tau)	{ tau_ = _tau; return *this; };
 
 	virtual minimizer<V>&		step0(V& _S)	 { S=_S; return *this; };

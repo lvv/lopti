@@ -8,6 +8,10 @@
 	#ifndef		MINIMIZER
 		#define	MINIMIZER	condor_minimizer
 	#endif
+
+	#ifndef		V_IBEGIN
+		#define	V_IBEGIN 0
+	#endif
 	
 	#include <lvv/convert-condor.h>
 		using lvv::array;

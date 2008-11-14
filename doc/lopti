@@ -1,9 +1,11 @@
 LOPTI - C++ optimization library.
 =================================
 Leonid Volnitsky <leonid@volnitsky.com>
-v0.2 Nov 2008
+v0.2 (alpha) Nov 2008
 
-WARNING: This document is work in progress, only about 20% is complete and there is no logical sequence yet.
+WARNING: Though LOPTI is quite usable and everything works (for me),
+this is still work in progress, documentation only about 20% complete,  there
+is no logical sequence, build instructions are imprecise, API have not stabilized.
 
 +++<div style="float: right; margin-left: 2em">+++
 image:xgr001.gif["Visualization with xgraphics", width="400", link="xgr001.gif"]
@@ -11,7 +13,7 @@ image:xgr001.gif["Visualization with xgraphics", width="400", link="xgr001.gif"]
 LOPTI is open source C++ optimization library. There are three major parts.
 1st and main part is solver-driver which either wraps external solver or uses
 LOPTI native solvers and presents to library user consistent and simple
-optimization API.  2nd part is collection of solvers.  All current solver are
+optimization API.  2nd part is collection of solvers.  All current solvers are
 open source (GPL or BSD like licences).  Some of them (Condor) are unchanged
 and treated as black-box.  Some of them (NEWUOA - fortran source) went through
 heavy modification to interface with LOPTI.  And other (Hook-Jeevs) were
@@ -22,30 +24,44 @@ object function and object function modifiers.
 == Quick Start
 Sample use:
 
-[c]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[code,c++]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 include::example.cc[]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 == Install
-LOPTI mainly is interface and all the user-needed code is in C++ headers. All native solvers are simple enough for headers-only code too. 
-So "installation" is just cp-ing to compiler-include-search-directory or don't "install" at all and just use `CXXFLAGS=-I{nbsp}<lopti-dir>`
+LOPTI mainly is interface with headers only. All native solvers are simple enough for headers-only code too. 
+So simplest "installation" is just cp-ing to compiler-include-search-directory or don't "install" at all and just use `CXXFLAGS=-I{nbsp}<lopti-dir>`
 For installation external solvers see corresponding section bellow. 
 
-----------------
+.You will need
+- http://gcc.gnu.org/[GCC] with gfortran included (if you want NEWUOA solver), tested with 4.3.2. Intel ICC can not compile boost code for me
+- http://boost.org[BOOST C++ libraries], tested with 1.3.6.
+- http://en.wikipedia.org/wiki/Git_(software)[GIT], your distribution probably have package for GIT.
+- http://www.cmap.polytechnique.fr/~jouve/xd3d/[XGraphic] - simple visualisation utility(optional).
+- external solvers (optional), see doc for corresponding solvers below.
+
+.Install
+-----------------------------------
 git clone git@github.com:lvv/lopti.git
-----------------
+cd lopti.git
+make install
+----------------------------------
+
 
 == Minimizer Class
 
 === Data Types
-All solvers (and OF loft) are template with 1st parameter (we will call it `V`)  being vector type used for parameter, step0, X0 and argmin vector. 
-As of now,  the only type usable is `lvv::array<>`.  It will be changed to any random access container having members:
+All solvers (and OF loft) are template with 1st parameter being parameter vector type. Variables step0, X0 and argmin have the same type. 
+As of now,  the only type usable is `lvv::array<>`.  Can be found in `external`
+directory.   It will be changed in future to support any random access container having members:
 
 - `value_type`
 - `size()`
 - `begin()`
 - `end()`
+
+and plain C arrays.
 
 === Common Interface
 
@@ -66,6 +82,7 @@ Type  `lvv::array<>` is ...
 
 
 == Solvers
+
 .Available Solvers
 [grid="all"]
 `~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.~~~~~~~~~~~~~.~~~~~~~~~~~~~~~`~~~~~~~~~~~~~~~~~~~~~~~~~~~`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -78,27 +95,35 @@ Hook-Jeevs                     , Direct      , No            , "1962, C implemen
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 === GNU Scientific Library
-http://www.gnu.org/software/gsl/[GSL] is high quality
-library intended for scientific computing.  But using it is not simple, at least for simple things.
+http://www.gnu.org/software/gsl/[GSL] is high quality scientific computing
+C library.  But using it is not simple, at least for simple things.
 For example, GSL algorithms use extensively GSL vector and
 to create a GSL vector with values {1, 2, 3}, you need
 need something complex like this: 
 
-[c]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[code,c]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       	double c_vector[3] = { 1.0, 2.0, 3.0 };
       	gsl_vector *vector;
 	vector = gsl_vector_alloc (3);
 	for (int i=0; i<3; i++)
 	       gsl_vector_set (vector, i, c_vector[i]);
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 One reason for this complexity is that GSL needs flexible vectors and matrices
-(with slices, strides, views) for linear algebra.  C++ made possible flexible
-and simple vector, bug GSL is written in C. The complexities of external
+(with slices, strides, views) for linear algebra.  C++ made possible to have both: flexible
+and simple vector, bug unfortnetly GSL is written in C. The complexities of external
 libraries was major reason why LOPTI was created. 
 
 ==== GSL Nelder-Mead (simplex)
+
+----------------------------
+#include <newuoa.h>
+class gsl_nelder_mead_minimizer<V>
+------------------------------
+
+`LDFLAGS=-lgsl make ...`
+
 Termination criteria is set with member function `characteristic_size(double x)`
 Solver iteration is not equal to eval-count, it is about 1.5*eval-count.
 Rarely but it can happens, algorithm can get stuck, you can unstuck it by restarting form stuck point.
@@ -109,42 +134,76 @@ Only `double` vector,  index should start from 0.
 TR solvers work by approximating OF with quadratic model function, which is constructed
 to pass through evaluated points near current minimum (basis).  Near means: at
 distance less then `rho`, which is dynamically changed by solver for each
-iteration.  To build an exact model `NP=(N+1)(N+2)`  evaluated points are needed, so TR
+iteration.  To build an exact model,  `NP=(N+1)(N+2)`  evaluated points are needed, so TR
 solvers at first `NP` iterations just evaluate `NP` points near `X0`. You can notice
 this slow start on convergence charts.  For high `N` (>10) this can be really slow start. 
 Instead of exact model it is possible with some (NEWUOA) solvers to use approximate model with less then `(N+1)(N+2)` points. 
 
-Uses member `rho_begin(fp_t)` instead of `step0(V)`, defaults to
+Uses member `rho_begin(fp_t)` instead of `step0(V)`,  defaults to
 0.2.  Because `rho` is scalar (applied equally to all directions) it is good
 idea to normalize object junction with <<rescale>>.  Termination criteria is `rho_end(fp_t)`,
 defaults to 1/infinity.  
 
-=== NEWUOA
+==== NEWUOA
+
+----------------------------
+#include <newuoa.h>
+class newuoa_minimizer<V,[NP=2*N+1>
+------------------------------
+
+`LDFLAGS=-llopti make ...`
+
 Optional second template parameters is number of points used for building model, defaults to `2*N+1` (approximate quadratic model). 
-If exact model used for N > 14, NEWUOA crashes (index out of range). 
+If exact model is used for N > 14, NEWUOA crashes (index out of range).  When this solver is used `LFLAGS=-llopti` needed. 
 Only `double` vector,  index should start from `1`. 
 
 
-=== Condor
+==== CONDOR
+
+-----------------------------
+#include <condor.h>
+class condor_minimizer<V,[NP=2*N+1>
+------------------------------
+
+`LDFLAGS=-lcondor make ...`
+
+Fast for low dimentions.  Constrains capability not used. 
 Can use only exact  model, so use is very problematic for N > 10. 
 Sometimes can get stuck at high precision, it is not clear if it is rounding error or algorithm limitation. 
+Also sometimes aborts at FP illegal ops in the middle optimization run. 
 Only `double` vector,  index should start from 0. 
 
-==== Hook-Jeevs
-Native LOPTI solver, converted from Sergey Kiselev implementation. Very old and
-usually slow solver.  But sometimes can outperform all other at not trivial high dimensions tasks.
+=== Hook-Jeevs
+Native LOPTI solver, converted from Oleg Kiselev, 1998 http://www.netlib.org/c++/linalg.tgz[implementation]. Very old and
+usually slow solver.  But sometimes can outperform all other at not trivial
+high dimensions tasks.  My app, where I use LOPTI, segfaulted when I used this
+solver.  Lowering optimization from -O3 to -O2 (gcc-4.3.2 amd64) solved this segfault problem. 
+Code still needs some cleanup, and thread safty. 
 Any V type, any index start.
 
-== LOFT
-Object function are so called Lopti Object FuncTor (LOFT)  which are callable objects either representing object function
-or wrapper for other LOFTs.  LOFT allow to wrap object
+== Object Function
+Object function are defined in so called Lopti Object FuncTor (LOFT). LOFT also allow to wrap object
 function in any number and combination of LOFT, such as rescaler, logger, noise-adder,
 adapter, constrain-adder-by-barrier-function,  etc. 
 
 === make_loft() - create loft from any callable object
-`make_loft(loft l,)` +
+`make_loft(boost::function<fp_t (*)(V& X)> callable_object)` +
 
-TODO: write
+Converts any to loft. Callable object can be plain function, class member function, or functor. 
+A callable object passed (and possibly casted) to `make_loft` constructor.
+Because `make_loft` expects a `boost::function` as its argument, it is converted to `boost::function` internally.
+
+--------------------------------------------
+double plain_function(lvv::array<doulbe,2> X);
+minimizer.loft ( make_loft<V> (&plain_function);
+-------------------------------------------------------
+
+See also http://www.boost.org/doc/libs/1_37_0/doc/html/function/tutorial.html[`boost::function` tutorial]
+
+LOFT should have one argument - optimization vetctor.  If your original function have more arguments use 
+`boost::bind()`
+or 
+`std::bind1st(), bind2end()`
 
 === trace() - progress tracer
 `trace(loft l,)` +
@@ -173,8 +232,8 @@ don't forget to rescale X0 too:  X0 = X0/rescale_vector
 
 == TODO
 - docs
-- convert dependency from `lvv::array` to `boost::array`
-- remove all dependencies on <lvv/*.h>
+- remove dependency on `lvv::array`
+- remove all dependencies on any <lvv/*.h>
 - remove `using` from headers
 - add `zib nlqe1` solver
 - add `zib newton_test` functions
@@ -183,5 +242,11 @@ don't forget to rescale X0 too:  X0 = X0/rescale_vector
 
 == References
 + [[[1]]] J.A. Nelder and R. Mead, 'A simplex method for function minimization', Computer Journal vol. 7 (1965), 308-315.
++ [[[2]]] R. Hooke and T. A. Jeeves,  'Direct Search Solution of Numerical and Statistical Problems',  Journal of the ACM, Vol. 8, April 1961, pp. 212-229
++ [[[3]]] M. J. D. Powell. 'The NEWUOA software for unconstrained optimization with derivatives'. DAMTP Report 2004/NA05, University of Cambridge, 2004.
++ [[[4]]] Frank Vanden Berghen, Hugues Bersini, 
+'CONDOR, a new parallel, constrained extension of Powell's UOBYQA algorithm:
+Experimental results and comparison with the DFO algorithm',
+Journal of Computational and Applied Mathematics, Elsevier, Volume 181, Issue 1, September 2005, Pages 157-175
 
 // vim: set filetype=asciidoc nu:

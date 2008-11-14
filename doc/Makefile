@@ -1,4 +1,10 @@
-CXXFLAGS:='-I/home/lvv/NF/'
+
+#include ../Makefile
+
+PREFIX ?= /usr/local
+
+CXXFLAGS += -I$(PREFIX)/include/lopti
+LDFLAGS += -L$(PREFIX)/lib/
 
 example:
 
