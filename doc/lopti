@@ -35,9 +35,9 @@ So simplest "installation" is just cp-ing to compiler-include-search-directory o
 For installation external solvers see corresponding section bellow. 
 
 .You will need
-- http://gcc.gnu.org/[GCC] with gfortran included (if you want NEWUOA solver), tested with 4.3.2. Intel ICC can not compile boost code for me
-- http://boost.org[BOOST C++ libraries], tested with 1.3.6.
-- http://en.wikipedia.org/wiki/Git_(software)[GIT], your distribution probably have package for GIT.
+- http://gcc.gnu.org/[GCC]  with gfortran included (if you want NEWUOA solver), tested with 4.3.2. Intel ICC can not compile boost code for me
+- http://boost.org[BOOST C++ libraries]. tested with 1.3.6.
+- http://en.wikipedia.org/wiki/Git_(software)[GIT].  Your distribution probably have package for GIT.
 - http://www.cmap.polytechnique.fr/~jouve/xd3d/[XGraphic] - simple visualisation utility(optional).
 - external solvers (optional), see doc for corresponding solvers below.
 
@@ -47,6 +47,12 @@ git clone git@github.com:lvv/lopti.git
 cd lopti.git
 make install
 ----------------------------------
+
+Do no use GCC flags:
+
+- -fast-math (newuoa and hook-jeevs will get FP errors)
+- -fargument-noalias-anything (otherwise newuoa will segfault on exit)
+
 
 
 == Minimizer Class
@@ -112,7 +118,7 @@ need something complex like this:
 
 One reason for this complexity is that GSL needs flexible vectors and matrices
 (with slices, strides, views) for linear algebra.  C++ made possible to have both: flexible
-and simple vector, bug unfortnetly GSL is written in C. The complexities of external
+and simple vector, bug unfortunately GSL is written in C. The complexities of external
 libraries was major reason why LOPTI was created. 
 
 ==== GSL Nelder-Mead (simplex)
@@ -124,7 +130,7 @@ class gsl_nelder_mead_minimizer<V>
 
 `LDFLAGS=-lgsl make ...`
 
-Termination criteria is set with member function `characteristic_size(double x)`
+Old, somewhat slow but robust.  Termination criteria is set with member function `characteristic_size(double x)`
 Solver iteration is not equal to eval-count, it is about 1.5*eval-count.
 Rarely but it can happens, algorithm can get stuck, you can unstuck it by restarting form stuck point.
 Only `double` vector,  index should start from 0. 
@@ -153,8 +159,13 @@ class newuoa_minimizer<V,[NP=2*N+1>
 
 `LDFLAGS=-llopti make ...`
 
+One of the best solvers in this collection. But have really picky termination criteria.
+I `max_iter` is too small it will aborts at max_iter and often will not give optimum
+X found so far. If `rho_end` is too small it will hit max_iter and will return `NaN` value in X. 
+Or will happily terminate not reaching minimum. So you will might need debug with termination parameter. Turn on verbosity,
+increase/decrease rho_end, adjust max_iter.
 Optional second template parameters is number of points used for building model, defaults to `2*N+1` (approximate quadratic model). 
-If exact model is used for N > 14, NEWUOA crashes (index out of range).  When this solver is used `LFLAGS=-llopti` needed. 
+If exact model is used for N > 14, NEWUOA crashes (index out of range).  When this solver is used `LDFLAGS=-llopti` needed. 
 Only `double` vector,  index should start from `1`. 
 
 
@@ -167,7 +178,7 @@ class condor_minimizer<V,[NP=2*N+1>
 
 `LDFLAGS=-lcondor make ...`
 
-Fast for low dimentions.  Constrains capability not used. 
+Fast for low dimensions.  Constrains capability not used. 
 Can use only exact  model, so use is very problematic for N > 10. 
 Sometimes can get stuck at high precision, it is not clear if it is rounding error or algorithm limitation. 
 Also sometimes aborts at FP illegal ops in the middle optimization run. 
@@ -175,10 +186,10 @@ Only `double` vector,  index should start from 0.
 
 === Hook-Jeevs
 Native LOPTI solver, converted from Oleg Kiselev, 1998 http://www.netlib.org/c++/linalg.tgz[implementation]. Very old and
-usually slow solver.  But sometimes can outperform all other at not trivial
+usually slow solver robust.  But sometimes can outperform all other at not trivial
 high dimensions tasks.  My app, where I use LOPTI, segfaulted when I used this
 solver.  Lowering optimization from -O3 to -O2 (gcc-4.3.2 amd64) solved this segfault problem. 
-Code still needs some cleanup, and thread safty. 
+Code still needs some cleanup, and thread safety. 
 Any V type, any index start.
 
 == Object Function
@@ -194,13 +205,13 @@ A callable object passed (and possibly casted) to `make_loft` constructor.
 Because `make_loft` expects a `boost::function` as its argument, it is converted to `boost::function` internally.
 
 --------------------------------------------
-double plain_function(lvv::array<doulbe,2> X);
+double plain_function(lvv::array<double,2> X);
 minimizer.loft ( make_loft<V> (&plain_function);
 -------------------------------------------------------
 
 See also http://www.boost.org/doc/libs/1_37_0/doc/html/function/tutorial.html[`boost::function` tutorial]
 
-LOFT should have one argument - optimization vetctor.  If your original function have more arguments use 
+LOFT should have one argument - optimization vector.  If your original function have more arguments use 
 `boost::bind()`
 or 
 `std::bind1st(), bind2end()`
@@ -222,12 +233,30 @@ file name is composed from loft name and minimizer name and file created under `
 `rescale<V>(loft L, V rescale_vector)` +
 
 Most solvers work much better if function first derivative (and second?) have
-about the same order in all directions.  `rescale` convert wrapped loft
-function into such normalized function with rescaling
-vector.  When solver request to evaluate loft on X, `rescale` gives wrapped
-loft(real object function),  vector  X*rescale_vector. When you use `rescale`,
-don't forget to rescale X0 too:  X0 = X0/rescale_vector
+about the same order in all directions.  
+The `rescale` converts object function into such normalized function. 
+When solver request to evaluate 'f(X)',
+`rescale` gives to wrapped 'f' modified X. 
+Modification is simple multiplication by rescaling factor:  X*rescale_vector. 
+When you use `rescale`, don't forget also rescale `X0`, devide it by rescale
+vector and same thing for  answer verctor. 
 
+.Rescale
+[code,c++]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+typedef  array<double,2>   V;
+V   R  = {{ 1, 0.0100 }};		// rescale vector  
+V   X0 = {{ -1.2, 1 }}; 			
+V   X_opt;				// answer
+condor_minimizer<V0>	mzr;
+	mzr	.loft		(rescale<V0>( trace<V0>(rosenberg<V0>()), R));
+	mzr	.x0		(X/=R);
+	mzr	.rho_begin	(1);
+	mzr	.rho_end	(0.01);
+X_opt = mzr	.argmin();
+X_opt *= R;				// un-rescale
+cout << "optimum at: " << X_opt << endl;
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 == TODO
@@ -235,6 +264,7 @@ don't forget to rescale X0 too:  X0 = X0/rescale_vector
 - remove dependency on `lvv::array`
 - remove all dependencies on any <lvv/*.h>
 - remove `using` from headers
+- unify and simplify termination criteria. 
 - add `zib nlqe1` solver
 - add `zib newton_test` functions
 - add `gsl bfgs` solver

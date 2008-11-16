@@ -4,8 +4,8 @@
 PREFIX ?= /usr/local
 
 CXXFLAGS += -I$(PREFIX)/include/lopti
-LDFLAGS += -L$(PREFIX)/lib/
 
 example:
 
-example-gsl: LDFLAGS=-lgsl
+example-gsl:	LDFLAGS=-lgsl
+example-newuoa:	LDFLAGS=-llopti
