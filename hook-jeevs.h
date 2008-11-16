@@ -76,7 +76,8 @@ struct   hook_jeevs_minimizer   : minimizer<V>  {
 				if (success) {
 					found_ = true;
 					ymin_ = f_base;
-					return  X;
+					Xmin_ = X;
+					return  Xmin_;
 				}
 			}
 
