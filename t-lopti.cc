@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
 				for (int i=0; i <_N; i++)   _X0[i] = (i+1.)/(i+2.);
 				const double RHO_BEGIN = 0.2* _X0[0];
 				cout << "x0: "<< _X0 << endl;
-			#elif
+			#else
 				#define 	RHO_BEGIN	0.1
 			#endif
 
@@ -108,14 +108,17 @@ int main(int argc, char **argv) {
 		#endif
 
 		#ifdef  RESCALE
-		{  	V0 R = {{ 1, 0.0100 }};   V0 X = _X0; 
+		{  	V0 R = {{ 1, 0.0100 }};   V0 X = _X0; V0  X_opt;
 		condor_minimizer<V0>	mzr;////  condor  logged RESCALED rosenberg
 			mzr	.loft		(xg_log<V0>  (rescale<V0>  ( trace<V0>(rosenberg<V0>()), R),  mzr));
 			mzr	.x0		(X/=R);	// X[0..N-1]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
-			mzr	.argmin();
+		X_opt = mzr	.argmin();
+		X_opt *= R;
 			mzr	.print(); 
+
+		cout << "optimum at: " << (X_opt *= R) << endl;
 		}	
 		#endif
 
@@ -129,7 +132,7 @@ int main(int argc, char **argv) {
 			mzr	.x0		(*(V1*)&(_X0));	// X[1..N]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
-			mzr	.argmin		();
+			cout << mzr	.argmin		() << endl;
 			mzr	.print		();
 		}
 
@@ -141,7 +144,7 @@ int main(int argc, char **argv) {
 			mzr	.x0		(*(V1*)&(_X0));	// X[1..N]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
-			mzr	.argmin();
+			cout << mzr	.argmin() << endl;
 			mzr	.print();
 		}
 		#endif

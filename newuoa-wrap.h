@@ -109,7 +109,7 @@ newuoa_minimizer<V,NPT>::argmin () {
 	int    IDZ;
 	int    IH;
 	int    IP;
-	int    IPT    = 0;
+	int    IPT    = 1;
 	int    ITEMP;
 	int    ITEST  = 0;
 	int    JPT    = 0;
@@ -119,7 +119,7 @@ newuoa_minimizer<V,NPT>::argmin () {
 	int    NFSAV  = 0;
 	int    KOPT   = 0;
 
-	int    _ndim  = NDIM;                 //const err
+	int    _ndim  = NDIM;                		
 	int    _n     = N;
 	int    _npt   = NPT;
 
@@ -176,7 +176,9 @@ fill_xpt_50:
      	    if (FVAL[IPT+NP] < FVAL[IPT+1]) XIPT = -XIPT;
      	    XJPT = rho_begin_;
      	    if (FVAL[JPT+NP] < FVAL[JPT+1]) XJPT = -XJPT;
-     	    XPT(iter_,IPT) = XIPT;
+												assert (IPT > 0 &&  IPT <= NPT );
+												assert (JPT > 0 &&  JPT <= NPT );
+     	    XPT(iter_,IPT) = XIPT;								// gcc warging that IPT, JPT are out of bounds
      	    XPT(iter_,JPT) = XJPT;
      	}
 
@@ -714,7 +716,7 @@ new_rho_490:
 	if (verbose_)  FMT("-- (%d) RETURNED: \t F =%.15g    X is: %.15g\n\n")  %iter_ %F  %X;
 	ymin_ = F;
 	Xmin_ = X;
-	return X;
+	return Xmin_;
 }; // newuoa
 
 	} // namespace lopti

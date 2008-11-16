@@ -3,20 +3,23 @@ include  ../lvv/include.mk
 	
 PREFIX ?= /usr/local
 VERSION = 0.2
-FCFLAGS += -g -O2
-#FCFLAGS = -frange-check -fbounds-check -O0 -ggdb3
-LDFLAGS += -lgsl -lgslcblas -L /usr/local/lib -lcondor newuoa/*.o -lgfortran 
+#FCFLAGS +=  -O2
+FCFLAGS += -frange-check -fbounds-check -O0 -ggdb3
+LDFLAGS += -L. -L /usr/local/lib  -lgsl -lgslcblas -lcondor -llopti -lgfortran 
 CXXFLAGS += -I /home/lvv/NF/
 XGRAPHIC = xgraphic  -scat -markcol=-1  -g2 -logy -leg -legpos=3  -legsiz=1 -legtyp=2 -titgen="Convergance speed for dirivative-free algorithms" -titx="Objective function evaluation count" -tity="Distance to optimum:  log10 ( | X - X_opt | )" 
 
 #.DEFAULT_GOAL := t-lopti-r
 #.PHONY: t-lopti-r all
 
+test:	t-lopti
+	./t-lopti
+
 install: liblopti.so
 	mkdir -p		$(PREFIX)/include/lopti/
 	cp -v *.h external/*.h 	$(PREFIX)/include/lopti/
 	mkdir -p		$(PREFIX)/lib/
-	cp -v liblopti.so*	$(PREFIX)/lib/
+	cp -va liblopti.so*	$(PREFIX)/lib/
 
 clean:
 	rm -f liblopti.so.*
@@ -24,14 +27,14 @@ clean:
 	rm -f doc/*.{html,css}
 	rm -f t-lopti
 
-test:	t-lopti
-	./t-lopti
  
 liblopti.so:
 	$(FC) $(FCFLAGS) -fPIC -c newuoa/{bigden,biglag,calfun,trsapp,update}.f
 	gcc -shared -Wl,-soname,liblopti.so.0 -o liblopti.so.$(VERSION) *.o
 	ln -sf liblopti.so.$(VERSION) liblopti.so.0
 	ln -sf liblopti.so.0 liblopti.so
+
+t-lopti: t-lopti.cc *.cc *.h liblopti.so
 
 t-lopti-xg: t-lopti log/condor
 	$<
@@ -45,7 +48,6 @@ t-lopti.ps: t-lopti t-lopti-r
 	cd log; $(XGRAPHIC) -pscoltex=../$@  `find  -type f \( -newer ../$< -o -cmin -1 \) -printf "%f\n"`
 	gsview $@
 
-t-lopti: t-lopti.cc *.cc *.h
 
 t-condor: CXXFLAGS +=   -I ..
 t-condor: LDFLAGS  +=   -L /usr/local/lib/ -lcondor  -lm 
