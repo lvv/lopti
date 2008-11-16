@@ -1,6 +1,17 @@
-See  lopti/doc/lopti.html or txt version: doc/lopti.
+LOPTI is open source C++ optimization library. There are three major parts.
+1st and main part is solver-driver which either wraps external solver or uses
+LOPTI native solvers and presents to library user consistent and simple
+optimization API. Currently LOPTI have 4 derivative free solvers: 'NEWUOA',
+'CONDOR', 'Nelder Mead' (simplex) and 'Hook-Jeevs'.  2nd part is collection of
+solvers.  All current solvers are open source (GPL or BSD like licences).  Some
+of them (Condor) are unchanged and treated as black-box.  Some of them
+(NEWUOA - fortran source) went through heavy modification to interface with LOPTI.  And
+other (Hook-Jeevs) were completely rewritten into LOPTI native solver.  3rd
+part is collection of object function and object function modifiers. 
 
-if there is no lopti/doc/lopti.html
+More details in lopti/doc/lopti.html or text version: doc/lopti.
+
+If there is no lopti/doc/lopti.html, you can generate it:
 
 	# install asciidoc, if not installed
 	cd lopti/doc/
