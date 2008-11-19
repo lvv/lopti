@@ -6,6 +6,8 @@ v0.2 (alpha) Nov 2008
 WARNING: Though LOPTI is quite usable and everything works (for me),
 this is still work in progress, documentation only about 20% complete,  there
 is no logical sequence, build instructions are imprecise, API have not stabilized.
+Also there is dependency on `lvv::array` (derived from `boost::array`). In near
+future I am planning to remove this dependency or document it better.  Stay tuned. 
 
 +++<div style="float: right; margin-left: 2em">+++
 image:xgr001.gif["Visualization with xgraphics", width="400", link="xgr001.gif"]
@@ -13,22 +15,23 @@ image:xgr001.gif["Visualization with xgraphics", width="400", link="xgr001.gif"]
 LOPTI is open source C++ optimization library. There are three major parts.
 1st and main part is solver-driver which either wraps external solver or uses
 LOPTI native solvers and presents to library user consistent and simple
-optimization API. Currently LOPTI have 4 derivative free solvers: 'NEWUOA',
-'CONDOR', 'Nelder Mead' (simplex) and 'Hook-Jeevs'.  2nd part is collection of
-solvers.  All current solvers are open source (GPL or BSD like licences).  Some
-of them (Condor) are unchanged and treated as black-box.  Some of them
-(NEWUOA - fortran source) went through heavy modification to interface with LOPTI.  And
-other (Hook-Jeevs) were completely rewritten into LOPTI native solver.  3rd
-part is collection of object function and object function modifiers. 
+optimization API. 2nd part is collection of solvers.  Currently LOPTI have 4
+solvers: 'NEWUOA', 'CONDOR', 'Nelder Mead' (simplex) and 'Hook-Jeevs'.  All
+current solvers are derivative free and have open source (GPL or BSD like
+licences).  Some of them (Condor) are unchanged and treated as black-box.  Some
+of them (NEWUOA - fortran source) went through heavy modification to interface
+with LOPTI.  And other (Hook-Jeevs) were completely rewritten into LOPTI native
+solver.  3rd part is collection of object function and object function
+modifiers. 
 +++</div>+++
 
 == Quick Start
 Sample use:
 
 [code,c++]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~
 include::example.cc[]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~
 
 == Install
 LOPTI mainly is interface with headers only. All native solvers are simple enough for headers-only code too. 
@@ -51,9 +54,11 @@ make install
 
 Do no use GCC flags:
 
-- -fast-math (newuoa and hook-jeevs will get FP errors)
+- -fast-math (newuoa and hook-jeevs can get FP errors otherwise)
 - -fargument-noalias-anything (otherwise newuoa will segfault on exit)
 
+
+== Definitions
 
 
 == Minimizer Class
@@ -109,13 +114,13 @@ to create a GSL vector with values {1, 2, 3}, you need
 need something complex like this: 
 
 [code,c]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      	double c_vector[3] = { 1.0, 2.0, 3.0 };
-      	gsl_vector *vector;
-	vector = gsl_vector_alloc (3);
-	for (int i=0; i<3; i++)
-	       gsl_vector_set (vector, i, c_vector[i]);
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------
+double c_vector[3] = { 1.0, 2.0, 3.0 };
+gsl_vector *vector;
+vector = gsl_vector_alloc (3);
+for (int i=0; i<3; i++)
+       gsl_vector_set (vector, i, c_vector[i]);
+------------------------------------
 
 One reason for this complexity is that GSL needs flexible vectors and matrices
 (with slices, strides, views) for linear algebra.  C++ made possible to have both: flexible
@@ -160,11 +165,9 @@ class newuoa_minimizer<V,[NP=2*N+1>
 
 `LDFLAGS=-llopti make ...`
 
-One of the best solvers in this collection. But have really picky termination criteria.
-I `max_iter` is too small it will aborts at max_iter and often will not give optimum
-X found so far. If `rho_end` is too small it will hit max_iter and will return `NaN` value in X. 
-Or will happily terminate not reaching minimum. So you will might need debug with termination parameter. Turn on verbosity,
-increase/decrease rho_end, adjust max_iter.
+One of the best solvers in this collection.
+If `rho_end` is too small it will hit `max_iter` and return `NaN` value in X. 
+You will might need debug termination parameter. Turn on verbosity, increase/decrease rho_end, adjust max_iter.
 Optional second template parameters is number of points used for building model, defaults to `2*N+1` (approximate quadratic model). 
 If exact model is used for N > 14, NEWUOA crashes (index out of range).  When this solver is used `LDFLAGS=-llopti` needed. 
 Only `double` vector,  index should start from `1`. 
