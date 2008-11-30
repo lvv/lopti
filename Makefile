@@ -22,7 +22,7 @@ install: liblopti.so
 	cp -va liblopti.so*	$(PREFIX)/lib/
 
 clean:
-	rm -f liblopti.so.*
+	rm -f liblopti.so*
 	rm -f {,newuoa/}*.o
 	rm -f doc/*.{html,css}
 	rm -f t-lopti

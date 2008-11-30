@@ -23,4 +23,5 @@ install: index.html *.gif example*.cc
 	cp -uv $^ $(DESTDIR)
 
 clean:
-	rm *.html
+	rm -f *.html
+	git clean
