@@ -2,13 +2,13 @@
 #include ../Makefile
 
 PREFIX ?= /usr/local
-DESTDIR ?= /tmp/html-lopti
+WEB_DESTDIR ?= /tmp/html-lopti
 ASCIIDOC ?= asciidoc
 
 CXXFLAGS += -I$(PREFIX)/include/lopti
 
-show: install
-	firefox $(DESTDIR)/index.html
+show: web_install
+	firefox $(WEB_DESTDIR)/index.html
 
 example:
 
@@ -18,10 +18,10 @@ example-newuoa:	LDFLAGS=-llopti
 index.html: index.txt
 	$(ASCIIDOC)  -o $@  $<
 
-install: index.html *.gif example*.cc
-	mkdir -p  $(DESTDIR)
-	cp -uv $^ $(DESTDIR)
+web_install: index.html *.gif example*.cc
+	mkdir -p  $(WEB_DESTDIR)
+	cp -uv $^ $(WEB_DESTDIR)
 
 clean:
 	rm -f *.html
-	git clean
+	git clean -df

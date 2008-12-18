@@ -3,11 +3,11 @@ LOPTI - C++ optimization library.
 Leonid Volnitsky <leonid@volnitsky.com>
 v0.2 (alpha) Nov 2008
 :icons: Yes
-:iconsdir: /etc/asciidoc/images/icons
 :language: cpp
 :caption:
 :compact-option: compact
 
+//:iconsdir: /etc/asciidoc/images/icons/
 +++<div style="float: right; margin-left: 2em">+++
 image:xgr001.gif["Visualization with xgraphics", width="400", link="xgr001.gif"]
 
@@ -34,7 +34,6 @@ future I am planning to remove this dependency or document it better.  Stay tune
 
 == Quick Start
 
-[source]
 --------------------
 include::example.cc[]
 ---------------------
@@ -55,9 +54,8 @@ Lopti library used only by `NEWUOA`.
 
 to do installation:
 
-[source,sh]
 ---------------------
-git clone git@github.com:lvv/lopti.git
+git clone git://github.com:lvv/lopti.git
 cd lopti.git
 make install
 ---------------------
@@ -154,9 +152,10 @@ The complexities of external libraries was major reason why LOPTI was created.
 [[Nelder-Mead]]
 ==== GSL Nelder-Mead (simplex)
 
-[source,cpp]
+----------------------
 #include <newuoa.h>
 class gsl_nelder_mead_minimizer<V>
+-------------------------
 
 `LDFLAGS=-lgsl make ...`
 
@@ -183,7 +182,6 @@ defaults to 1/infinity.
 [[NEWUOA]]
 ==== NEWUOA
 
-[source,cpp]
 ----------------------
 #include <lopti/newuoa.h>
 class newuoa_minimizer<V,[NP=2*N+1]>
@@ -203,7 +201,6 @@ Only `double` vector,  index should start from `1`.
 ==== CONDOR
 
 
-[source]
 ---------------
 #include <lopti/condor.h>
 class condor_minimizer<V,[NP=2*N+1>
@@ -238,7 +235,6 @@ Converts any to loft. Callable object can be plain function, class member functi
 A callable object passed (and possibly casted) to `make_loft` constructor.
 Because `make_loft` expects a `boost::function` as its argument, it is converted to `boost::function` internally.
 
-[source]
 ---------------------------------
 double   plain_function(lvv::array<double,2> X);
 ...
@@ -280,7 +276,6 @@ When you use `rescale`, don't forget also rescale `X0`, devide it by rescale
 vector and same thing for  answer verctor. 
 
 .Rescale
-[source]
 --------------------------------------
 typedef  array<double,2>   V;
 V   R  = {{ 1, 0.0100 }};		// rescale vector  
