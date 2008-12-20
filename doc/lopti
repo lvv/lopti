@@ -3,6 +3,7 @@ LOPTI - C++ optimization library.
 Leonid Volnitsky <leonid@volnitsky.com>
 v0.2 (alpha) Nov 2008
 :icons: Yes
+:iconsdir: /
 :language: cpp
 :caption:
 :compact-option: compact
@@ -55,7 +56,7 @@ Lopti library used only by `NEWUOA`.
 to do installation:
 
 ---------------------
-git clone git://github.com:lvv/lopti.git
+git clone git://github.com/lvv/lopti.git
 cd lopti.git
 make install
 ---------------------
@@ -157,7 +158,7 @@ The complexities of external libraries was major reason why LOPTI was created.
 class gsl_nelder_mead_minimizer<V>
 -------------------------
 
-`LDFLAGS=-lgsl make ...`
+`LDFLAGS=-lgsl`
 
 Old, somewhat slow but robust.  Termination criteria is set with member function `characteristic_size(double x)`
 Solver iteration is not equal to eval-count, it is about 1.5*eval-count.
@@ -171,10 +172,11 @@ in such a way that it passes through evaluated points near current minimum (basi
 distance less then `rho`, which is dynamically changed by solver for each
 iteration.  To build an exact model,  `NP=(N+1)(N+2)`  evaluated points are needed, so TR
 solvers at first `NP` iterations just evaluate `NP` points near `X0`. You can notice
-this slow start on convergence charts.  For high `N` (>10) this can be really slow start. 
-Instead of exact model it is possible with some (NEWUOA) solvers to use approximate model with less then `(N+1)(N+2)` points. 
+this slow start on convergence charts.  For high `N` (>10) this can be especially noticeable. 
+Instead of exact model it is possible with some (NEWUOA) solvers to use approximate model with less
+then `(N+1)(N+2)` points. 
 
-Uses member `rho_begin(fp_t)` instead of `step0(V)`,  defaults to
+Uses member `rho_begin(fp_t)`, instead of `step0(V)`,  defaults to
 0.2.  Because `rho` is scalar (applied equally to all directions) it is good
 idea to normalize object junction with <<rescale>>.  Termination criteria is `rho_end(fp_t)`,
 defaults to 1/infinity.
@@ -187,13 +189,17 @@ defaults to 1/infinity.
 class newuoa_minimizer<V,[NP=2*N+1]>
 ----------------------
 
-`LDFLAGS=-llopti make ...`
+`LDFLAGS=-llopti`
 
 One of the best solvers in this collection.
 Optional second template parameters is number of points used for building model, defaults to `2*N+1` (approximate model). 
-If `rho_end` is too small it will hit `max_iter` and return `NaN` value in X. 
+
+CAUTION: If `rho_end` is too small it will hit `max_iter` and return `NaN` value in X. 
 You will might need debug termination parameter. Turn on verbosity, increase/decrease rho_end, adjust max_iter.
-If exact model is used for N > 14, NEWUOA crashes (index out of range).  When this solver is used `LDFLAGS=-llopti` needed. 
+
+CAUTION: If non-default,  exact model is used for N > 14, NEWUOA crashes (index out of range). 
+
+When this solver is used `LDFLAGS=-llopti` needed. 
 Only `double` vector,  index should start from `1`. 
 
 
@@ -206,20 +212,25 @@ Only `double` vector,  index should start from `1`.
 class condor_minimizer<V,[NP=2*N+1>
 -------------------
 
-`LDFLAGS=-lcondor make ...`
+`LDFLAGS=-lcondor`
 
 Fast for low dimensions.  Constraints capability not used. Condor internal rescaler not used (use loft rescaler).
 Can use only exact  model, so use is very problematic for N > 10.
-Sometimes can get stuck at high precision, it is not clear if it is rounding error or algorithm limitation. 
-Also sometimes aborts at FP illegal ops in the middle optimization run. 
+
+CAUTION: Sometimes can get stuck at high precision, it is not clear if it is rounding error or algorithm limitation. 
+Also sometimes aborts at FP illegal ops in the middle of optimization run. 
+
 Only `double` vector,  index should start from 0. 
 
 [[Hook-Jeevs]]
 === Hook-Jeevs
 Native LOPTI solver, converted from Oleg Kiselev, 1998 http://www.netlib.org/c++/linalg.tgz[implementation]. Old and robust, 
 usually slow solver.  But sometimes can outperform all other at not trivial
-high dimensions tasks.  My app, where I use LOPTI, segfaulted when I used this
+high dimensions tasks. 
+
+CAUTION: My app, where I use LOPTI, segfaulted when I used this
 solver.  Lowering optimization from -O3 to -O2 (gcc-4.3.2 amd64) solved this segfault problem. 
+
 Code still needs some cleanup, and thread safety. 
 Any V type, any index start.
 
@@ -258,8 +269,8 @@ Prints on screen eval-number, seconds of last eval, X and f-value
 `xg_log(loft l, minimizer<V> m)` +
 
 Logs eval-number, f-value and X on every loft evaluation. Program `xgraphic` is
-open source visualization utility which can directly input log file.  Log
-file name is composed from loft name, number of dimentions and minimizer name. 
+open source visualization utility which can directly input log file.  Created log
+name is composed from loft name, number of dimentions and minimizer name. 
 Logs are created under `./log/`
 
 [[rescale]]
@@ -302,7 +313,6 @@ cout << "optimum at: " << X_opt << endl;
 - add `zib newton_test` functions
 - add `gsl bfgs` solver
 - add `assert` / `throw` on use uninitialized data in `minimizer` class
-
 
 [bibliography]
 .References

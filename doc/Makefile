@@ -2,8 +2,11 @@
 #include ../Makefile
 
 PREFIX ?= /usr/local
-WEB_DESTDIR ?= /tmp/html-lopti
-ASCIIDOC ?= asciidoc
+#NAME = lopti
+WEB_DESTDIR ?= /tmp/html
+#WEB_DESTDIR := $(WEB_DESTDIR)/$(NAME)
+
+ASCIIDOC ?= asciidoc --unsafe --backend=xhtml11 --attribute icons --attribute iconsdir=/images/icons
 
 CXXFLAGS += -I$(PREFIX)/include/lopti
 
