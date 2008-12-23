@@ -15,22 +15,21 @@ image:xgr001.gif["Visualization with xgraphics", width="400", link="xgr001.gif"]
 LOPTI is open source C++ optimization library. There are three major parts.
 1st and main part is solver-driver which either wraps external solver or uses
 LOPTI native solvers and presents to library user consistent and simple
-optimization API. 2nd part is collection of solvers.  Currently include with LOPTI are 4
+optimization API. 2nd part is collection of solvers.  Currently included with LOPTI are 4
 solvers: <<NEWUOA,NEWUOA>>, <<CONDOR,CONDOR>>, <<Nelder-Mead,Nelder-Mead>> (simplex) and <<Hook-Jeevs,Hook-Jeevs>>.
 All these solvers are derivative free and have open source (GPL or BSD like)
 licences.  Some of them (Condor) are unchanged and treated as black-box.  Some
 of them (NEWUOA - fortran source) went through heavy modification to interface
 with LOPTI.  And other (Hook-Jeevs) were completely rewritten into LOPTI native
 solver.  3rd part is collection of object function and object function
-modifiers. 
+modifiers.
 +++</div>+++
 
 [icon="under-construction.gif"]
-WARNING: Though LOPTI is quite usable and everything works (for me),
-this is still work in progress, documentation only about 20% complete,  there
-is no logical sequence, build instructions are imprecise, API have not stabilized.
-Also there is dependency on `lvv::array` (derived from `boost::array`). In near
-future I am planning to remove this dependency or document it better.  Stay tuned. 
+CAUTION: Though LOPTI is quite usable and everything works for me,
+this is still work in progress, documentation only about 40% complete,  there
+is no logical sequence, API have not stabilized, build instructions are imprecise
+and dependencies almost not documented
 
 
 == Quick Start
@@ -40,20 +39,24 @@ include::example.cc[]
 ---------------------
 
 == Install
-Simplest "installation" is just cp-ing to _compiler-include-search-directory_ or don't "install" at all and just use `CXXFLAGS=-I{nbsp}<lopti-dir>`
+It is possible to use just LOPTI headers. Lopti library file used only by `NEWUOA`. 
+Running `make install` installs by default into `/usr/local/include` and `/usr/local/lib`
 For installation external solvers see corresponding section bellow. 
-Lopti library used only by `NEWUOA`.
+
 
 //[options="compact"]
 
 .You will need
-- http://gcc.gnu.org/[GCC]  with gfortran included (if you want NEWUOA solver), tested with 4.3.2. Intel ICC can not compile boost code for me
-- http://boost.org[BOOST C++ libraries]. tested with 1.3.6.
+- Compiler. LOPTI tested only on x86-64 with with:
+	-  http://gcc.gnu.org/[GCC]  with gfortran included (if you want NEWUOA solver), tested with v4.2,4.4
+	-  http://www.intel.com/cd/software/products/asmo-na/eng/compilers/284264.htm[ICC], vervion 11
+- http://boost.org[BOOST C++ libraries], tested with 1.3.36,37
 - http://en.wikipedia.org/wiki/Git_(software)[GIT].  Your distribution probably have package for GIT.
 - http://www.cmap.polytechnique.fr/~jouve/xd3d/[XGraphic] - simple visualisation utility(optional).
-- external solvers (optional), see doc for corresponding solvers below.
+- http://volnitsky.com/project/lvvlib/[lvvlib] - only array.h needed for `lvv::array` class.
+- External solvers (optional), see solvers docs below.
 
-to do installation:
+to install:
 
 ---------------------
 git clone git://github.com/lvv/lopti.git
@@ -70,7 +73,9 @@ Do no use:
 * `-fast-math` -- newuoa and hook-jeevs can get FP errors
 * `-fargument-noalias-anything` -- newuoa will segfault on exit
 
-This might be specific to GCC v3.4.2
+try `-fno-strict-aliasing` if you encounter stability problem. 
+
+This might be specific to GCC v4.x.x
 
 =============================================
 
@@ -228,7 +233,7 @@ Native LOPTI solver, converted from Oleg Kiselev, 1998 http://www.netlib.org/c++
 usually slow solver.  But sometimes can outperform all other at not trivial
 high dimensions tasks. 
 
-CAUTION: My app, where I use LOPTI, segfaulted when I used this
+CAUTION: My app, segfaulted when I used this
 solver.  Lowering optimization from -O3 to -O2 (gcc-4.3.2 amd64) solved this segfault problem. 
 
 Code still needs some cleanup, and thread safety. 
@@ -305,10 +310,10 @@ cout << "optimum at: " << X_opt << endl;
 
 == TODO
 - docs
-- remove dependency on `lvv::array`
-- remove all dependencies on any <lvv/*.h>
+- fix all type-puning
 - remove `using` from headers
 - unify and simplify termination criteria. 
+- add `mkl TR solver` solver
 - add `zib nlqe1` solver
 - add `zib newton_test` functions
 - add `gsl bfgs` solver

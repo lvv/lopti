@@ -48,7 +48,6 @@ t-lopti.ps: t-lopti t-lopti-r
 	cd log; $(XGRAPHIC) -pscoltex=../$@  `find  -type f \( -newer ../$< -o -cmin -1 \) -printf "%f\n"`
 	gsview $@
 
-
 t-condor: CXXFLAGS +=   -I ..
 t-condor: LDFLAGS  +=   -L /usr/local/lib/ -lcondor  -lm 
 
@@ -57,16 +56,6 @@ t-condor: t-condor.cc condor-wrap.h
 
 t-nm: t.cc  gsl-nelder-mead-wrap.h
 	$(CXX) $(CXXFLAGS) -DOPTI=NM  $< -o $@ $(LDFLAGS)
-
-git-install:
-	cd /usr/local &&  git checkout lopti
-	make install
-	cd /usr/local &&  git add /usr/local/include/lopti
-	cd /usr/local &&  git commit -a -m up
-	cd /usr/local &&  git checkout installed
-	cd /usr/local &&  git merge lopti
-
-
 
 t-newuoa: newuoa/t-newuoa.cc newuoa-wrap.h  lopti.h
 	#	rm -f *.o

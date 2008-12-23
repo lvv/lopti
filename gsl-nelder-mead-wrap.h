@@ -11,7 +11,7 @@
 	#endif
 	
 
-	#include <lvv/convert-gsl.h>
+	#include <lopti/convert-gsl.h>
 		using lvv::array;
 	#include <lopti/lopti.h>
 	#include <stdlib.h>
