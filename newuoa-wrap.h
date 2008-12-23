@@ -448,7 +448,7 @@ eval_f_310:
 
   	if (iter_ > max_iter_)  {
 		iter_ = iter_-1;
-		if (verbose_) FMT("\n    error:  CALFUN has been called max_iter_ times.");
+		if (verbose_) FMT("\n newuoa:  objective function has been called max_iter_ times, terminating, best X will be returned");
      	    goto exit_530;
      	}
 

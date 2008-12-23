@@ -173,17 +173,17 @@ Only `double` vector,  index should start from 0.
 === Trust Region solvers
 
 TR solvers work by approximating OF with quadratic model function, which is constructed
-in such a way that it passes through evaluated points near current minimum (basis).  Near means: at
+in such way that it passes through evaluation points near current minimum (basis).  Near means: at
 distance less then `rho`, which is dynamically changed by solver for each
-iteration.  To build an exact model,  `NP=(N+1)(N+2)`  evaluated points are needed, so TR
+iteration.  To build an exact model,  `NP=(N+1)(N+2)`  evaluation points are needed, so TR
 solvers at first `NP` iterations just evaluate `NP` points near `X0`. You can notice
 this slow start on convergence charts.  For high `N` (>10) this can be especially noticeable. 
-Instead of exact model it is possible with some (NEWUOA) solvers to use approximate model with less
+Instead of exact model it is possible with NEWUOA to use approximate model with less
 then `(N+1)(N+2)` points. 
 
 Uses member `rho_begin(fp_t)`, instead of `step0(V)`,  defaults to
-0.2.  Because `rho` is scalar (applied equally to all directions) it is good
-idea to normalize object junction with <<rescale>>.  Termination criteria is `rho_end(fp_t)`,
+0.2.  Because `rho` is scalar (applied equally to all directions) it is recommended
+to normalize object junction with <<rescale>>.  Termination criteria is `rho_end(fp_t)`,
 defaults to 1/infinity.
 
 [[NEWUOA]]
@@ -218,26 +218,28 @@ class condor_minimizer<V,[NP=2*N+1>
 -------------------
 
 `LDFLAGS=-lcondor`
+`CXXFLAGS=-I/path/to/dir/with/condorlib-dir`
 
 Fast for low dimensions.  Constraints capability not used. Condor internal rescaler not used (use loft rescaler).
-Can use only exact  model, so use is very problematic for N > 10.
+Can use only exact  model, so it might be problematic for N > 10.
+LOPTI will looking for `<condor/Vector.h>` from `condorlib` subdirectory in Condor source directory.
 
-CAUTION: Sometimes can get stuck at high precision, it is not clear if it is rounding error or algorithm limitation. 
+CAUTION: Sometimes Condor can get stuck at high precision, it is not clear if it is rounding error or algorithm limitation. 
 Also sometimes aborts at FP illegal ops in the middle of optimization run. 
 
 Only `double` vector,  index should start from 0. 
 
 [[Hook-Jeevs]]
 === Hook-Jeevs
-Native LOPTI solver, converted from Oleg Kiselev, 1998 http://www.netlib.org/c++/linalg.tgz[implementation]. Old and robust, 
-usually slow solver.  But sometimes can outperform all other at not trivial
-high dimensions tasks. 
+Native LOPTI solver, converted from Oleg Kiselev, 1998 http://www.netlib.org/c++/linalg.tgz[implementation]. Old and usually slow solver. 
+But sometimes can outperform all other at not trivial high dimensions tasks. 
 
 CAUTION: My app, segfaulted when I used this
-solver.  Lowering optimization from -O3 to -O2 (gcc-4.3.2 amd64) solved this segfault problem. 
+solver.  Lowering optimization from -O3 to -O2 (gcc-4.3.2 x86_64) solved this segfault problem. 
 
 Code still needs some cleanup, and thread safety. 
 Any V type, any index start.
+
 
 == Object Function
 Object function are defined in so called Lopti Object FuncTor (LOFT). LOFT also allow to wrap object
