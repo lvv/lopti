@@ -56,19 +56,19 @@ int main(int argc, char **argv) {
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(RHO_END);
 			mzr	.max_iter	(ITER);
-			mzr	.verbose     (true);
+			mzr	.verbose	(true);
 			V1 X_opt = mzr.argmin();
 			//cout << mzr	.argmin		() << endl;
 			mzr	.print		();
 		}
-
+	/*
 		{ newuoa_minimizer<V1>	mzr;		 ////  NEWUOA :  2*N + 1 
 			V0		_X0 = {{ -1.2, 1 }};
 			mzr	.loft		(xg_log<V1>(FN<V1>(),mzr));
 			mzr	.x0		(*(V1*)&(_X0));	// X[1..N]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(RHO_END);
-			mzr	.verbose     (true);
+			mzr	.verbose	(false);
 			mzr	.max_iter	(ITER);
 			cout << mzr	.argmin		() << endl;
 			mzr	.print		();
@@ -83,13 +83,13 @@ int main(int argc, char **argv) {
 			mzr	.x0		(*(V1*)&(_X0));	// X[1..N]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(RHO_END);
-			mzr	.verbose     (true);
+			mzr	.verbose	(false);
 			mzr	.max_iter	(ITER);
 			cout << mzr	.argmin() << endl;
 			mzr	.print();
 		}
 		#endif
-
+	*/
 
 	return 0;
  }

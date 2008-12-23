@@ -199,8 +199,8 @@ class newuoa_minimizer<V,[NP=2*N+1]>
 One of the best solvers in this collection.
 Optional second template parameters is number of points used for building model, defaults to `2*N+1` (approximate model). 
 
-CAUTION: If `rho_end` is too small it will hit `max_iter` and return `NaN` value in X. 
-You will might need debug termination parameter. Turn on verbosity, increase/decrease rho_end, adjust max_iter.
+CAUTION: If MAX_ITER <= NP, newuoa can sometimes return `NaN` value in X. 
+//You will might need debug termination parameter. Turn on verbosity, increase/decrease rho_end, adjust max_iter.
 
 CAUTION: If non-default,  exact model is used for N > 14, NEWUOA crashes (index out of range). 
 
@@ -326,8 +326,8 @@ cout << "optimum at: " << X_opt << endl;
 - [[[1]]] J.A. Nelder and R. Mead, 'A simplex method for function minimization', Computer Journal vol. 7 (1965), 308-315.
 - [[[2]]] R. Hooke and T. A. Jeeves,  'Direct Search Solution of Numerical and Statistical Problems',  Journal of the ACM, Vol. 8, April 1961, pp. 212-229
 - [[[3]]] M. J. D. Powell. 'The NEWUOA software for unconstrained optimization with derivatives'. DAMTP Report 2004/NA05, University of Cambridge, 2004.
-- [[[4]]] Frank Vanden Berghen, Hugues Bersini, 
-'CONDOR, a new parallel, constrained extension of Powell's UOBYQA algorithm: Experimental results and comparison with the DFO algorithm',
+- [[[4]]] Frank Vanden Berghen, Hugues Bersini, 'CONDOR, a new parallel, constrained extension of Powell's UOBYQA algorithm: Experimental results and comparison with the DFO algorithm',
 Journal of Computational and Applied Mathematics, Elsevier, Volume 181, Issue 1, September 2005, Pages 157-175
+- [[[5]]] Intel Math Kernel Library Reference Manual. http://http://www.intel.com/software/products/mkl/docs/WebHelp/osr/osr_Intro.html[Optimization Solver Routines] 
 
 // vim: set filetype=asciidoc nu:
