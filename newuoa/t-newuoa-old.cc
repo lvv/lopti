@@ -1,4 +1,4 @@
-#include <newuoa-wrap.h>
+#include <lopti/newuoa-wrap.h>
 			template<typename V>  typename V::value_type
 of_chebyquad		(V& X) 		{			// The Chebyquad test problem (Fletcher, 1965) 
 	const int N = V::size();

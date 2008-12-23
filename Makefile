@@ -6,7 +6,7 @@ VERSION = 0.2
 #FCFLAGS +=  -O2
 FCFLAGS += -frange-check -fbounds-check -O0 -ggdb3
 LDFLAGS += -L. -L /usr/local/lib  -lgsl -lgslcblas -lcondor -llopti -lgfortran 
-CXXFLAGS += -I /home/lvv/NF/
+#CXXFLAGS += -I /home/lvv/NF/
 XGRAPHIC = xgraphic  -scat -markcol=-1  -g2 -logy -leg -legpos=3  -legsiz=1 -legtyp=2 -titgen="Convergance speed for dirivative-free algorithms" -titx="Objective function evaluation count" -tity="Distance to optimum:  log10 ( | X - X_opt | )" 
 
 #.DEFAULT_GOAL := t-lopti-r
@@ -28,11 +28,13 @@ clean:
 	rm -f t-lopti
 
  
-liblopti.so:
+liblopti.so: newuoa/bigden.o newuoa/biglag.o newuoa/calfun.o newuoa/trsapp.o newuoa/update.o
 	$(FC) $(FCFLAGS) -fPIC -c newuoa/{bigden,biglag,calfun,trsapp,update}.f
 	gcc -shared -Wl,-soname,liblopti.so.0 -o liblopti.so.$(VERSION) *.o
 	ln -sf liblopti.so.$(VERSION) liblopti.so.0
 	ln -sf liblopti.so.0 liblopti.so
+
+t-%: t-%.cc *.h liblopti.so
 
 t-lopti: t-lopti.cc *.cc *.h liblopti.so
 
@@ -57,7 +59,7 @@ t-condor: t-condor.cc condor-wrap.h
 t-nm: t.cc  gsl-nelder-mead-wrap.h
 	$(CXX) $(CXXFLAGS) -DOPTI=NM  $< -o $@ $(LDFLAGS)
 
-t-newuoa: newuoa/t-newuoa.cc newuoa-wrap.h  lopti.h
+t-newuoa-old: newuoa/t-newuoa.cc newuoa-wrap.h  lopti.h
 	#	rm -f *.o
 	#$(FC)  $(FCFLAGS) -c bigden.f  biglag.f  calfun.f   trsapp.f  update.f
 	$(CXX) $(CXXFLAGS) $<  newuoa/*.o -lgfortran -o $@

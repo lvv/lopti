@@ -86,8 +86,7 @@ int main(int argc, char **argv) {
 
 		#ifdef  PLAIN_FN
 		{  condor_minimizer<V0> mzr;////  CONDOR  x PLAIN_FN  ROSENBERG		// TODO: why results deffrent from loft?
-			//mzr	.loft			( make_loft<V0> (&plain_fn_rosenberg<V0>, "make_loft") );
-			mzr	.loft			( make_loft<V0> (&bind (&plain_fn_rosenberg<V0>, _1) ));
+			mzr	.loft			( make_loft<V0> (&plain_fn_rosenberg<V0>, "make_loft") );
 			mzr	.x0			(_X0);	// X[0..N-1]	
 			mzr	.rho_begin		(1);
 			mzr	.rho_end		(STOP_AT_X_STEP);
@@ -132,7 +131,7 @@ int main(int argc, char **argv) {
 			mzr	.x0		(*(V1*)&(_X0));	// X[1..N]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
-			cout << mzr	.argmin		() << endl;
+			//cout << mzr	.argmin		() << endl;
 			mzr	.print		();
 		}
 
@@ -144,7 +143,7 @@ int main(int argc, char **argv) {
 			mzr	.x0		(*(V1*)&(_X0));	// X[1..N]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
-			cout << mzr	.argmin() << endl;
+			//cout << mzr	.argmin() << endl;
 			mzr	.print();
 		}
 		#endif
