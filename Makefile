@@ -17,7 +17,7 @@ test:	t-lopti
 
 install: liblopti.so
 	mkdir -p		$(PREFIX)/include/lopti/
-	cp -v *.h external/*.h 	$(PREFIX)/include/lopti/
+	cp -v *.h 		$(PREFIX)/include/lopti/
 	mkdir -p		$(PREFIX)/lib/
 	cp -va liblopti.so*	$(PREFIX)/lib/
 

@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
 			mzr	.x0		(*(V1*)&(_X0));	// X[1..N]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
-			//cout << mzr	.argmin		() << endl;
+			mzr	.argmin		();
 			mzr	.print		();
 		}
 
@@ -143,7 +143,7 @@ int main(int argc, char **argv) {
 			mzr	.x0		(*(V1*)&(_X0));	// X[1..N]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
-			//cout << mzr	.argmin() << endl;
+			mzr	.argmin();
 			mzr	.print();
 		}
 		#endif
