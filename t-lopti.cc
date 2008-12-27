@@ -27,7 +27,7 @@
 
 int main(int argc, char **argv) {
 	
-			///////////////////////////////////////////////// CONFIG  <1>
+			///////////////////////////////////////////////// CONFIG
 			#ifdef  ALL
 				#define CONDOR
 				#define NEWUOA
@@ -126,6 +126,7 @@ int main(int argc, char **argv) {
 
 	#ifdef  NEWUOA
 
+		/*
 		{ newuoa_minimizer<V1>	mzr;		 ////  NEWUOA :  2*N + 1 
 			mzr	.loft		(xg_log<V1>(FN<V1>(),mzr));
 			mzr	.x0		(*(V1*)&(_X0));	// X[1..N]
@@ -133,14 +134,31 @@ int main(int argc, char **argv) {
 			mzr	.rho_end	(STOP_AT_X_STEP);
 			mzr	.argmin		();
 			mzr	.print		();
+		}*/
+
+		{//  ANY V  (<float,2,0>)
+		cout << "<float,2,0>\n";
+		typedef		array<float,2,1>		V;
+		V X0 = {{-1.2, 1}};
+		X0 = _X0;
+
+		newuoa_minimizer<V>	mzr;		 ////  NEWUOA :  2*N + 1 
+			mzr	.loft		(xg_log<V>(FN<V>(),mzr));
+			mzr	.x0		(X0);		// X[1..N]
+			mzr	.rho_begin	(RHO_BEGIN);
+			mzr	.rho_end	(STOP_AT_X_STEP);
+			mzr	.argmin		();
+			mzr	.print		();
 		}
+		cout << _X0 << endl;
+
 
 
 		#if _N < 15
 		{	const int N=V1::sz;
-		newuoa_minimizer<V1, (N+1)*(N+2)/2>	mzr; ////  NEWUOA  (N+1)*(N+2)/2
-			mzr	.loft		(xg_log<V1>(FN<V1>(),mzr));
-			mzr	.x0		(*(V1*)&(_X0));	// X[1..N]
+		newuoa_minimizer<V0, (N+1)*(N+2)/2>	mzr; ////  NEWUOA  (N+1)*(N+2)/2
+			mzr	.loft		(xg_log<V0>(FN<V0>(),mzr));
+			mzr	.x0		(_X0);	// X[1..N]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
 			mzr	.argmin();

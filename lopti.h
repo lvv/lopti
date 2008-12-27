@@ -96,10 +96,11 @@ struct	trust_region_minimizer : minimizer<V>    {
 
 	explicit		trust_region_minimizer		(const char* _name= "unknown (trust region type)")
 	:	minimizer<V>(_name),
-		rho_begin_ 	(1),
+		rho_begin_ 	(1.0),
+		//rho_end_   	(0.1)
 		rho_end_   	(numeric_limits<fp_t>::min()*1000)
-		//rho_begin_ 	(numeric_limits<fp_t>::quiet_NaN ()),
-		//rho_end_   	(numeric_limits<fp_t>::quiet_NaN ())
+									//rho_begin_ 	(numeric_limits<fp_t>::quiet_NaN ()),
+									//rho_end_   	(numeric_limits<fp_t>::quiet_NaN ())
 	{};
 
 	virtual minimizer<V>&		rho_begin		(fp_t rho)	{ rho_begin_ = rho;  return *this; };
@@ -107,7 +108,7 @@ struct	trust_region_minimizer : minimizer<V>    {
  };
 
 
-	// of prog inlude <lopti.h> then include all
+	// if app inludes <lopti.h>,  then include all
 //	#ifndef MINIMIZER
 //		#include	<lopti/condor-wrap.h>
 //		#include   	<lopti/newuoa-wrap.h>

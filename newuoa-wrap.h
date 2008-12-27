@@ -3,6 +3,7 @@
 
 	#include <lopti/lopti.h>
 	#include <lopti/object_function.h>
+	#include <cassert>
 	
 	#ifndef   MINIMIZER                                                                                                                                  
 		#define	MINIMIZER	newuoa_minimizer
@@ -36,12 +37,21 @@
 	extern "C" void  bigden_  (int* N, int* NPT, double* XOPT, double* XPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, int* KOPT, int*  KNEW, double* D, double* W, double* VLAG, double* BETA, double* XNEW, double* /*W[NDIM+1]*/, double* /*W[6*NDIM+1]*/);
 	extern "C" void  update_  (int* N, int* NPT, double* BMAT, double* ZMAT, int* IDZ, int* NDIM, double* VLAG, double* BETA, int* KNEW, double* W);
 
+
 		template<typename V, int NPT=2*V::sz+1>
 struct  newuoa_minimizer:  trust_region_minimizer<V> {
+	typedef 	typename V::value_type		T;
+	typedef 	double				newuoa_t;
+	const static int 	N  = V::sz;
+	typedef 	array<newuoa_t,N,1>		Vd;
+
 						MINIMIZER_MEMBERS;  TR_MINIMIZER_MEMBERS;  LOFT_TYPES;
+	array<double,N,1>	Xd;	
 	explicit 		newuoa_minimizer	():   trust_region_minimizer<V>("newoua") {};
+	minimizer<V>&		x0			(V& _X) 	{  X  = _X;    Xd = _X;  	return *this;  };
 	virtual V&		argmin			();
 	virtual const string	name			() 	const	{  return (format("%s-%d-%d") %name_ %(V::size())  %NPT ).str(); };
+
 };
 
 		template<typename V, int NPT> 	V&
@@ -51,19 +61,20 @@ newuoa_minimizer<V,NPT>::argmin () {
 						assert(!isnan(rho_begin_) && " rho_begin is not definition ");
 						assert(!isnan(rho_end_)   && " rho_end   is not definition ");
 						/*static*/assert(V::ibg == 1        && " 1st vector index is not == 1 "); //  newuoa have index:  [1:N]
-	const int N = V::sz;
+	const static int 	N  = V::sz;
 	const int NP = N+1;
 	const int NPTM = NPT-NP;
 	const int NDIM = NPT+N;
 
-	if ((NPT < N+2) || ( NPT > ((N+2)*NP)/2))  { cout << "error: NPT is not in the required interval\n"; exit(33); }
-	if (verbose_) FMT("olduoa:  N =%d and NPT =%d   ----------------------------------------------------------\n")  % N  % NPT;
+	//if ((NPT < N+2) || ( NPT > ((N+2)*NP)/2))  { cout << "error: NPT should be  N+2 <= NPT  <=  (N+2)*NP)/2  is not in the required interval\n"; exit(33); }
+	static_assert(N+2 <= NPT  &&   NPT <= (N+2)*NP/2,  "newuoa error: NPT should be  in  N+2 <= NPT  <=  (N+2)*NP)/2  interval\n");
+	if (verbose_) FMT("newuoa:  N =%d and NPT =%d   ----------------------------------------------------------\n")  % N  % NPT;
 
-	V		XBASE;
-	V		XOPT; 
-	V		XNEW;
-	V		GQ;
-	V		D;
+	Vd		XBASE;
+	Vd		XOPT; 
+	Vd		XNEW;
+	Vd		GQ;
+	Vd		D;
 	lvv::vector<double,NPT>		FVAL;
 	lvv::vector<double,NPT>		PQ;
 	lvv::vector<double,NDIM>		VLAG;
@@ -135,7 +146,7 @@ newuoa_minimizer<V,NPT>::argmin () {
 	//  Set the initial elements of XPT, BMAT, HQ, PQ and ZMAT to zero.
 
  	for (int J=1; J<=N; J++)  {
-		XBASE[J] = X[J];
+		XBASE[J] = Xd[J];
 	 	for (int K=1; K<=NPT; K++)  	XPT(K,J) = ZERO;
 	 	for (int I=1; I<=NDIM; I++)  	BMAT(I,J) = ZERO;
 	}
@@ -160,7 +171,7 @@ fill_xpt_50:
 	//  next initial interpolation point from XBASE are set in XPT(iter_,.).
 
 	int  NFM = iter_;
-     	int  NFMM = iter_-N;
+     	int  NFMM = iter_ - N;
      	iter_++;
      	if (NFM <= 2*N)  {
      	    if (NFM >= 1  &&  NFM <= N)	XPT(iter_,NFM) = rho_begin_;
@@ -188,7 +199,7 @@ fill_xpt_50:
 	//  after this calculation. The least function value so far and its index
 	//  are required.
 
- 	for (int J=1; J<=N; J++)  	X[J] = XPT(iter_,J)+XBASE[J];
+ 	for (int J=1; J<=N; J++)  	Xd[J] = XPT(iter_,J)+XBASE[J];
 
      	goto eval_f_310;
 
@@ -441,7 +452,7 @@ shift_xbase_120:
  xnew_290:
   	for (int I=1; I<=N; I++) {
 		XNEW[I] = XOPT[I]+D[I];
-	  	X[I] = XBASE[I]+XNEW[I];
+	  	Xd[I] = XBASE[I]+XNEW[I];
 	}
 
      	iter_ = iter_+1;
@@ -450,17 +461,15 @@ eval_f_310:
 
   	if (iter_ > max_iter_)  {
 		iter_ = iter_-1;
-		if (verbose_) FMT("\n newuoa:  objective function has been called max_iter_ times, terminating, best X will be returned");
+		if (verbose_) FMT("\n newuoa:  objective function has been called max_iter_ times, terminating, best Xd will be returned");
      	    goto exit_530;
      	}
 
-	// CALL CALFUN (N,X,F)
-	// calfun_ (&_n, (double*)&X, &F);
-	//F = (*oco)(X, NULL);
-	//F = oco(X);
+	X = Xd;		// de-promote
+
 	F = (*this->loft_v)(X);
 
-	if (verbose_) FMT ("%d \t %18.10g  \t  %18.10g \n")  %iter_  %F  %X;
+	if (verbose_) FMT ("%d \t %18.10g  \t  %18.10g \n")  %iter_  %F  %Xd;
 
 	if (iter_ <= NPT) goto return_to_init_from_eval_70;
 	if (KNEW == -1) goto exit_530;
@@ -699,7 +708,7 @@ new_rho_490:
 		
 		DELTA = max(DELTA,RHO);
 
-		if (verbose_) FMT("-- (%d) RHO =%9.6g \t F =%9.6g   X%.8g \n")   %iter_  %RHO  %FOPT  %X;
+		if (verbose_) FMT("-- (%d) RHO =%9.6g \t F =%9.6g   Xd%.8g \n")   %iter_  %RHO  %FOPT  %Xd;
 		goto  begin_iter_90; 
      	}
 
@@ -711,13 +720,13 @@ new_rho_490:
   exit_530:
 
 	if (FOPT <= F)  {
-	 	for (int I=1; I<=N; I++)  	X[I] = XBASE[I]+XOPT[I];
+	 	for (int I=1; I<=N; I++)  	Xd[I] = XBASE[I]+XOPT[I];
 		F = FOPT;
 	}
 
-	if (verbose_)  FMT("-- (%d) RETURNED: \t F =%.15g    X is: %.15g\n\n")  %iter_ %F  %X;
+	if (verbose_)  FMT("-- (%d) RETURNED: \t F =%.15g    Xd is: %.15g\n\n")  %iter_ %F  %Xd;
 	ymin_ = F;
-	Xmin_ = X;
+	Xmin_ = Xd;
 	return Xmin_;
 }; // newuoa
 
