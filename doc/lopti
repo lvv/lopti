@@ -29,7 +29,8 @@ modifiers.
 CAUTION: Though LOPTI is quite usable and everything works for me,
 this is still work in progress, documentation only about 40% complete,  there
 is no logical sequence, API have not stabilized, build instructions are imprecise
-and dependencies almost not documented
+and dependencies mostly not documented. Also it requires GCC-4.4 (not yet released) or ICC-11,
+some +++C++0x+++ features are used. 
 
 
 == Quick Start
@@ -48,9 +49,9 @@ For installation external solvers see corresponding section bellow.
 
 .You will need
 - Compiler. LOPTI tested only on x86-64 with with:
-	-  http://gcc.gnu.org/[GCC]  with gfortran included (if you want NEWUOA solver), tested with v4.2,4.4
+	-  http://gcc.gnu.org/[GCC]  with gfortran included (if you want NEWUOA solver), tested with v4.4
 	-  http://www.intel.com/cd/software/products/asmo-na/eng/compilers/284264.htm[ICC], vervion 11
-- http://boost.org[BOOST C++ libraries], tested with 1.3.36,37
+- http://boost.org[BOOST C++ libraries], tested with 1.3.37
 - http://en.wikipedia.org/wiki/Git_(software)[GIT].  Your distribution probably have package for GIT.
 - http://www.cmap.polytechnique.fr/~jouve/xd3d/[XGraphic] - simple visualisation utility(optional).
 - http://volnitsky.com/project/lvvlib/[lvvlib] - only array.h needed for `lvv::array` class.
@@ -172,6 +173,7 @@ Only `double` vector,  index should start from 0.
 
 === Trust Region solvers
 
+The Trust-Region (TR) solvers are iterative methods for solving nonlinear optimization problems.
 TR solvers work by approximating OF with quadratic model function, which is constructed
 in such way that it passes through evaluation points near current minimum (basis).  Near means: at
 distance less then `rho`, which is dynamically changed by solver for each
@@ -197,15 +199,13 @@ class newuoa_minimizer<V,[NP=2*N+1]>
 `LDFLAGS=-llopti`
 
 One of the best solvers in this collection.
-Optional second template parameters is number of points used for building model, defaults to `2*N+1` (approximate model). 
-
-CAUTION: If MAX_ITER <= NP, newuoa can sometimes return `NaN` value in X. 
-//You will might need debug termination parameter. Turn on verbosity, increase/decrease rho_end, adjust max_iter.
+Optional second template parameters NP -  is Number-of-Points used for building model, defaults to `2*N+1` (approximate model). 
+max_iter should be bigger then NP.
 
 CAUTION: If non-default,  exact model is used for N > 14, NEWUOA crashes (index out of range). 
 
 When this solver is used `LDFLAGS=-llopti` needed. 
-Only `double` vector,  index should start from `1`. 
+Any lvv::array<> vector.
 
 
 [[CONDOR]]
