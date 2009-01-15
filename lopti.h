@@ -5,14 +5,18 @@
 	#include <lvv/lvv.h>
 	#include <lvv/array.h>
 		using lvv::array;
+
+	#include <cstdio>
+		// sprintf
+
 	#include <limits>
 		using 	std::numeric_limits;
 
 	// functional  		// TODO: try to remove 
-	#include <functional>
-		using std::binder1st;
-		using std::unary_function;
-		using std::mem_fun;
+	//#include <functional>
+		//using std::binder1st;
+		//using std::unary_function;
+		//using std::mem_fun;
 	#include <boost/function.hpp>
 		using boost::function;
 	#include <boost/bind.hpp>
@@ -78,7 +82,12 @@ struct	minimizer {
 
 
 	// get-ters
-	virtual const string		name			() 	const	{  return (format("%s-%d")  %name_  %(V::size()) ).str(); };
+	//virtual const string		name			() 	const	{  return (format("%s-%d")  %name_  %(V::size()) ).str(); };
+	virtual const string		name			() 	const	{ 
+			char	buf[100];
+			sprintf(buf, "%s-%d",  name_.c_str(), V::size());
+			return string(buf);
+	};
 	virtual fp_t 	 		ymin			()	const	{  return ymin_; };
 	virtual V 	 		Xmin			()	const	{  return Xmin_; };
 	virtual fp_t 	 		iter			()	const	{  return iter_; };
@@ -86,7 +95,8 @@ struct	minimizer {
 
 	// do-ers
 	virtual V&			argmin			() 		{  return Xmin_; };
-	virtual void			print			()		{ MSG("%s(%s)  %35t  iter=%d  \t ymin=%g \t Xmin=%22.15g \n") %name() %loft_v->name() %loft_v->iter()  %ymin()  %Xmin();};
+	//virtual void			print			()		{ MSG("%s(%s)  %35t  iter=%d  \t ymin=%g \t Xmin=%22.15g \n") %name() %loft_v->name() %loft_v->iter()  %ymin()  %Xmin();};
+	virtual void			print			()		{ printf("%s(%s)  	  iter=%d  	 ymin=%g 	 Xmin: ", name().c_str(),  loft_v->name().c_str(), loft_v->iter(),  ymin()); cout <<  Xmin() << endl; };
  };
 
 				 template<typename V>

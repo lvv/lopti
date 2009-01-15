@@ -50,7 +50,8 @@ struct  newuoa_minimizer:  trust_region_minimizer<V> {
 	explicit 		newuoa_minimizer	():   trust_region_minimizer<V>("newoua") {};
 	minimizer<V>&		x0			(V& _X) 	{  X  = _X;    Xd = _X;  	return *this;  };
 	virtual V&		argmin			();
-	virtual const string	name			() 	const	{  return (format("%s-%d-%d") %name_ %(V::size())  %NPT ).str(); };
+	//virtual const string	name			() 	const	{  return (format("%s-%d-%d") %name_  %(V::size())  %NPT ).str(); };
+	virtual const string	name			() 	const	{  char buf[100];   sprintf(buf,"%s-%d-%d", name_.c_str(),  V::size(),  NPT); return string(buf); };
 
 };
 
@@ -68,7 +69,8 @@ newuoa_minimizer<V,NPT>::argmin () {
 
 	//if ((NPT < N+2) || ( NPT > ((N+2)*NP)/2))  { cout << "error: NPT should be  N+2 <= NPT  <=  (N+2)*NP)/2  is not in the required interval\n"; exit(33); }
 	static_assert(N+2 <= NPT  &&   NPT <= (N+2)*NP/2,  "newuoa error: NPT should be  in  N+2 <= NPT  <=  (N+2)*NP)/2  interval\n");
-	if (verbose_) FMT("newuoa:  N =%d and NPT =%d   ----------------------------------------------------------\n")  % N  % NPT;
+	//if (verbose_) FMT("newuoa:  N =%d and NPT =%d   ----------------------------------------------------------\n")  % N  % NPT;
+	if (verbose_) printf("newuoa:  N =%d and NPT =%d   ----------------------------------------------------------\n",  N, NPT);
 
 	Vd		XBASE;
 	Vd		XOPT; 
@@ -100,14 +102,14 @@ newuoa_minimizer<V,NPT>::argmin () {
 	double DIFFA;
 	double DIFFB;
 	double DIFFC;
-	double DNORM  = 0;
+	double DNORM	= 0;
 	double DX;
 	double FSAVE;
-	double F;
-	double FOPT;
-	double FBEG   = 0;
+	double F	= 0;
+	double FOPT	= 0;
+	double FBEG  	= 0;
 	double GQSQ;
-	double RATIO  = 0;
+	double RATIO 	= 0;
 	double RHO;
 	double SUM;
 	double SUMA;
@@ -189,6 +191,7 @@ fill_xpt_50:
      	    if (FVAL[IPT+NP] < FVAL[IPT+1]) XIPT = -XIPT;
      	    XJPT = rho_begin_;
      	    if (FVAL[JPT+NP] < FVAL[JPT+1]) XJPT = -XJPT;
+												assert (0 < iter_ &&  iter_ <= N );
 												assert (IPT > 0 &&  IPT <= NPT );
 												assert (JPT > 0 &&  JPT <= NPT );
      	    XPT(iter_,IPT) = XIPT;								// gcc warging that IPT, JPT are out of bounds
@@ -282,8 +285,9 @@ begin_iter_90:
 gen_tr_100:
 
   	KNEW = 0;
-	trsapp_ (&_n, &_npt, (double*)&XOPT, (double*)&XPT, (double*)&GQ, (double*)&HQ, (double*)&PQ, &DELTA,
-		 	(double*)&D, (double*)&W, &W[NP], &W[NP+N], &W[NP+2*N], &CRVMIN);  
+	//trsapp_ (&_n, &_npt, (double*)&XOPT, (double*)&XPT, (double*)&GQ, (double*)&HQ, (double*)&PQ, &DELTA,
+	trsapp_ (&_n, &_npt, XOPT.data(), XPT.data(), GQ.data(), HQ.data(), PQ.data(), &DELTA,
+		 	D.data(), W.data(), &W[NP], &W[NP+N], &W[NP+2*N], &CRVMIN);  
      	DSQ = ZERO;
  	for (int I=1; I<=N; I++)  DSQ = DSQ+pow2(D[I]);
      	DNORM = min(DELTA,sqrt(DSQ));
@@ -383,8 +387,8 @@ shift_xbase_120:
 
      	if (KNEW > 0) 
      	    //CALL BIGLAG (N,NPT,XOPT,XPT,BMAT,ZMAT,IDZ,NDIM,KNEW,DSTEP,D,ALPHA,VLAG,VLAG[NPT+1],W,W[NP],W[NP+N])
-	    biglag_ (&_n, &_npt, (double*)&XOPT, (double*)&XPT, (double*)&BMAT, (double*)&ZMAT, &IDZ, &_ndim,
-	     &KNEW, &DSTEP, (double*)&D, &ALPHA, (double*)&VLAG, &VLAG[NPT+1], (double*)&W, &W[NP], &W[NP+N]);
+	    biglag_ (&_n, &_npt, XOPT.data(), XPT.data(), BMAT.data(), ZMAT.data(), &IDZ, &_ndim,
+	     &KNEW, &DSTEP, D.data(), &ALPHA, VLAG.data(), &VLAG[NPT+1], W.data(), &W[NP], &W[NP+N]);
 
 	//  Calculate VLAG and BETA for the current choice of D. The first NPT
 	//  components of W_check will be held in W.
@@ -442,9 +446,8 @@ shift_xbase_120:
      	    TEMP = ONE+ALPHA*BETA/pow2(VLAG[KNEW]);
      	    if (abs(TEMP) <= 0.8)  {
      	        //CALL BIGDEN (N,NPT,XOPT,XPT,BMAT,ZMAT,IDZ,NDIM,KOPT,KNEW,D,W,VLAG,BETA,XNEW,W[NDIM+1],W[6*NDIM+1])
-		bigden_( &_n, &_npt, (double*)&XOPT, (double*)&XPT, (double*)&BMAT, (double*)&ZMAT, &IDZ, &_ndim, &KOPT,  &KNEW,
-		(double*)&D, (double*)&W, (double*)&VLAG, &BETA, (double*)&XNEW, &W[NDIM+1], &W[6*NDIM+1]);
-
+		bigden_( &_n, &_npt, XOPT.data(), XPT.data(), BMAT.data(), ZMAT.data(), &IDZ, &_ndim, &KOPT,  &KNEW,
+		D.data(), W.data(), VLAG.data(), &BETA, XNEW.data(), &W[NDIM+1], &W[6*NDIM+1]);
      	    }
 	}
 	//  Calculate the next value of the objective function.
@@ -461,7 +464,7 @@ eval_f_310:
 
   	if (iter_ > max_iter_)  {
 		iter_ = iter_-1;
-		if (verbose_) FMT("\n newuoa:  objective function has been called max_iter_ times, terminating, best Xd will be returned");
+		if (verbose_) cout << "\n newuoa:  objective function has been called max_iter_ times, terminating, best Xd will be returned";
      	    goto exit_530;
      	}
 
@@ -469,7 +472,8 @@ eval_f_310:
 
 	F = (*this->loft_v)(X);
 
-	if (verbose_) FMT ("%d \t %18.10g  \t  %18.10g \n")  %iter_  %F  %Xd;
+	//if (verbose_) FMT ("%d \t %18.10g  \t  %18.10g \n")  %iter_  %F  %Xd;
+	if (verbose_) {  printf("%d 	 %18.10g  	  ",  iter_, F);   cout <<  Xd << endl; }
 
 	if (iter_ <= NPT) goto return_to_init_from_eval_70;
 	if (KNEW == -1) goto exit_530;
@@ -521,7 +525,7 @@ eval_f_310:
 	//  Pick the next value of DELTA after a trust region step.
 
      	if (VQUAD >= ZERO)  {
-		if (verbose_)     FMT ("\n        error: trust region step has failed to reduce Q.");
+		if (verbose_)     cout << "\n        error: trust region step has failed to reduce Q.";
 		goto exit_530;
      	}
 
@@ -576,7 +580,8 @@ eval_f_310:
 update_410:
 
 	// CALL UPDATE (N,NPT,BMAT,ZMAT,IDZ,NDIM,VLAG,BETA,KNEW,W)
-	update_  (&_n, &_npt, (double*)&BMAT, (double*)&ZMAT, &IDZ, &_ndim, (double*)&VLAG, &BETA, &KNEW, (double*)&W);
+	//update_  (&_n, &_npt, (double*)&BMAT, (double*)&ZMAT, &IDZ, &_ndim, (double*)&VLAG, &BETA, &KNEW, (double*)&W);
+	update_  (&_n, &_npt, BMAT.data(), ZMAT.data(), &IDZ, &_ndim, VLAG.data(), &BETA, &KNEW, W.data());
 
      	FVAL[KNEW] = F;
      	IH = 0;
@@ -708,7 +713,8 @@ new_rho_490:
 		
 		DELTA = max(DELTA,RHO);
 
-		if (verbose_) FMT("-- (%d) RHO =%9.6g \t F =%9.6g   Xd%.8g \n")   %iter_  %RHO  %FOPT  %Xd;
+		//if (verbose_) FMT("-- (%d) RHO =%9.6g \t F =%9.6g   Xd%.8g \n")   %iter_  %RHO  %FOPT  %Xd;
+		if (verbose_) printf("-- (%d) RHO =%9.6g 	 F =%9.6g   Xd: ", iter_,  RHO,  FOPT);  cout << Xd << endl;
 		goto  begin_iter_90; 
      	}
 
@@ -724,7 +730,9 @@ new_rho_490:
 		F = FOPT;
 	}
 
-	if (verbose_)  FMT("-- (%d) RETURNED: \t F =%.15g    Xd is: %.15g\n\n")  %iter_ %F  %Xd;
+	//if (verbose_)  FMT("-- (%d) RETURNED: \t F =%.15g    Xd is: %.15g\n\n")  %iter_ %F  %Xd;
+	if (verbose_)  { printf("-- (%d) RETURNED: 	 F =%.15g    Xd is: ",  iter_,  F);   cout << Xd << endl << endl; }
+
 	ymin_ = F;
 	Xmin_ = Xd;
 	return Xmin_;

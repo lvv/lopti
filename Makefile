@@ -25,7 +25,8 @@ clean:
 	rm -f liblopti.so*
 	rm -f {,newuoa/}*.o
 	rm -f doc/*.{html,css}
-	rm -f t-lopti
+	rm -f t-{lopti,newuoa}
+	rm -f gmon.out
 
  
 liblopti.so: *.h newuoa/bigden.o newuoa/biglag.o newuoa/calfun.o newuoa/trsapp.o newuoa/update.o 

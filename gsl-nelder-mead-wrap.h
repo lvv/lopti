@@ -74,7 +74,8 @@ struct	gsl_nelder_mead_minimizer  :  minimizer<V> {
 		///// main cicle
 		int	test_status=GSL_CONTINUE;			// test_status:  GSL_SUCCESS==0; GSL_CONTINUE==-2; 
 
-		if (verbose_)  FMT("# Itr  %10t Y   %20t  X[0..]   Step\n");
+		//if (verbose_)  FMT("# Itr  %10t Y   %20t  X[0..]   Step\n");
+		if (verbose_)  cout << "# Itr  %10t Y   %20t  X[0..]   Step\n";
 	
 		for  ( iter_=0;  iter_ < max_iter_  &&  (test_status==GSL_CONTINUE);   ++iter_ )   {
 
@@ -95,9 +96,9 @@ struct	gsl_nelder_mead_minimizer  :  minimizer<V> {
 			}
 			
 			if (verbose_) { 
-				FMT("%5d \t %18.10g \t ") %iter_   %(gsl_minimizer->fval);
-				for (int i=0; i < gsl_minimizer->x->size; ++i) FMT("%18.10d") %gsl_vector_get(gsl_minimizer->x, i);
-				FMT("%18.10g")  %size;
+				printf("%5d 	 %18.10g 	 ", iter_,  gsl_minimizer->fval);
+				for (int i=0; i < gsl_minimizer->x->size; ++i) printf("%18.10g",  gsl_vector_get(gsl_minimizer->x, i));
+				printf("%18.10g", size);
 				cout << endl;
 			}
 		}

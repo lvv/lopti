@@ -154,7 +154,8 @@ template<typename V>	struct	xg_log : loft_base<V> 		{				LOFT_TYPES;   LOFT_MEMB
 	fp_t		operator()	(V&  X)			{
 		fp_t   y = (*wrapped_loft_v)(X); 			assert(log_file->good());
 		// 1 - iter no(gp: splot label);  2 - hight (y);  3 - |X-opt| ignored;  4,5 - X coord;  
-		*log_file << format("%d \t %22.18g \t %22.18g \t %22.18g \n")   % (wrapped_loft_v->iter())   %y   % wrapped_loft_v->opt_distance(X)  %X  << flush;  
+		//*log_file << format("%d \t %22.18g \t %22.18g \t %22.18g \n")   % (wrapped_loft_v->iter())   %y   % wrapped_loft_v->opt_distance(X)  %X  << flush;  
+		*log_file << setprecision(18) << wrapped_loft_v->iter() << " 	" <<  y  << " " <<  wrapped_loft_v->opt_distance(X)  << " " <<  X  << endl;  
 		return  y;
 	};
  };
@@ -166,13 +167,15 @@ template<typename V>	struct	trace : loft_base<V> 		{				  CLONER(trace); LOFT_TY
 	fp_t		operator()	(V&  X)			{
 
 		if (wrapped_loft_v->iter()==0)   cout << "# (iter)              X[*]               ==F-value" << endl;
-		cout << format("(%d) \t % 11.8g")   % (wrapped_loft_v->iter())  %X;
+		//cout << format("(%d) \t % 11.8g")   % (wrapped_loft_v->iter())  %X;
+		printf("(%d) 	 ",  wrapped_loft_v->iter());  cout <<  X;
 
 		//MSG("(%d/%.1fs") % cnt++  %timer();                                                                                                                
 		//for(int i=0; i<param_size; ++i)      MSG("%=10.6g")   %param[i];
 
 		fp_t   y = (*wrapped_loft_v)(X); 			
-		cout << format("\t(%.1fs)   ==%18.13g\n")  %timer()    %y<< flush;  
+		//cout << format("\t(%.1fs)   ==%18.13g\n")  %timer()    %y<< flush;  
+		printf("	(%.1fs)   ==%18.13g\n", timer(), y);	cout << flush;
 		return  y;
 	};
  };

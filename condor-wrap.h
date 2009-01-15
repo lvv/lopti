@@ -56,8 +56,8 @@ class	c_of_t  : public CONDOR::ObjectiveFunction { public:
 			eval_cnt++;
 
 			if (verbose) {
-				FMT("%5d \t %19.15g  ")  %eval_cnt  %y;
-				for  (typename V::iterator x=X.begin();   x != X.end();   x++)    FMT("\t%19.15g")   %(*x);
+				printf("%5d 	 %19.15g  ",  eval_cnt, y);
+				for  (typename V::iterator x=X.begin();   x != X.end();   x++)    printf("\t%19.15g",  *x);
 				cout << endl;
 			}
 
