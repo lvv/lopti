@@ -58,10 +58,13 @@ struct  newuoa_minimizer:  trust_region_minimizer<V> {
 		template<typename V, int NPT> 	V&
 newuoa_minimizer<V,NPT>::argmin () {		
 						static_assert(V::sz <= NPT, "NPT is too small");		
-						assert(max_iter_ >= NPT && " rho_begin is not definition ");
 						assert(!isnan(rho_begin_) && " rho_begin is not definition ");
 						assert(!isnan(rho_end_)   && " rho_end   is not definition ");
 						/*static*/assert(V::ibg == 1        && " 1st vector index is not == 1 "); //  newuoa have index:  [1:N]
+						if (max_iter_ < NPT ) {
+							cerr << "newuoa_minimizer warning: max_iter(" << max_iter_ << ") is too small to go beyond initialization phase, continuing anyway." << endl;	
+						}
+
 	const static int 	N  = V::sz;
 	const int NP = N+1;
 	const int NPTM = NPT-NP;
