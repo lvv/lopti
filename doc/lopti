@@ -8,7 +8,8 @@ v0.2 (alpha) Nov 2008
 :caption:
 :compact-option: compact
 
-//:iconsdir: /etc/asciidoc/images/icons/
+//  To see HTML rendered web page go to:   http://volnitsky.com/project/lopti
+
 +++<div style="float: right; margin-left: 2em">+++
 image:xgr001.gif["Visualization with xgraphics", width="400", link="xgr001.gif"]
 
@@ -140,8 +141,7 @@ Type  `lvv::array<>` is ...
 |Condor                         | Trust Region| No            | Written by Dr. Ir. Frank Vanden Berghen, based on Powell's UOBYQA<<4>>|
 	You need to get source or binary from author
 
-|Hook-Jeevs                     | Direct      | No            | 1962<<2>>, C implementation by Sergey Kiselev      |
-	"none (converted to native LOPTI implementation)"
+|Hook-Jeevs                     | Direct      | No            | 1962<<2>>, C implementation by Sergey Kiselev      | none (converted to native LOPTI implementation)
 |========================================================================================================================
 
 
@@ -160,7 +160,7 @@ The complexities of external libraries was major reason why LOPTI was created.
 ==== GSL Nelder-Mead (simplex)
 
 ----------------------
-#include <newuoa.h>
+#include <lopti/gsl-nelder-mead-wrap.h>
 class gsl_nelder_mead_minimizer<V>
 -------------------------
 
