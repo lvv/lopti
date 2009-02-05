@@ -40,7 +40,7 @@
 
 		template<typename V, int NPT=2*V::sz+1>
 struct  newuoa_minimizer:  trust_region_minimizer<V> {
-	typedef 	typename V::value_type		T;
+	//typedef 	typename V::value_type		T;
 	typedef 	double				newuoa_t;
 	const static int 	N  = V::sz;
 	typedef 	array<newuoa_t,N,1>		Vd;

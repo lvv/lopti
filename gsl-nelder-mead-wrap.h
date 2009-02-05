@@ -57,7 +57,7 @@ struct	gsl_nelder_mead_minimizer  :  minimizer<V> {
 	};
 
 	//void 		gsl_var			(void* var )	{ minex_func.params = var; };
-	virtual  minimizer<V>&		characteristic_size	(fp_t cs)	{ characteristic_size_ = cs;  return *this; };
+	virtual  minimizer<V>&		characteristic_size	(T cs)	{ characteristic_size_ = cs;  return *this; };
 
 	virtual V&		argmin () {
 		

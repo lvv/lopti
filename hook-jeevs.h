@@ -29,17 +29,17 @@ namespace lopti  {
 struct   hook_jeevs_minimizer   : minimizer<V>  {
 						MINIMIZER_MEMBERS;  LOFT_TYPES;
 					#define  EPSILON 0.000001
-						fp_t	tau_;	   // Termination criterium        
+						T	tau_;	   // Termination criterium        
 
 	hook_jeevs_minimizer	()			: minimizer<V>("hook-jeevs"), tau_(10*EPSILON) { S.assign(0.2);};
-	virtual	minimizer<V>&	 	tau		(fp_t _tau)	{ tau_ = _tau; return *this; };
+	virtual	minimizer<V>&	 	tau		(T _tau)	{ tau_ = _tau; return *this; };
 
 	virtual minimizer<V>&		step0(V& _S)	 { S=_S; return *this; };
 
 	V&		 	argmin			()		{
-					const fp_t	threshold = 1e-12;	   // Threshold for the function   
-					const fp_t	step_reduce_factor = 10;	// decay to be treated as significant                  
-					//fp_t  ymin_;				   // Min function value found     
+					const T	threshold = 1e-12;	   // Threshold for the function   
+					const T	step_reduce_factor = 10;	// decay to be treated as significant                  
+					//T  ymin_;				   // Min function value found     
 
 		BASE = X ;
 		f_base = ymin_ = (*loft_v) (X);
@@ -88,13 +88,13 @@ struct   hook_jeevs_minimizer   : minimizer<V>  {
 
 			V	S;				//  Steps along axes        
 			V	BASE;				//  Base point              
-			fp_t	f_base;				//  Function value at it    
+			T	f_base;				//  Function value at it    
 
-	fp_t   examination() {
+	T   examination() {
 		
 		for (int  i = BASE.ibegin();  i < BASE.iend(); i++) {	// Perform step along a coordinate              
-			 fp_t basi_old = BASE[i];		   // Old coordinate value         
-			 fp_t f_new;
+			 T basi_old = BASE[i];		   // Old coordinate value         
+			 T f_new;
 
 			BASE[i] = basi_old + S[i];
 			f_new = (*loft_v) (BASE); 

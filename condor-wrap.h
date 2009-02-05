@@ -51,7 +51,7 @@ class	c_of_t  : public CONDOR::ObjectiveFunction { public:
 	double  eval (CONDOR::Vector cX, int *nerror=NULL) {  		// condor use this to eval
 			V X;	
 			X << cX;
-			fp_t y = (*loft_v)(X);
+			T y = (*loft_v)(X);
 			updateCounter(y,cX);
 			eval_cnt++;
 

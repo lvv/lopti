@@ -3,6 +3,7 @@
 	#include	<lvv/lvv.h>
 	#include	<lvv/math.h>
 		using lvv::pow2;
+
 	#include	<lvv/array.h>
 		using lvv::array;
 		using lvv::matrix;

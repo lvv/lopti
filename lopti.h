@@ -32,7 +32,6 @@ namespace lopti {
 							using minimizer<V>::max_iter_;		\
 							using minimizer<V>::iter_;		\
 							using minimizer<V>::verbose_;		\
-							using minimizer<V>::verbose_;		\
 							using minimizer<V>::ymin_;		\
 							using minimizer<V>::Xmin_;		\
 							using minimizer<V>::name;		\
@@ -54,7 +53,7 @@ struct	minimizer {
 			bool				verbose_;
 			V				X;
 			V				Xmin_;
-			fp_t				ymin_;
+			T				ymin_;
 			int				iter_;
 			bool				found_;
 			string				name_;
@@ -64,7 +63,7 @@ struct	minimizer {
 	:
 		name_		(_name),
 		max_iter_	(10000),
-		ymin_    	(numeric_limits<fp_t>::quiet_NaN ()),
+		ymin_    	(numeric_limits<T>::quiet_NaN ()),
 		iter_    	(0),
 		verbose_ 	(false),
 		found_ 		(false)
@@ -88,9 +87,9 @@ struct	minimizer {
 			sprintf(buf, "%s-%d",  name_.c_str(), V::size());
 			return string(buf);
 	};
-	virtual fp_t 	 		ymin			()	const	{  return ymin_; };
+	virtual T 	 		ymin			()	const	{  return ymin_; };
 	virtual V 	 		Xmin			()	const	{  return Xmin_; };
-	virtual fp_t 	 		iter			()	const	{  return iter_; };
+	virtual T 	 		iter			()	const	{  return iter_; };
 	virtual bool			found			() 	const	{  return found_; };
 
 	// do-ers
@@ -102,19 +101,19 @@ struct	minimizer {
 				 template<typename V>
 struct	trust_region_minimizer : minimizer<V>    { 
 					LOFT_TYPES;  MINIMIZER_MEMBERS;
-			fp_t 				rho_begin_, rho_end_;
+			T 				rho_begin_, rho_end_;
 
 	explicit		trust_region_minimizer		(const char* _name= "unknown (trust region type)")
 	:	minimizer<V>(_name),
 		rho_begin_ 	(1.0),
 		//rho_end_   	(0.1)
-		rho_end_   	(numeric_limits<fp_t>::min()*1000)
-									//rho_begin_ 	(numeric_limits<fp_t>::quiet_NaN ()),
-									//rho_end_   	(numeric_limits<fp_t>::quiet_NaN ())
+		rho_end_   	(numeric_limits<T>::min()*1000)
+									//rho_begin_ 	(numeric_limits<T>::quiet_NaN ()),
+									//rho_end_   	(numeric_limits<T>::quiet_NaN ())
 	{};
 
-	virtual minimizer<V>&		rho_begin		(fp_t rho)	{ rho_begin_ = rho;  return *this; };
-	virtual minimizer<V>&		rho_end			(fp_t rho)	{ rho_end_   = rho;  return *this; };
+	virtual minimizer<V>&		rho_begin		(T rho)	{ rho_begin_ = rho;  return *this; };
+	virtual minimizer<V>&		rho_end			(T rho)	{ rho_end_   = rho;  return *this; };
  };
 
 

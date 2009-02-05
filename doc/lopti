@@ -114,7 +114,7 @@ and plain C arrays.
 - `X0(V)` - initial point
 - `S0(V)` - initial step size
 - `V argmin()` - solution optimum point
-- `fp_t  ymin()` - solution minimum value
+- `T  ymin()` - solution minimum value
 - `int  iter()` - number of iterations
 
 Type  `lvv::array<>` is ...
@@ -122,8 +122,8 @@ Type  `lvv::array<>` is ...
 
 === Termination Criteria
 - `max_iter(int)`  - defaults to `10000`
-- `rho_end(fp_t)` - defaults to `1/infinity`
-- `characteristic_size(fp_t)`
+- `rho_end(T)` - defaults to `1/infinity`
+- `characteristic_size(T)`
 
 
 == Solvers
@@ -183,9 +183,9 @@ this slow start on convergence charts.  For high `N` (>10) this can be especiall
 Instead of exact model it is possible with NEWUOA to use approximate model with less
 then `(N+1)(N+2)` points. 
 
-Uses member `rho_begin(fp_t)`, instead of `step0(V)`,  defaults to
+Uses member `rho_begin(T)`, instead of `step0(V)`,  defaults to
 0.2.  Because `rho` is scalar (applied equally to all directions) it is recommended
-to normalize object junction with <<rescale>>.  Termination criteria is `rho_end(fp_t)`,
+to normalize object junction with <<rescale>>.  Termination criteria is `rho_end(T)`,
 defaults to 1/infinity.
 
 [[NEWUOA]]
@@ -247,7 +247,7 @@ function in any number and combination of LOFT, such as rescaler, logger, noise-
 adapter, constrain-adder-by-barrier-function,  etc. 
 
 === make_loft() - create loft from any callable object
-`make_loft(boost::function<fp_t (*)(V& X)> callable_object)` +
+`make_loft(boost::function<T (*)(V& X)> callable_object)` +
 
 Converts any to loft. Callable object can be plain function, class member function, or functor. 
 A callable object passed (and possibly casted) to `make_loft` constructor.
