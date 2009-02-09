@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
 			#endif
 
 			#if  ! defined(NEWUOA) && ! defined(NM)  && !defined(CONDOR)
-				#define CONDOR
+				//#define CONDOR
 				#define NEWUOA
 				#define NM
 				#define HJ

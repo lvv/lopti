@@ -23,7 +23,8 @@
 
  namespace lopti {
 
-						#define CLONER(T)	 virtual T&  clone()  const   {  return  *new T(*this); }
+						#define CLONER(T)		\
+							virtual T& 	clone()  const		{  return  *new T(*this); }	// FIXME: mem leak
 
 
 						 #define         LOFT_MEMBERS    \
@@ -36,10 +37,12 @@
 							static const int N = V::sz;
 
 						#define 	LOFT_TYPES	\
-							typedef		loft_base<V>*			loft_p_t;	\
+							typedef         loft_base<V>*                   loft_p_t;       \
 							typedef 	const loft_base<V>&		loft_cref_t;	\
 							typedef		typename V::value_type		T;
 
+							//typedef		shared_ptr<loft_base<V> >			loft_p_t;
+						
 						#define		NaN	numeric_limits<T>::quiet_NaN()
 			template<typename V>
 struct	loft_base		{									// Lopti Object FuncTor
@@ -53,8 +56,9 @@ struct	loft_base		{									// Lopti Object FuncTor
 
 	// CTOR
 	explicit		loft_base	()			:  wrapped_loft_v(0),	iter_(0)				{ X_opt_ = -1; };
-	explicit		loft_base	(const string& s)	:  wrapped_loft_v(0),	iter_(0), name_(s)			{ X_opt_ = -1; };
-	virtual loft_base<V>&	clone		()	const		{ assert(false); return  *new loft_base<V>(*this); }
+	explicit		loft_base	(const string& s)	:  wrapped_loft_v(0),	iter_(0),	name_(s)		{ X_opt_ = -1; };
+	//virtual			~loft_base	()			{ delete wrapped_loft_v; };
+	virtual loft_base<V>&	clone		() const = 0; 
 
 	// set-ters
 	void 			known_optimum	(const V& X_answ)	{ X_opt_ = X_answ; };		// known optimum, used for testing optimizers
