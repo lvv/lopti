@@ -26,18 +26,18 @@
 	namespace lopti {
  
  template<typename V>		struct gsl_of_wrap {
-				LOFT_TYPES;
-				static		loft_p_t	 loft_v;
-		static void	init	(loft_p_t  _loft_v)			{ loft_v = _loft_v; }	
-		static double	eval	(const gsl_vector* gX, void * var)	{ V X;    X << gX;    return  (*loft_v)(X); }	
+				OBJECTIVE_TYPES;
+				static		objective_p_t	 objective_v;
+		static void	init	(objective_p_t  _objective_v)			{ objective_v = _objective_v; }	
+		static double	eval	(const gsl_vector* gX, void * var)	{ V X;    X << gX;    return  (*objective_v)(X); }	
  };
 
-//template<typename V>  loft_base<V>* gsl_of_wrap<V>::loft_v; // this is in gsl_of_wrap class, but we need to decl it 1 more time for compiler
-template<typename V>  shared_ptr<loft_base<V>> gsl_of_wrap<V>::loft_v; // this is in gsl_of_wrap class, but we need to decl it 1 more time for compiler
+//template<typename V>  objective_base<V>* gsl_of_wrap<V>::objective_v; // this is in gsl_of_wrap class, but we need to decl it 1 more time for compiler
+template<typename V>  shared_ptr<objective_base<V>> gsl_of_wrap<V>::objective_v; // this is in gsl_of_wrap class, but we need to decl it 1 more time for compiler
 
                  template<typename V>
 struct	gsl_nelder_mead_minimizer  :  minimizer<V> {
-						MINIMIZER_MEMBERS;   LOFT_TYPES;
+						MINIMIZER_MEMBERS;   OBJECTIVE_TYPES;
 		gsl_vector*			gX;	
 		gsl_vector* 			gS;	
 		const gsl_multimin_fminimizer_type *gsl_minimizer_type_ptr;
@@ -63,7 +63,7 @@ struct	gsl_nelder_mead_minimizer  :  minimizer<V> {
 	virtual V&		argmin () {
 		
 		////  gsl init
-		gsl_of_wrap<V>::init(loft_v);
+		gsl_of_wrap<V>::init(objective_v);
 		minex_func.f = &gsl_of_wrap<V>::eval;
 		minex_func.n = X.size();
 		//minex_func.params = var;

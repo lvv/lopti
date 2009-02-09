@@ -32,13 +32,13 @@
 namespace lopti {
 			template<typename V>
 class	c_of_t  : public CONDOR::ObjectiveFunction { public:
-						LOFT_TYPES;
+						OBJECTIVE_TYPES;
 				int eval_cnt;
 				bool verbose;
-				loft_p_t loft_v;
+				objective_p_t objective_v;
 
-	void	init (loft_p_t loft_p, V& X0) {  
-			loft_v = loft_p;
+	void	init (objective_p_t objective_p, V& X0) {  
+			objective_v = objective_p;
 			strcpy(name,"condor_of_wrap");
 			xOptimal.setSize(X0.size());
 			xStart.  setSize(X0.size());
@@ -51,7 +51,7 @@ class	c_of_t  : public CONDOR::ObjectiveFunction { public:
 	double  eval (CONDOR::Vector cX, int *nerror=NULL) {  		// condor use this to eval
 			V X;	
 			X << cX;
-			T y = (*loft_v)(X);
+			T y = (*objective_v)(X);
 			updateCounter(y,cX);
 			eval_cnt++;
 
@@ -68,7 +68,7 @@ class	c_of_t  : public CONDOR::ObjectiveFunction { public:
 /////////////////////////////////////////////////////////////// 
                  template<typename V>
 struct	condor_minimizer: trust_region_minimizer<V>   {
-						MINIMIZER_MEMBERS;  TR_MINIMIZER_MEMBERS;  LOFT_TYPES;
+						MINIMIZER_MEMBERS;  TR_MINIMIZER_MEMBERS;  OBJECTIVE_TYPES;
 			c_of_t<V>			c_of;	// condor object func wrap	
 									//CONDOR::ObjectiveFunction*	c_of;		
 									//CONDOR::ObjectiveFunction*	c_rof_wrap;	// condor object func rescaled wrap	
@@ -78,8 +78,8 @@ struct	condor_minimizer: trust_region_minimizer<V>   {
 	explicit 			condor_minimizer	()			: trust_region_minimizer<V>("condor") {};
 	virtual	minimizer<V>&	 	verbose			(bool flag)	{ verbose_     = flag; c_of.verbose = flag; return *this; };
 	virtual V&		 	argmin			()		{
-							assert(loft_v != 0 );  assert(!isnan(rho_begin_) && !isnan(rho_end_));
-		c_of.init(loft_v, X);
+							assert(objective_v != 0 );  assert(!isnan(rho_begin_) && !isnan(rho_end_));
+		c_of.init(objective_v, X);
 		globalPrintLevel = 10;		// off
 		CONDOR::CONDORSolver(rho_begin_, rho_end_, max_iter_,  &c_of);
 		Xmin_ << (c_of.xBest);

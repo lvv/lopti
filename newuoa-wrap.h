@@ -45,7 +45,7 @@ struct  newuoa_minimizer:  trust_region_minimizer<V> {
 	const static int 	N  = V::sz;
 	typedef 	array<newuoa_t,N,1>		Vd;
 
-						MINIMIZER_MEMBERS;  TR_MINIMIZER_MEMBERS;  LOFT_TYPES;
+						MINIMIZER_MEMBERS;  TR_MINIMIZER_MEMBERS;  OBJECTIVE_TYPES;
 	array<double,N,1>	Xd;	
 	explicit 		newuoa_minimizer	():   trust_region_minimizer<V>("newoua") {};
 	minimizer<V>&		x0			(V& _X) 	{  X  = _X;    Xd = _X;  	return *this;  };
@@ -473,7 +473,7 @@ eval_f_310:
 
 	X = Xd;		// de-promote
 
-	F = (*this->loft_v)(X);
+	F = (*this->objective_v)(X);
 
 	//if (verbose_) FMT ("%d \t %18.10g  \t  %18.10g \n")  %iter_  %F  %Xd;
 	if (verbose_) {  printf("%d 	 %18.10g  	  ",  iter_, F);   cout <<  Xd << endl; }

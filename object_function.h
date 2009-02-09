@@ -27,66 +27,66 @@
 							virtual CLASS& 	clone()  const		{  return  *new CLASS(*this); }
 
 
-						 #define         LOFT_MEMBERS    \
-							using           loft_base<V>::iter_; \
-							using           loft_base<V>::wrapped_loft_v; \
-							using           loft_base<V>::name_; \
-							using           loft_base<V>::name; \
-							using           loft_base<V>::X_opt_; \
+						 #define         OBJECTIVE_MEMBERS    \
+							using           objective_base<V>::iter_; \
+							using           objective_base<V>::wrapped_objective_v; \
+							using           objective_base<V>::name_; \
+							using           objective_base<V>::name; \
+							using           objective_base<V>::X_opt_; \
 							static	const int B = V::ibg; \
 							static const int N = V::sz;
 
-						#define 	LOFT_TYPES	\
-							typedef		shared_ptr<loft_base<V> >	loft_p_t; \
-							typedef 	const loft_base<V>&		loft_cref_t;	\
+						#define 	OBJECTIVE_TYPES	\
+							typedef		shared_ptr<objective_base<V> >	objective_p_t; \
+							typedef 	const objective_base<V>&		objective_cref_t;	\
 							typedef		typename V::value_type		T;
 
 						
 						#define		NaN	numeric_limits<T>::quiet_NaN()
 			template<typename V>
-struct	loft_base		{									// Lopti Object FuncTor
+struct	objective_base		{									// Lopti Object FuncTor
 
-				LOFT_TYPES;
+				OBJECTIVE_TYPES;
 
 			string			name_;
 			V			X_opt_;
 			int			iter_;
-			loft_p_t		wrapped_loft_v;
+			objective_p_t		wrapped_objective_v;
 
 	// CTOR
-	explicit		loft_base	()			:  	iter_(0)				{ X_opt_ = -1; };
-	explicit		loft_base	(const string& s)	:  	iter_(0),	name_(s)		{ X_opt_ = -1; };
-	virtual			~loft_base	()	= 0;
-	virtual loft_base<V>&	clone		() const = 0; 
+	explicit		objective_base	()			:  	iter_(0)				{ X_opt_ = -1; };
+	explicit		objective_base	(const string& s)	:  	iter_(0),	name_(s)		{ X_opt_ = -1; };
+	virtual			~objective_base	()	= 0;
+	virtual objective_base<V>&	clone		() const = 0; 
 
 	// set-ters
 	void 			known_optimum	(const V& X_answ)	{ X_opt_ = X_answ; };		// known optimum, used for testing optimizers
-	virtual void		loft		(loft_cref_t loft_cref)	{ wrapped_loft_v = loft_p_t(&loft_cref.clone());	name_ = loft_cref.name(); };
+	virtual void		objective		(objective_cref_t objective_cref)	{ wrapped_objective_v = objective_p_t(&objective_cref.clone());	name_ = objective_cref.name(); };
 
 	// get-ers
 	virtual const string	name		()	const		{ return  name_; };
-	virtual int 		iter		()	const		{ return  ! wrapped_loft_v  ?  iter_  :  wrapped_loft_v->iter(); };
+	virtual int 		iter		()	const		{ return  ! wrapped_objective_v  ?  iter_  :  wrapped_objective_v->iter(); };
 	virtual	T 		opt_distance	(V& X)	const		{ return  distance_norm2(X_opt_, X);  };
-	virtual	bool 		empty		()	const		{ return  ! wrapped_loft_v;  };
+	virtual	bool 		empty		()	const		{ return  ! wrapped_objective_v;  };
 
 	// do-ers
 	virtual T		operator()	(V&  X)			{
-					assert( wrapped_loft_v != 0 );
-		T   y = (*wrapped_loft_v)(X);
+					assert( wrapped_objective_v != 0 );
+		T   y = (*wrapped_objective_v)(X);
 		return y;
 	}
 
 	//virtual void		reset		()		{ iter_ = 0; };
  };
 
-	template<typename V>	loft_base<V>::~loft_base () {}; 				// we need this (see http://www.devx.com/tips/Tip/12729)
+	template<typename V>	objective_base<V>::~objective_base () {}; 				// we need this (see http://www.devx.com/tips/Tip/12729)
 
  /////////////////////////////////////////////////////////////////////////////////////////  OF: CHEBYQUAD
 
 			template<typename V> 
-struct  chebyquad: loft_base<V>		{	 LOFT_TYPES;  LOFT_MEMBERS;  CLONER(chebyquad)		// The Chebyquad test problem (Fletcher, 1965) 
+struct  chebyquad: objective_base<V>		{	 OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(chebyquad)		// The Chebyquad test problem (Fletcher, 1965) 
 
-			chebyquad		()	: loft_base<V>("chebyquad") 	{};
+			chebyquad		()	: objective_base<V>("chebyquad") 	{};
 
 	T		operator() 		(V& X)  {
 
@@ -119,65 +119,65 @@ struct  chebyquad: loft_base<V>		{	 LOFT_TYPES;  LOFT_MEMBERS;  CLONER(chebyquad
 	}
  };
  /////////////////////////////////////////////////////////////////////////////////////////  ADAPTER: PLAIN_FN
-template<typename V>	struct	make_loft : loft_base<V>		{  				LOFT_TYPES;  LOFT_MEMBERS;  CLONER(make_loft)
+template<typename V>	struct	make_objective : objective_base<V>		{  				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(make_objective)
 						function<T(V&)>	of;
-	explicit	make_loft	(function<T(V&)> _of, const string& _name)	 : loft_base<V>(_name) , of(_of)   {};
+	explicit	make_objective	(function<T(V&)> _of, const string& _name)	 : objective_base<V>(_name) , of(_of)   {};
 	T	operator()	(V&  X)	  { assert(!of.empty() && ">> NOT DEFINED OBJ FUNC <<");  iter_++;   T y = (of)(X); return y; }
  };
  /////////////////////////////////////////////////////////////////////////////////////////  OF: ROSENBERG
-template<typename V>	struct	rosenberg  : loft_base<V> { 				LOFT_TYPES;  LOFT_MEMBERS;  CLONER(rosenberg)
-	rosenberg	()	: loft_base<V>("rosenberg") 	{ V const  X_answ = {{ 1.0, 1.0 }};   known_optimum(X_answ); };
+template<typename V>	struct	rosenberg  : objective_base<V> { 				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(rosenberg)
+	rosenberg	()	: objective_base<V>("rosenberg") 	{ V const  X_answ = {{ 1.0, 1.0 }};   known_optimum(X_answ); };
 	T	operator() 		(V& X)  {  iter_++;      return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
  };
 
  template<typename V>   typename V::value_type    plain_fn_rosenberg  (V& X) { const int B = V::ibg;   return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
  /////////////////////////////////////////////////////////////////////////////////////////  OF: BAD SCALE ROSENBERG
-template<typename V, int FACTOR>	struct	bad_scale_rosenberg	 : loft_base<V> { 	LOFT_TYPES;  LOFT_MEMBERS;  CLONER(bad_scale_rosenberg);
-	bad_scale_rosenberg() : loft_base<V>("bad_scale_rosenberg") { V const  X_answ = {{ 1.0, 1.0*FACTOR }};   known_optimum(X_answ); };
+template<typename V, int FACTOR>	struct	bad_scale_rosenberg	 : objective_base<V> { 	OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(bad_scale_rosenberg);
+	bad_scale_rosenberg() : objective_base<V>("bad_scale_rosenberg") { V const  X_answ = {{ 1.0, 1.0*FACTOR }};   known_optimum(X_answ); };
 	T	operator() 		(V& X)   {  iter_++; return  100 * pow2(X[1+B]/FACTOR-pow2(X[0+B])) + pow2(1-X[0+B]); };
  };
  /////////////////////////////////////////////////////////////////////////////////////////  WRAPPER: RESCALE
-template<typename V>	struct	rescale :  loft_base<V> 	{				LOFT_TYPES;  LOFT_MEMBERS;  CLONER(rescale)
+template<typename V>	struct	rescale :  objective_base<V> 	{				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(rescale)
 				V R;
-			rescale		(loft_cref_t loft_v, V& _R)  : 	R(_R)  {  X_opt_ = loft_v.X_opt_; X_opt_ /= _R;   loft(loft_v); /*cout << "rescaled opt: " << X_opt_ << endl <<  "opt: " << loft_v.X_opt_ << endl;*/  };
+			rescale		(objective_cref_t objective_v, V& _R)  : 	R(_R)  {  X_opt_ = objective_v.X_opt_; X_opt_ /= _R;   objective(objective_v); /*cout << "rescaled opt: " << X_opt_ << endl <<  "opt: " << objective_v.X_opt_ << endl;*/  };
 	const string	name		()	const	{ return  name_ + " rescaled"; };
-	T		operator()	(V&  X)		{ iter_++;  	V XR = X;  XR *= R;    return  (*wrapped_loft_v)(XR); };
-	T 		opt_distance	(V& X)	const	{ V XR = X;   XR*=R;    return  distance_norm2(wrapped_loft_v->X_opt_, XR); }; // distance in normalized coord
+	T		operator()	(V&  X)		{ iter_++;  	V XR = X;  XR *= R;    return  (*wrapped_objective_v)(XR); };
+	T 		opt_distance	(V& X)	const	{ V XR = X;   XR*=R;    return  distance_norm2(wrapped_objective_v->X_opt_, XR); }; // distance in normalized coord
  };
  /////////////////////////////////////////////////////////////////////////////////////////  WRAPPER:  XG_LOG (xgraphic)
  template<typename V> class minimizer;
 
-template<typename V>	struct	xg_log : loft_base<V> 		{				LOFT_TYPES;   LOFT_MEMBERS;  CLONER(xg_log)
+template<typename V>	struct	xg_log : objective_base<V> 		{				OBJECTIVE_TYPES;   OBJECTIVE_MEMBERS;  CLONER(xg_log)
 				shared_ptr<ofstream>	log_file;  // need smart ptr becase xg_log dtor-ed on coping
-	xg_log	 (loft_cref_t _loft_v, minimizer<V>& mzr)	{
-		loft(_loft_v);													assert(log_file == 0 );
+	xg_log	 (objective_cref_t _objective_v, minimizer<V>& mzr)	{
+		objective(_objective_v);											assert(log_file == 0 );
 		// FIXME: test if there is a "log" dir
 		log_file = shared_ptr<ofstream>(new ofstream(("log/" +  (&mzr)->name() + "(" + name() + ")" ).c_str()));	assert(log_file->good());
 	};
 
 	T		operator()	(V&  X)			{
-		T   y = (*wrapped_loft_v)(X); 			assert(log_file->good());
+		T   y = (*wrapped_objective_v)(X); 			assert(log_file->good());
 		// 1 - iter no(gp: splot label);  2 - hight (y);  3 - |X-opt| ignored;  4,5 - X coord;  
-		//*log_file << format("%d \t %22.18g \t %22.18g \t %22.18g \n")   % (wrapped_loft_v->iter())   %y   % wrapped_loft_v->opt_distance(X)  %X  << flush;  
-		*log_file << setprecision(18) << wrapped_loft_v->iter() << " 	" <<  y  << " " <<  wrapped_loft_v->opt_distance(X)  << " " <<  X  << endl;  
+		//*log_file << format("%d \t %22.18g \t %22.18g \t %22.18g \n")   % (wrapped_objective_v->iter())   %y   % wrapped_objective_v->opt_distance(X)  %X  << flush;  
+		*log_file << setprecision(18) << wrapped_objective_v->iter() << " 	" <<  y  << " " <<  wrapped_objective_v->opt_distance(X)  << " " <<  X  << endl;  
 		return  y;
 	};
  };
 
-template<typename V>	struct	trace : loft_base<V> 		{				  CLONER(trace); LOFT_TYPES;   LOFT_MEMBERS;
+template<typename V>	struct	trace : objective_base<V> 		{				  CLONER(trace); OBJECTIVE_TYPES;   OBJECTIVE_MEMBERS;
 	Timer	timer;
-	trace	 (loft_cref_t _loft_v)	{ loft(_loft_v);	};
+	trace	 (objective_cref_t _objective_v)	{ objective(_objective_v);	};
 
 	T		operator()	(V&  X)			{
 
-		if (wrapped_loft_v->iter()==0)   cout << "# (iter)              X[*]               ==F-value" << endl;
-		//cout << format("(%d) \t % 11.8g")   % (wrapped_loft_v->iter())  %X;
-		printf("(%d) 	 ",  wrapped_loft_v->iter());  cout <<  X;
+		if (wrapped_objective_v->iter()==0)   cout << "# (iter)              X[*]               ==F-value" << endl;
+		//cout << format("(%d) \t % 11.8g")   % (wrapped_objective_v->iter())  %X;
+		printf("(%d) 	 ",  wrapped_objective_v->iter());  cout <<  X;
 
 		//MSG("(%d/%.1fs") % cnt++  %timer();                                                                                                                
 		//for(int i=0; i<param_size; ++i)      MSG("%=10.6g")   %param[i];
 
-		T   y = (*wrapped_loft_v)(X); 			
+		T   y = (*wrapped_objective_v)(X); 			
 		//cout << format("\t(%.1fs)   ==%18.13g\n")  %timer()    %y<< flush;  
 		printf("	(%.1fs)   ==%18.13g\n", timer(), y);	cout << flush;
 		return  y;

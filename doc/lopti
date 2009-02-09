@@ -91,13 +91,13 @@ This might be specific to GCC v4.x.x
 *trust region*:: ...
 *functor*:: ...
 *boost::function*:: ...
-*loft*:: ...
+*objective*:: ...
 
 
 == Minimizer Class
 
 === Data Types
-All solvers (and OF loft) are template with 1st parameter being parameter vector type. Variables step0, X0 and argmin have the same type. 
+All solvers (and OF objective) are template with 1st parameter being parameter vector type. Variables step0, X0 and argmin have the same type. 
 As of now,  the only type usable is `lvv::array<>`.  Can be found in `external`
 directory.   It will be changed in future to support any random access container having members:
 
@@ -220,7 +220,7 @@ class condor_minimizer<V,[NP=2*N+1>
 `LDFLAGS=-lcondor`
 `CXXFLAGS=-I/path/to/dir/with/condorlib-dir`
 
-Fast for low dimensions.  Constraints capability not used. Condor internal rescaler not used (use loft rescaler).
+Fast for low dimensions.  Constraints capability not used. Condor internal rescaler not used (use objective rescaler).
 Can use only exact  model, so it might be problematic for N > 10.
 LOPTI will looking for `<condor/Vector.h>` from `condorlib` subdirectory in Condor source directory.
 
@@ -242,47 +242,47 @@ Any V type, any index start.
 
 
 == Object Function
-Object function are defined in so called Lopti Object FuncTor (LOFT). LOFT also allow to wrap object
-function in any number and combination of LOFT, such as rescaler, logger, noise-adder,
-adapter, constrain-adder-by-barrier-function,  etc. 
+Object function are defined in class dirived from `class objective_base`. Object function also can be wrapped in multile wrapper, 
+such as rescaler, logger, tracer, adapter,  etc. 
+Planned wrappers are also noise-adder, constrain-adder-by-barrier-function, 
 
-=== make_loft() - create loft from any callable object
-`make_loft(boost::function<T (*)(V& X)> callable_object)` +
+=== make_objective() - create objective from any callable object
+`make_objective(boost::function<T (*)(V& X)> callable_object)` +
 
-Converts any to loft. Callable object can be plain function, class member function, or functor. 
-A callable object passed (and possibly casted) to `make_loft` constructor.
-Because `make_loft` expects a `boost::function` as its argument, it is converted to `boost::function` internally.
+Converts any to objective. Callable object can be plain function, class member function, or functor. 
+A callable object passed (and possibly casted) to `make_objective` constructor.
+Because `make_objective` expects a `boost::function` as its argument, it is converted to `boost::function` internally.
 
 ---------------------------------
 double   plain_function(lvv::array<double,2> X);
 ...
-mzr.loft ( make_loft<V> (&plain_function);
+mzr.objective ( make_objective<V> (&plain_function);
 ------------------------------
 
 
 See also http://www.boost.org/doc/libs/1_37_0/doc/html/function/tutorial.html[boost::function tutorial]
 
-LOFT should have one argument - optimization vector.  If your original function have more arguments use 
+Objective should have one argument - optimization vector.  If your original function have more arguments use 
 `boost::bind()`
 or 
 `std::bind1st(), bind2end()`
 
 === trace() - progress tracer
-`trace(loft l,)` +
+`trace(objective o,)` +
 
 Prints on screen eval-number, seconds of last eval, X and f-value
 
 === xg_log() - xgraphic logger
-`xg_log(loft l, minimizer<V> m)` +
+`xg_log(objective o, minimizer<V> m)` +
 
-Logs eval-number, f-value and X on every loft evaluation. Program `xgraphic` is
+Logs eval-number, f-value and X on every objective evaluation. Program `xgraphic` is
 open source visualization utility which can directly input log file.  Created log
-name is composed from loft name, number of dimentions and minimizer name. 
+name is composed from objective name, number of dimentions and minimizer name. 
 Logs are created under `./log/`
 
 [[rescale]]
 === rescale() - normalizer
-`rescale<V>(loft L, V rescale_vector)` +
+`rescale<V>(objective o, V rescale_vector)` +
 
 Most solvers work much better if function first derivative (and second?) have
 about the same order in all directions.  
@@ -300,7 +300,7 @@ V   R  = {{ 1, 0.0100 }};		// rescale vector
 V   X0 = {{ -1.2, 1 }}; 			
 V   X_opt;				// answer
 condor_minimizer<V0>	mzr;
-	mzr	.loft		(rescale<V0>( trace<V0>(rosenberg<V0>()), R));
+	mzr	.objective		(rescale<V0>( trace<V0>(rosenberg<V0>()), R));
 	mzr	.x0		(X/=R);
 	mzr	.rho_begin	(1);
 	mzr	.rho_end	(0.01);

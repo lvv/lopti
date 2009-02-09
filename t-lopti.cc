@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
 
 		{  condor_minimizer<V0>	mzr;////  condor  LOGGED 
 			mzr	.x0		(_X0);
-			mzr	.loft		(xg_log<V0>(FN<V0>(),  mzr));
+			mzr	.objective		(xg_log<V0>(FN<V0>(),  mzr));
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
 			mzr	.argmin();
@@ -85,8 +85,8 @@ int main(int argc, char **argv) {
 		}
 
 		#ifdef  PLAIN_FN
-		{  condor_minimizer<V0> mzr;////  CONDOR  x PLAIN_FN  ROSENBERG		// TODO: why results deffrent from loft?
-			mzr	.loft			( make_loft<V0> (&plain_fn_rosenberg<V0>, "make_loft") );
+		{  condor_minimizer<V0> mzr;////  CONDOR  x PLAIN_FN  ROSENBERG		// TODO: why results deffrent from objective?
+			mzr	.objective			( make_objective<V0> (&plain_fn_rosenberg<V0>, "make_objective") );
 			mzr	.x0			(_X0);	// X[0..N-1]	
 			mzr	.rho_begin		(1);
 			mzr	.rho_end		(STOP_AT_X_STEP);
@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
 
 		#ifdef  NAKED
 		{  condor_minimizer<V0>	mzr;	////  CONDOR  x NAKED ROSENBERG
-			mzr	.loft		(  rosenberg<V0>() );
+			mzr	.objective		(  rosenberg<V0>() );
 			mzr	.x0		(_X0);
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
@@ -109,7 +109,7 @@ int main(int argc, char **argv) {
 		#ifdef  RESCALE
 		{  	V0 R = {{ 1, 0.0100 }};   V0 X = _X0; V0  X_opt;
 		condor_minimizer<V0>	mzr;////  condor  logged RESCALED rosenberg
-			mzr	.loft		(xg_log<V0>  (rescale<V0>  ( trace<V0>(rosenberg<V0>()), R),  mzr));
+			mzr	.objective		(xg_log<V0>  (rescale<V0>  ( trace<V0>(rosenberg<V0>()), R),  mzr));
 			mzr	.x0		(X/=R);	// X[0..N-1]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
@@ -128,7 +128,7 @@ int main(int argc, char **argv) {
 
 		/*
 		{ newuoa_minimizer<V1>	mzr;		 ////  NEWUOA :  2*N + 1 
-			mzr	.loft		(xg_log<V1>(FN<V1>(),mzr));
+			mzr	.objective		(xg_log<V1>(FN<V1>(),mzr));
 			mzr	.x0		(*(V1*)&(_X0));	// X[1..N]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
@@ -143,7 +143,7 @@ int main(int argc, char **argv) {
 		X0 = _X0;
 
 		newuoa_minimizer<V>	mzr;		 ////  NEWUOA :  2*N + 1 
-			mzr	.loft		(xg_log<V>(FN<V>(),mzr));
+			mzr	.objective		(xg_log<V>(FN<V>(),mzr));
 			mzr	.x0		(X0);		// X[1..N]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
@@ -157,7 +157,7 @@ int main(int argc, char **argv) {
 		#if _N < 15
 		{	const int N=V1::sz;
 		newuoa_minimizer<V0, (N+1)*(N+2)/2>	mzr; ////  NEWUOA  (N+1)*(N+2)/2
-			mzr	.loft		(xg_log<V0>(FN<V0>(),mzr));
+			mzr	.objective		(xg_log<V0>(FN<V0>(),mzr));
 			mzr	.x0		(_X0);	// X[1..N]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
@@ -172,7 +172,7 @@ int main(int argc, char **argv) {
 	#ifdef NM
 		{	V0  S;   S.assign(0.1); //{{ 0.6, 0.6 }};
 		gsl_nelder_mead_minimizer<V0>	mzr;	////  NELDER-MEAD
-			mzr	.loft		(xg_log<V0>(FN<V0>(),  mzr));
+			mzr	.objective		(xg_log<V0>(FN<V0>(),  mzr));
 			mzr	.x0		(_X0);  // will ignore BEGIN index
 			mzr	.step0		(S);
 			//mzr	.characteristic_size	(0.0002);
@@ -185,7 +185,7 @@ int main(int argc, char **argv) {
 	#ifdef HJ
 		{	V0  S;   S.assign(0.03); //{{ 0.6, 0.6 }};
 		hook_jeevs_minimizer<V0>	mzr;	////  NELDER-MEAD
-			mzr	.loft		(xg_log<V0>(FN<V0>(),  mzr));
+			mzr	.objective		(xg_log<V0>(FN<V0>(),  mzr));
 			mzr	.x0		(_X0);  // will ignore BEGIN index
 			mzr	.step0		(S);
 			//mzr	.characteristic_size	(0.0002);

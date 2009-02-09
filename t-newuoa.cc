@@ -43,8 +43,8 @@ int main(int argc, char **argv) {
 		typedef		array<float,2,0>		V;
 		V		X0 = {{ -1.2, -1 }};
 		newuoa_minimizer<V>	mzr;		 ////  NEWUOA :  2*N + 1 
-			//mzr	.loft		(xg_log<V>(FN<V>(),mzr));
-			mzr	.loft		(trace<V>(FN<V>()));
+			//mzr	.objective		(xg_log<V>(FN<V>(),mzr));
+			mzr	.objective		(trace<V>(FN<V>()));
 			mzr	.x0		(X0);	// X[1..N]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(RHO_END);

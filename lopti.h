@@ -37,7 +37,7 @@ namespace lopti {
 							using minimizer<V>::name;		\
 							using minimizer<V>::name_;		\
 							using minimizer<V>::found_;		\
-							using minimizer<V>::loft_v;
+							using minimizer<V>::objective_v;
 
 						 #define         TR_MINIMIZER_MEMBERS    \
 							using trust_region_minimizer<V>::rho_begin_;	\
@@ -46,10 +46,10 @@ namespace lopti {
 
 					 template<typename V>
 struct	minimizer {
-					LOFT_TYPES;
+					OBJECTIVE_TYPES;
 
-			//loft_p_t			loft_v;	
-			shared_ptr<loft_base<V>>		loft_v;	
+			//objective_p_t			objective_v;	
+			shared_ptr<objective_base<V>>		objective_v;	
 			int				max_iter_;
 			bool				verbose_;
 			V				X;
@@ -74,9 +74,9 @@ struct	minimizer {
 
 
 	// set-ters
-	//virtual minimizer<V>&		loft			(loft_cref_t  ref)	{  loft_v = &ref.clone();   return *this;  };
-	virtual minimizer<V>&		loft			(loft_cref_t  ref)	{  loft_v = shared_ptr<loft_base<V>>(&ref.clone());   return *this;  };
-	//virtual void			loft			(loft_cref_t loft_cref)	{ wrapped_loft_v = shared_ptr<loft_base<V>>(&loft_cref.clone());	name_ = loft_cref.name(); };
+	//virtual minimizer<V>&		objective			(objective_cref_t  ref)	{  objective_v = &ref.clone();   return *this;  };
+	virtual minimizer<V>&		objective			(objective_cref_t  ref)	{  objective_v = shared_ptr<objective_base<V>>(&ref.clone());   return *this;  };
+	//virtual void			objective			(objective_cref_t objective_cref)	{ wrapped_objective_v = shared_ptr<objective_base<V>>(&objective_cref.clone());	name_ = objective_cref.name(); };
 	virtual minimizer<V>&		x0			(V& _X) 		{  X  = _X;	return *this;  };
 	virtual minimizer<V>&		max_iter		(int mx)		{  max_iter_   = mx;	return *this;  };
 	virtual minimizer<V>&		verbose			(bool flag)		{  verbose_ = flag;	return *this;  };
@@ -96,13 +96,13 @@ struct	minimizer {
 
 	// do-ers
 	virtual V&			argmin			() 		{  return Xmin_; };
-	//virtual void			print			()		{ MSG("%s(%s)  %35t  iter=%d  \t ymin=%g \t Xmin=%22.15g \n") %name() %loft_v->name() %loft_v->iter()  %ymin()  %Xmin();};
-	virtual void			print			()		{ printf("%s(%s)  	  iter=%d  	 ymin=%g 	 Xmin: ", name().c_str(),  loft_v->name().c_str(), loft_v->iter(),  ymin()); cout <<  Xmin() << endl; };
+	//virtual void			print			()		{ MSG("%s(%s)  %35t  iter=%d  \t ymin=%g \t Xmin=%22.15g \n") %name() %objective_v->name() %objective_v->iter()  %ymin()  %Xmin();};
+	virtual void			print			()		{ printf("%s(%s)  	  iter=%d  	 ymin=%g 	 Xmin: ", name().c_str(),  objective_v->name().c_str(), objective_v->iter(),  ymin()); cout <<  Xmin() << endl; };
  };
 
 				 template<typename V>
 struct	trust_region_minimizer : minimizer<V>    { 
-					LOFT_TYPES;  MINIMIZER_MEMBERS;
+					OBJECTIVE_TYPES;  MINIMIZER_MEMBERS;
 			T 				rho_begin_, rho_end_;
 
 	explicit		trust_region_minimizer		(const char* _name= "unknown (trust region type)")

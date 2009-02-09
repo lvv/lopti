@@ -27,7 +27,7 @@ namespace lopti  {
 
 			template<typename V> 
 struct   hook_jeevs_minimizer   : minimizer<V>  {
-						MINIMIZER_MEMBERS;  LOFT_TYPES;
+						MINIMIZER_MEMBERS;  OBJECTIVE_TYPES;
 					#define  EPSILON 0.000001
 						T	tau_;	   // Termination criterium        
 
@@ -42,7 +42,7 @@ struct   hook_jeevs_minimizer   : minimizer<V>  {
 					//T  ymin_;				   // Min function value found     
 
 		BASE = X ;
-		f_base = ymin_ = (*loft_v) (X);
+		f_base = ymin_ = (*objective_v) (X);
 
 
 		for (;;) {										   // Main iteration loop        // X is a next approximation to min             
@@ -56,7 +56,7 @@ struct   hook_jeevs_minimizer   : minimizer<V>  {
 
 
 					ymin_ = f_base;
-					f_base = (*loft_v) (BASE);
+					f_base = (*objective_v) (BASE);
 				}	while (examination() < ymin_ - threshold);	// Continue search until f doesn't  decrease         
 
 				BASE = X;
@@ -97,13 +97,13 @@ struct   hook_jeevs_minimizer   : minimizer<V>  {
 			 T f_new;
 
 			BASE[i] = basi_old + S[i];
-			f_new = (*loft_v) (BASE); 
+			f_new = (*objective_v) (BASE); 
 
 			if	(f_new < f_base)  {
 				f_base = f_new;								// Step caused f to decrease, OK 
 			} else {
 				BASE[i] = basi_old - S[i];
-				f_new = (*loft_v) (BASE); 
+				f_new = (*objective_v) (BASE); 
 				if (f_new < f_base) f_base = f_new;
 				else               BASE[i] = basi_old;					 // No fall was found along this coord 
 			}
