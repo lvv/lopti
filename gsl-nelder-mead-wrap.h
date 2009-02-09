@@ -32,7 +32,8 @@
 		static double	eval	(const gsl_vector* gX, void * var)	{ V X;    X << gX;    return  (*loft_v)(X); }	
  };
 
-template<typename V>  loft_base<V>* gsl_of_wrap<V>::loft_v; // this is in gsl_of_wrap class, but we need to decl it 1 more time for compiler
+//template<typename V>  loft_base<V>* gsl_of_wrap<V>::loft_v; // this is in gsl_of_wrap class, but we need to decl it 1 more time for compiler
+template<typename V>  shared_ptr<loft_base<V>> gsl_of_wrap<V>::loft_v; // this is in gsl_of_wrap class, but we need to decl it 1 more time for compiler
 
                  template<typename V>
 struct	gsl_nelder_mead_minimizer  :  minimizer<V> {
@@ -50,7 +51,7 @@ struct	gsl_nelder_mead_minimizer  :  minimizer<V> {
 
 	virtual minimizer<V>&		step0			(V& S)		{
 		gS = gsl_vector_alloc(V::size()); 
-		gS << S; 
+		gS << S;  // convert to gsl_vector
 		gsl_minimizer = gsl_multimin_fminimizer_alloc(gsl_minimizer_type_ptr, V::size());
 		if (verbose_)   cerr << "#  minimizer: "  <<  gsl_multimin_fminimizer_name (gsl_minimizer)  <<  endl;
 		return *this;

@@ -194,7 +194,7 @@ fill_xpt_50:
      	    if (FVAL[IPT+NP] < FVAL[IPT+1]) XIPT = -XIPT;
      	    XJPT = rho_begin_;
      	    if (FVAL[JPT+NP] < FVAL[JPT+1]) XJPT = -XJPT;
-												assert (0 < iter_ &&  iter_ <= N );
+												//assert (0 < iter_ &&  iter_ <= N);
 												assert (IPT > 0 &&  IPT <= NPT );
 												assert (JPT > 0 &&  JPT <= NPT );
      	    XPT(iter_,IPT) = XIPT;								// gcc warging that IPT, JPT are out of bounds

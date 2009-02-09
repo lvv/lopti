@@ -48,7 +48,8 @@ namespace lopti {
 struct	minimizer {
 					LOFT_TYPES;
 
-			loft_p_t			loft_v;	
+			//loft_p_t			loft_v;	
+			shared_ptr<loft_base<V>>		loft_v;	
 			int				max_iter_;
 			bool				verbose_;
 			V				X;
@@ -73,11 +74,12 @@ struct	minimizer {
 
 
 	// set-ters
-	virtual minimizer<V>&		loft			(loft_cref_t  ref){ loft_v = &ref.clone(); return *this; };
-
-	virtual minimizer<V>&		x0			(V& _X) 	{  X  = _X;	return *this;  };
-	virtual minimizer<V>&		max_iter		(int mx)	{  max_iter_   = mx;	return *this;  };
-	virtual minimizer<V>&		verbose			(bool flag)	{  verbose_ = flag;	return *this;  };
+	//virtual minimizer<V>&		loft			(loft_cref_t  ref)	{  loft_v = &ref.clone();   return *this;  };
+	virtual minimizer<V>&		loft			(loft_cref_t  ref)	{  loft_v = shared_ptr<loft_base<V>>(&ref.clone());   return *this;  };
+	//virtual void			loft			(loft_cref_t loft_cref)	{ wrapped_loft_v = shared_ptr<loft_base<V>>(&loft_cref.clone());	name_ = loft_cref.name(); };
+	virtual minimizer<V>&		x0			(V& _X) 		{  X  = _X;	return *this;  };
+	virtual minimizer<V>&		max_iter		(int mx)		{  max_iter_   = mx;	return *this;  };
+	virtual minimizer<V>&		verbose			(bool flag)		{  verbose_ = flag;	return *this;  };
 
 
 	// get-ters

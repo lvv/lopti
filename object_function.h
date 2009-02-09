@@ -23,8 +23,8 @@
 
  namespace lopti {
 
-						#define CLONER(T)		\
-							virtual T& 	clone()  const		{  return  *new T(*this); }	// FIXME: mem leak
+						#define CLONER(CLASS)		\
+							virtual CLASS& 	clone()  const		{  return  *new CLASS(*this); }
 
 
 						 #define         LOFT_MEMBERS    \
@@ -37,11 +37,10 @@
 							static const int N = V::sz;
 
 						#define 	LOFT_TYPES	\
-							typedef         loft_base<V>*                   loft_p_t;       \
+							typedef		shared_ptr<loft_base<V> >	loft_p_t; \
 							typedef 	const loft_base<V>&		loft_cref_t;	\
 							typedef		typename V::value_type		T;
 
-							//typedef		shared_ptr<loft_base<V> >			loft_p_t;
 						
 						#define		NaN	numeric_limits<T>::quiet_NaN()
 			template<typename V>
@@ -55,20 +54,20 @@ struct	loft_base		{									// Lopti Object FuncTor
 			loft_p_t		wrapped_loft_v;
 
 	// CTOR
-	explicit		loft_base	()			:  wrapped_loft_v(0),	iter_(0)				{ X_opt_ = -1; };
-	explicit		loft_base	(const string& s)	:  wrapped_loft_v(0),	iter_(0),	name_(s)		{ X_opt_ = -1; };
-	//virtual			~loft_base	()			{ delete wrapped_loft_v; };
+	explicit		loft_base	()			:  	iter_(0)				{ X_opt_ = -1; };
+	explicit		loft_base	(const string& s)	:  	iter_(0),	name_(s)		{ X_opt_ = -1; };
+	virtual			~loft_base	()	= 0;
 	virtual loft_base<V>&	clone		() const = 0; 
 
 	// set-ters
 	void 			known_optimum	(const V& X_answ)	{ X_opt_ = X_answ; };		// known optimum, used for testing optimizers
-	virtual void		loft		(loft_cref_t loft_cref)	{ wrapped_loft_v = &loft_cref.clone();	name_ = loft_cref.name(); };
+	virtual void		loft		(loft_cref_t loft_cref)	{ wrapped_loft_v = loft_p_t(&loft_cref.clone());	name_ = loft_cref.name(); };
 
 	// get-ers
 	virtual const string	name		()	const		{ return  name_; };
-	virtual int 		iter		()	const		{ return  wrapped_loft_v == 0  ?  iter_  :  wrapped_loft_v->iter(); };
-	virtual	T 		opt_distance	(V& X)	const		{ return  distance_norm2(X_opt_, X); };
-	virtual	bool 		empty		()	const		{ return  wrapped_loft_v == 0; };
+	virtual int 		iter		()	const		{ return  ! wrapped_loft_v  ?  iter_  :  wrapped_loft_v->iter(); };
+	virtual	T 		opt_distance	(V& X)	const		{ return  distance_norm2(X_opt_, X);  };
+	virtual	bool 		empty		()	const		{ return  ! wrapped_loft_v;  };
 
 	// do-ers
 	virtual T		operator()	(V&  X)			{
@@ -80,6 +79,7 @@ struct	loft_base		{									// Lopti Object FuncTor
 	//virtual void		reset		()		{ iter_ = 0; };
  };
 
+	template<typename V>	loft_base<V>::~loft_base () {}; 				// we need this (see http://www.devx.com/tips/Tip/12729)
 
  /////////////////////////////////////////////////////////////////////////////////////////  OF: CHEBYQUAD
 
