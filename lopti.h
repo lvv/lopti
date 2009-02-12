@@ -6,7 +6,9 @@
 	#include <lvv/array.h>
 		using lvv::array;
 
-	#include <cstdio>
+	#include <boost/format.hpp>
+		using boost::format;
+	//#include <cstdio>
 		// sprintf
 
 	#include <limits>
@@ -49,7 +51,7 @@ struct	minimizer {
 					OBJECTIVE_TYPES;
 
 			//objective_p_t			objective_v;	
-			shared_ptr<objective_base<V>>		objective_v;	
+			shared_ptr<objective_base<V>>	objective_v;	
 			int				max_iter_;
 			bool				verbose_;
 			V				X;
@@ -83,12 +85,12 @@ struct	minimizer {
 
 
 	// get-ters
-	//virtual const string		name			() 	const	{  return (format("%s-%d")  %name_  %(V::size()) ).str(); };
-	virtual const string		name			() 	const	{ 
+	virtual const string		name			() 	const	{  return (format("%s-%d")  %name_  %(V::size()) ).str(); };
+	/*virtual const string		name			() 	const	{ 
 			char	buf[100];
 			sprintf(buf, "%s-%d",  name_.c_str(), V::size());
 			return string(buf);
-	};
+	};*/
 	virtual T 	 		ymin			()	const	{  return ymin_; };
 	virtual V 	 		Xmin			()	const	{  return Xmin_; };
 	virtual T 	 		iter			()	const	{  return iter_; };
@@ -96,8 +98,15 @@ struct	minimizer {
 
 	// do-ers
 	virtual V&			argmin			() 		{  return Xmin_; };
-	//virtual void			print			()		{ MSG("%s(%s)  %35t  iter=%d  \t ymin=%g \t Xmin=%22.15g \n") %name() %objective_v->name() %objective_v->iter()  %ymin()  %Xmin();};
-	virtual void			print			()		{ printf("%s(%s)  	  iter=%d  	 ymin=%g 	 Xmin: ", name().c_str(),  objective_v->name().c_str(), objective_v->iter(),  ymin()); cout <<  Xmin() << endl; };
+	virtual void			print			()		{  cout << format("%s(%s)  %35t  iter=%d  \t ymin=%g \t Xmin=%22.15g \n") %name() %objective_v->name() %objective_v->iter()  %ymin()  %Xmin();};
+	/*virtual void			print			()		{
+		printf("%s(%s)  	  iter=%d  	 ymin=%g 	 Xmin: ",
+			name().c_str(), 
+			objective_v->name().c_str(),
+			iter_, 
+			ymin()
+		);
+		cout <<  Xmin() << endl; }; */
  };
 
 				 template<typename V>

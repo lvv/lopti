@@ -31,10 +31,9 @@ struct   hook_jeevs_minimizer   : minimizer<V>  {
 					#define  EPSILON 0.000001
 						T	tau_;	   // Termination criterium        
 
-	hook_jeevs_minimizer	()			: minimizer<V>("hook-jeevs"), tau_(10*EPSILON) { S.assign(0.2);};
-	virtual	minimizer<V>&	 	tau		(T _tau)	{ tau_ = _tau; return *this; };
-
-	virtual minimizer<V>&		step0(V& _S)	 { S=_S; return *this; };
+	explicit			hook_jeevs_minimizer	()		: minimizer<V>("hook-jeevs"), tau_(10*EPSILON) { S.assign(0.2);};
+	virtual	minimizer<V>&	 	tau			(T _tau)	{ tau_ = _tau; return *this; };
+	virtual minimizer<V>&		step0			(V& _S)		{ S=_S; return *this; };
 
 	V&		 	argmin			()		{
 					const T	threshold = 1e-12;	   // Threshold for the function   
@@ -42,7 +41,8 @@ struct   hook_jeevs_minimizer   : minimizer<V>  {
 					//T  ymin_;				   // Min function value found     
 
 		BASE = X ;
-		f_base = ymin_ = (*objective_v) (X);
+		f_base = ymin_ = (*objective_v) (X);	
+		iter_++;
 
 
 		for (;;) {										   // Main iteration loop        // X is a next approximation to min             
@@ -56,7 +56,9 @@ struct   hook_jeevs_minimizer   : minimizer<V>  {
 
 
 					ymin_ = f_base;
-					f_base = (*objective_v) (BASE);
+					f_base = (*objective_v) (BASE);	
+					iter_++;
+
 				}	while (examination() < ymin_ - threshold);	// Continue search until f doesn't  decrease         
 
 				BASE = X;
@@ -79,6 +81,10 @@ struct   hook_jeevs_minimizer   : minimizer<V>  {
 					Xmin_ = X;
 					return  Xmin_;
 				}
+
+				if (iter_  >  max_iter_) {
+					return  Xmin_;
+				}
 			}
 
 		}
@@ -98,12 +104,14 @@ struct   hook_jeevs_minimizer   : minimizer<V>  {
 
 			BASE[i] = basi_old + S[i];
 			f_new = (*objective_v) (BASE); 
+			iter_++;
 
 			if	(f_new < f_base)  {
 				f_base = f_new;								// Step caused f to decrease, OK 
 			} else {
 				BASE[i] = basi_old - S[i];
 				f_new = (*objective_v) (BASE); 
+				iter_++;
 				if (f_new < f_base) f_base = f_new;
 				else               BASE[i] = basi_old;					 // No fall was found along this coord 
 			}

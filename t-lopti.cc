@@ -51,8 +51,8 @@ int main(int argc, char **argv) {
 			#define		STOP_AT_X_STEP 1e-15
 				
 			#if 	( FN == rosenberg )
-		//		#undef _N
-		//		#define _N 2
+				#undef _N
+				#define _N 2
 			#endif
 
 			#if  ! defined(_N) 
@@ -170,7 +170,7 @@ int main(int argc, char **argv) {
 
 
 	#ifdef NM
-		{	V0  S;   S.assign(0.1); //{{ 0.6, 0.6 }};
+		{	V0  S;   S = 0.1; //{{ 0.6, 0.6 }};
 		gsl_nelder_mead_minimizer<V0>	mzr;	////  NELDER-MEAD
 			mzr	.objective		(xg_log<V0>(FN<V0>(),  mzr));
 			mzr	.x0		(_X0);  // will ignore BEGIN index
@@ -183,7 +183,7 @@ int main(int argc, char **argv) {
 	#endif 
 
 	#ifdef HJ
-		{	V0  S;   S.assign(0.03); //{{ 0.6, 0.6 }};
+		{	V0  S;   S = 0.03; //{{ 0.6, 0.6 }};
 		hook_jeevs_minimizer<V0>	mzr;	////  NELDER-MEAD
 			mzr	.objective		(xg_log<V0>(FN<V0>(),  mzr));
 			mzr	.x0		(_X0);  // will ignore BEGIN index

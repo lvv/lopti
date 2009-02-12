@@ -2,6 +2,11 @@
 	#ifndef LOPTI_CONDOR_H
 	#define LOPTI_CONDOR_H
 
+	// there is a namespace CONDOR, to avoid name conflict:
+	#ifdef		CONDOR
+		#undef	CONDOR
+	#endif
+
 	#include <lopti/lopti.h>
 	#include <lopti/object_function.h>
 

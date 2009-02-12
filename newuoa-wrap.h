@@ -50,8 +50,8 @@ struct  newuoa_minimizer:  trust_region_minimizer<V> {
 	explicit 		newuoa_minimizer	():   trust_region_minimizer<V>("newoua") {};
 	minimizer<V>&		x0			(V& _X) 	{  X  = _X;    Xd = _X;  	return *this;  };
 	virtual V&		argmin			();
-	//virtual const string	name			() 	const	{  return (format("%s-%d-%d") %name_  %(V::size())  %NPT ).str(); };
-	virtual const string	name			() 	const	{  char buf[100];   sprintf(buf,"%s-%d-%d", name_.c_str(),  V::size(),  NPT); return string(buf); };
+	virtual const string	name			() 	const	{  return (format("%s-%d-%d") %name_  %(V::size())  %NPT ).str(); };
+	//virtual const string	name			() 	const	{  char buf[100];   sprintf(buf,"%s-%d-%d", name_.c_str(),  V::size(),  NPT); return string(buf); };
 
 };
 
@@ -72,8 +72,8 @@ newuoa_minimizer<V,NPT>::argmin () {
 
 	//if ((NPT < N+2) || ( NPT > ((N+2)*NP)/2))  { cout << "error: NPT should be  N+2 <= NPT  <=  (N+2)*NP)/2  is not in the required interval\n"; exit(33); }
 	static_assert(N+2 <= NPT  &&   NPT <= (N+2)*NP/2,  "newuoa error: NPT should be  in  N+2 <= NPT  <=  (N+2)*NP)/2  interval\n");
-	//if (verbose_) FMT("newuoa:  N =%d and NPT =%d   ----------------------------------------------------------\n")  % N  % NPT;
-	if (verbose_) printf("newuoa:  N =%d and NPT =%d   ----------------------------------------------------------\n",  N, NPT);
+	if (verbose_) cout << format("newuoa:  N =%d and NPT =%d   ----------------------------------------------------------\n")  % N  % NPT;
+	//if (verbose_) printf("newuoa:  N =%d and NPT =%d   ----------------------------------------------------------\n",  N, NPT);
 
 	Vd		XBASE;
 	Vd		XOPT; 
@@ -475,8 +475,8 @@ eval_f_310:
 
 	F = (*this->objective_v)(X);
 
-	//if (verbose_) FMT ("%d \t %18.10g  \t  %18.10g \n")  %iter_  %F  %Xd;
-	if (verbose_) {  printf("%d 	 %18.10g  	  ",  iter_, F);   cout <<  Xd << endl; }
+	if (verbose_) cout << format ("%d \t %18.10g  \t  %18.10g \n")  %iter_  %F  %Xd;
+	//if (verbose_) {  printf("%d 	 %18.10g  	  ",  iter_, F);   cout <<  Xd << endl; }
 
 	if (iter_ <= NPT) goto return_to_init_from_eval_70;
 	if (KNEW == -1) goto exit_530;
@@ -716,8 +716,8 @@ new_rho_490:
 		
 		DELTA = max(DELTA,RHO);
 
-		//if (verbose_) FMT("-- (%d) RHO =%9.6g \t F =%9.6g   Xd%.8g \n")   %iter_  %RHO  %FOPT  %Xd;
-		if (verbose_) printf("-- (%d) RHO =%9.6g 	 F =%9.6g   Xd: ", iter_,  RHO,  FOPT);  cout << Xd << endl;
+		if (verbose_) cout << format("-- (%d) RHO =%9.6g \t F =%9.6g   Xd%.8g \n")   %iter_  %RHO  %FOPT  %Xd;
+		//if (verbose_) printf("-- (%d) RHO =%9.6g 	 F =%9.6g   Xd: ", iter_,  RHO,  FOPT);  cout << Xd << endl;
 		goto  begin_iter_90; 
      	}
 
@@ -733,8 +733,8 @@ new_rho_490:
 		F = FOPT;
 	}
 
-	//if (verbose_)  FMT("-- (%d) RETURNED: \t F =%.15g    Xd is: %.15g\n\n")  %iter_ %F  %Xd;
-	if (verbose_)  { printf("-- (%d) RETURNED: 	 F =%.15g    Xd is: ",  iter_,  F);   cout << Xd << endl << endl; }
+	if (verbose_)  cout << format("-- (%d) RETURNED: \t F =%.15g    Xd is: %.15g\n\n")  %iter_ %F  %Xd;
+	//if (verbose_)  { printf("-- (%d) RETURNED: 	 F =%.15g    Xd is: ",  iter_,  F);   cout << Xd << endl << endl; }
 
 	ymin_ = F;
 	Xmin_ = Xd;

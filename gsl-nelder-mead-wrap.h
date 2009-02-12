@@ -45,7 +45,12 @@ struct	gsl_nelder_mead_minimizer  :  minimizer<V> {
 		gsl_multimin_function		minex_func;
 		double 				characteristic_size_;
 
-	explicit 		gsl_nelder_mead_minimizer	() : minimizer<V>("nelder-mead"), gsl_minimizer_type_ptr (gsl_multimin_fminimizer_nmsimplex) {};
+	explicit 		gsl_nelder_mead_minimizer	() :
+			minimizer<V>("nelder-mead"),
+			gsl_minimizer_type_ptr(gsl_multimin_fminimizer_nmsimplex),
+			gX(0),
+			gS(0)
+		{};
 
 	~gsl_nelder_mead_minimizer () { gsl_multimin_fminimizer_free(gsl_minimizer);  gsl_vector_free(gX);   gsl_vector_free(gS);  };
 
@@ -62,6 +67,10 @@ struct	gsl_nelder_mead_minimizer  :  minimizer<V> {
 
 	virtual V&		argmin () {
 		
+		//// set defaults if parameters are missing
+		if (gS == 0)		{ V S;	S = 0.2;	step0(S); }
+		//if (gX == 0) 		{ V X;	X = 0;		x0(X); }
+
 		////  gsl init
 		gsl_of_wrap<V>::init(objective_v);
 		minex_func.f = &gsl_of_wrap<V>::eval;

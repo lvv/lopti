@@ -1,12 +1,13 @@
 
 include  ../lvv/include.mk
 	
+SPEED ?= DEBUG
 PREFIX ?= /usr/local
 VERSION = 0.2
 #FCFLAGS +=  -O2
 FCFLAGS += -frange-check -fbounds-check -O0 -ggdb3
 LDFLAGS += -L. -L external/condor  -L /usr/local/lib  -lgsl -lgslcblas -lcondor -llopti -lgfortran 
-CXXFLAGS += -I ./external
+CXXFLAGS += -I ./external -I ..
 XGRAPHIC = xgraphic  -scat -markcol=-1  -g2 -logy -leg -legpos=3  -legsiz=1 -legtyp=2 -titgen="Convergance speed for dirivative-free algorithms" -titx="Objective function evaluation count" -tity="Distance to optimum:  log10 ( | X - X_opt | )" 
 
 #.DEFAULT_GOAL := t-lopti-r
