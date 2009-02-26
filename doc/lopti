@@ -1,7 +1,8 @@
-LOPTI - C++ optimization library.
-=================================
+= LOPTI - mathematical optimization library.
+
 Leonid Volnitsky <leonid@volnitsky.com>
-v0.2 (alpha) Nov 2008
+v0.2 (alpha) Feb 2009
+
 :icons: Yes
 :iconsdir: /
 :language: cpp
@@ -13,7 +14,7 @@ v0.2 (alpha) Nov 2008
 +++<div style="float: right; margin-left: 2em">+++
 image:xgr001.gif["Visualization with xgraphics", width="400", link="xgr001.gif"]
 
-LOPTI is open source C++ optimization library. There are three major parts.
+LOPTI is mathematical optimization (operations research) C++ library. There are three major parts.
 1st and main part is solver-driver which either wraps external solver or uses
 LOPTI native solvers and presents to library user consistent and simple
 optimization API. 2nd part is collection of solvers.  Currently included with LOPTI are 4
@@ -22,26 +23,27 @@ All these solvers are derivative free and have open source (GPL or BSD like)
 licences.  Some of them (Condor) are unchanged and treated as black-box.  Some
 of them (NEWUOA - fortran source) went through heavy modification to interface
 with LOPTI.  And other (Hook-Jeevs) were completely rewritten into LOPTI native
-solver.  3rd part is collection of object function and object function
+solver. Also I am developing my own solver, preliminary result are
+very promising, stay tuned.  3rd part is collection of object function and
+object function
 modifiers.
 +++</div>+++
 
 [icon="under-construction.gif"]
 CAUTION: Though LOPTI is quite usable and everything works for me,
-this is still work in progress, documentation only about 40% complete,  there
-is no logical sequence, API have not stabilized, build instructions are imprecise
+this is still work in progress, documentation only about 40% complete,
+API have not stabilized, build instructions are imprecise
 and dependencies mostly not documented. Also it requires GCC-4.4 (not yet released) or ICC-11,
-some +++C++0x+++ features are used. 
-
+some +++C++0x+++ features are used.
 
 == Quick Start
 
---------------------
+------------------
 include::example.cc[]
 ---------------------
 
 == Install
-It is possible to use just LOPTI headers. Lopti library file used only by `NEWUOA`. 
+It is possible to use just LOPTI headers. Lopti library (`liblopti.so` file) used only by `NEWUOA`. 
 Running `make install` installs by default into `/usr/local/include` and `/usr/local/lib`
 For installation external solvers see corresponding section bellow. 
 
@@ -49,14 +51,14 @@ For installation external solvers see corresponding section bellow.
 //[options="compact"]
 
 .You will need
-- Compiler. LOPTI tested only on x86-64 with with:
-   *  http://gcc.gnu.org/[GCC]  with gfortran included (if you want NEWUOA solver), tested with v4.4
+- Compiler. LOPTI tested only on x86-64 with:
+   * http://gcc.gnu.org/[GCC]  with gfortran included (if you want NEWUOA solver), tested with v4.4
    * http://www.intel.com/cd/software/products/asmo-na/eng/compilers/284264.htm[ICC], vervion 11
-- http://boost.org[BOOST C++ libraries], tested with 1.3.37
-- http://en.wikipedia.org/wiki/Git_(software)[GIT].  Your distribution probably have package for GIT.
-- http://www.cmap.polytechnique.fr/~jouve/xd3d/[XGraphic] - simple visualisation utility(optional).
-- http://volnitsky.com/project/lvvlib/[lvvlib] - only array.h needed for `lvv::array` class.
-- External solvers (optional), see solvers docs below.
+-       http://volnitsky.com/project/lvvlib/[lvvlib] - you will need `array.h` for `lvv::array` class.
+-       http://boost.org[BOOST C++ libraries], tested with 1.3.37
+-       http://en.wikipedia.org/wiki/Git_(software)[GIT].  Your distribution probably have package for GIT.
+-       http://www.cmap.polytechnique.fr/~jouve/xd3d/[XGraphic] - simple visualisation utility.  This is optional.
+-       External solvers (optional), see solvers docs below.
 
 to install:
 
@@ -71,13 +73,10 @@ make install
 ==================================================
 Do no use:
 
-* `-O3`  -- hook-jeavs segfalts,  `-O2` is safe
 * `-fast-math` -- newuoa and hook-jeevs can get FP errors
 * `-fargument-noalias-anything` -- newuoa will segfault on exit
 
-try `-fno-strict-aliasing` if you encounter stability problem. 
-
-This might be specific to GCC v4.x.x
+try `-fno-strict-aliasing -O2` if you encounter stability problem. 
 
 =============================================
 
@@ -91,22 +90,20 @@ This might be specific to GCC v4.x.x
 *trust region*:: ...
 *functor*:: ...
 *boost::function*:: ...
-*objective*:: ...
 
 
 == Minimizer Class
 
 === Data Types
-All solvers (and OF objective) are template with 1st parameter being parameter vector type. Variables step0, X0 and argmin have the same type. 
-As of now,  the only type usable is `lvv::array<>`.  Can be found in `external`
-directory.   It will be changed in future to support any random access container having members:
+All solvers (and OF objective) are template with 1st parameter being parameter
+vector type (named `V` in source). Minimizer members `S0`, `X0` and `argmin` use the same type. 
+As of now,  the only type usable is `lvv::array<>` which is part of http://volnitsky.com/project/lvvlib/[lvvlib].
+It will be changed in future to support any random access container having members:
 
 - `value_type`
 - `size()`
 - `begin()`
 - `end()`
-
-and plain C arrays.
 
 === Common Interface
 
@@ -126,22 +123,24 @@ Type  `lvv::array<>` is ...
 - `characteristic_size(T)`
 
 
+
 == Solvers
 
 [cols="s,^3,^2,7,11",frame="topbot",options="header"]
 |=====================================================================================================================
-|Solver                         | Type        | Use Derivative | Origin                   | Dependency
+|Solver                         | Type        | Use Derivative | Origin                   | Dependency 
 
 |NEWUOA                         | Trust Region| No             | 2002<<3>> latest from Powell, successor to UOBYQA| 
 	none (converted fortran source included)
 
-|GSL Nelder-Mead (Simplex)      | Direct      | No            | 1965<<1>>|
+|GSL Nelder-Mead (Simplex)      | Direct      | No            | 1965<<1>>| 
 	GNU Scientific Library (package available for most linux distro)
 
-|Condor                         | Trust Region| No            | Written by Dr. Ir. Frank Vanden Berghen, based on Powell's UOBYQA<<4>>|
+|Condor                         | Trust Region| No            | Written by Dr. Ir. Frank Vanden Berghen, based on Powell's UOBYQA<<4>>| 
 	You need to get source or binary from author
 
-|Hook-Jeevs                     | Direct      | No            | 1962<<2>>, C implementation by Sergey Kiselev      | none (converted to native LOPTI implementation)
+|Hook-Jeevs                     | Direct      | No            | 1962<<2>>, C implementation by Sergey Kiselev      | 
+	none (converted to native LOPTI implementation)
 |========================================================================================================================
 
 
@@ -177,13 +176,13 @@ The Trust-Region (TR) solvers are iterative methods for solving nonlinear optimi
 TR solvers work by approximating OF with quadratic model function, which is constructed
 in such way that it passes through evaluation points near current minimum (basis).  Near means: at
 distance less then `rho`, which is dynamically changed by solver for each
-iteration.  To build an exact model,  `NP=(N+1)(N+2)`  evaluation points are needed, so TR
+iteration.  To build an exact model,  `NP=(N+1)*(N+2)`  evaluation points are needed, so TR
 solvers at first `NP` iterations just evaluate `NP` points near `X0`. You can notice
 this slow start on convergence charts.  For high `N` (>10) this can be especially noticeable. 
 Instead of exact model it is possible with NEWUOA to use approximate model with less
-then `(N+1)(N+2)` points. 
+then `(N+1)*(N+2)` points. 
 
-Uses member `rho_begin(T)`, instead of `step0(V)`,  defaults to
+Uses member `rho_begin(T)`, instead of `S0(V)`,  defaults to
 0.2.  Because `rho` is scalar (applied equally to all directions) it is recommended
 to normalize object junction with <<rescale>>.  Termination criteria is `rho_end(T)`,
 defaults to 1/infinity.
@@ -220,8 +219,8 @@ class condor_minimizer<V,[NP=2*N+1>
 `LDFLAGS=-lcondor`
 `CXXFLAGS=-I/path/to/dir/with/condorlib-dir`
 
-Fast for low dimensions.  Constraints capability not used. Condor internal rescaler not used (use objective rescaler).
-Can use only exact  model, so it might be problematic for N > 10.
+Fast for low dimensions.  Constraints capability not used. Condor internal rescaler not used (use LOPTI rescaler).
+Can use only exact  model, so it use might be problematic for big N.
 LOPTI will looking for `<condor/Vector.h>` from `condorlib` subdirectory in Condor source directory.
 
 CAUTION: Sometimes Condor can get stuck at high precision, it is not clear if it is rounding error or algorithm limitation. 
@@ -242,14 +241,14 @@ Any V type, any index start.
 
 
 == Object Function
-Object function are defined in class dirived from `class objective_base`. Object function also can be wrapped in multile wrapper, 
+Object function are defined in class dirived from `class objective_base`. Object function also can be wrapped in multiple wrappers, 
 such as rescaler, logger, tracer, adapter,  etc. 
 Planned wrappers are also noise-adder, constrain-adder-by-barrier-function, 
 
 === make_objective() - create objective from any callable object
 `make_objective(boost::function<T (*)(V& X)> callable_object)` +
 
-Converts any to objective. Callable object can be plain function, class member function, or functor. 
+Converts any http://www.boost.org/doc/libs/1_37_0/doc/html/function/tutorial.html[callable object] (including plain functios) to objective class.  Callable object can be plain function, class member function, or functor. 
 A callable object passed (and possibly casted) to `make_objective` constructor.
 Because `make_objective` expects a `boost::function` as its argument, it is converted to `boost::function` internally.
 

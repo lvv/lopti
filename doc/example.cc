@@ -2,10 +2,10 @@
 // select minimizer with include. 
 #include <lopti/hook-jeevs.h>
 using lopti::hook_jeevs_minimizer;		// minimizer
-using lopti::make_loft;				// plain-function converter 
+using lopti::make_objective;				// plain-function converter 
 
-// Array-type (see boost::array) 
-typedef   array<double,2>   A;			// == double	X[2]
+// Array-type 
+typedef   lvv::array<double,2>   A;			// == double	X[2]
 
 // Objective Function
 double   rosenberg_fn (A& X)    {  return  100 * (X[1]-X[0]*X[0])*(X[1]-X[0]*X[0]) + (1-X[0])*(1-X[0]);  };
@@ -18,10 +18,10 @@ int main() {
 	hook_jeevs_minimizer<A>	  m;
 
 	// configure minimizer
-	m.loft     ( make_loft<A> (&rosenberg_fn,"rosenberg") );  // objective 
-	m.x0       (X);
-	m.step0    (S);
-	m.max_iter (500);
+	m.objective     ( make_objective<A> (&rosenberg_fn,"rosenberg") );  // objective 
+	m.x0       	(X);
+	m.step0    	(S);
+	m.max_iter 	(500);
 
 	// Result
 	A	X_min	=  m.argmin();

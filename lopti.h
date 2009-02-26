@@ -98,7 +98,7 @@ struct	minimizer {
 
 	// do-ers
 	virtual V&			argmin			() 		{  return Xmin_; };
-	virtual void			print			()		{  cout << format("%s(%s)  %35t  iter=%d  \t ymin=%g \t Xmin=%22.15g \n") %name() %objective_v->name() %objective_v->iter()  %ymin()  %Xmin();};
+	virtual void			print			()		{  cout << format("%s(%s)  %35t  iter/max=%d/%d  \t ymin=%g \t Xmin=%22.15g \n") %name() %objective_v->name() %objective_v->iter()  %max_iter_ %ymin()  %Xmin();};
 	/*virtual void			print			()		{
 		printf("%s(%s)  	  iter=%d  	 ymin=%g 	 Xmin: ",
 			name().c_str(), 
