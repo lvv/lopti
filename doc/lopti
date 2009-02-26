@@ -1,8 +1,6 @@
 = LOPTI - mathematical optimization library.
-
 Leonid Volnitsky <leonid@volnitsky.com>
 v0.2 (alpha) Feb 2009
-
 :icons: Yes
 :iconsdir: /
 :language: cpp
@@ -17,8 +15,12 @@ image:xgr001.gif["Visualization with xgraphics", width="400", link="xgr001.gif"]
 LOPTI is mathematical optimization (operations research) C++ library. There are three major parts.
 1st and main part is solver-driver which either wraps external solver or uses
 LOPTI native solvers and presents to library user consistent and simple
-optimization API. 2nd part is collection of solvers.  Currently included with LOPTI are 4
-solvers: <<NEWUOA,NEWUOA>>, <<CONDOR,CONDOR>>, <<Nelder-Mead,Nelder-Mead>> (simplex) and <<Hook-Jeevs,Hook-Jeevs>>.
+optimization API. 2nd part is collection of solvers.  Currently 4
+solvers are included (or supported):
+<<NEWUOA,NEWUOA>>,
+<<CONDOR,CONDOR>>,
+<<Nelder-Mead,Nelder-Mead>> (simplex) and
+<<Hook-Jeevs,Hook-Jeevs>>.
 All these solvers are derivative free and have open source (GPL or BSD like)
 licences.  Some of them (Condor) are unchanged and treated as black-box.  Some
 of them (NEWUOA - fortran source) went through heavy modification to interface
@@ -180,7 +182,7 @@ iteration.  To build an exact model,  `NP=(N+1)*(N+2)`  evaluation points are ne
 solvers at first `NP` iterations just evaluate `NP` points near `X0`. You can notice
 this slow start on convergence charts.  For high `N` (>10) this can be especially noticeable. 
 Instead of exact model it is possible with NEWUOA to use approximate model with less
-then `(N+1)*(N+2)` points. 
+then `(N+1)*(N+2)` points.
 
 Uses member `rho_begin(T)`, instead of `S0(V)`,  defaults to
 0.2.  Because `rho` is scalar (applied equally to all directions) it is recommended
@@ -308,6 +310,7 @@ X_opt *= R;				// un-rescale
 cout << "optimum at: " << X_opt << endl;
 -------------------------------------
 
+include::../../volnitsky.com/project/howto-submit-patch.txt[]
 
 == TODO
 - docs
