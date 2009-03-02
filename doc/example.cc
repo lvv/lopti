@@ -1,8 +1,7 @@
 
-// select minimizer with include. 
 #include <lopti/hook-jeevs.h>
-using lopti::hook_jeevs_minimizer;		// minimizer
-using lopti::make_objective;				// plain-function converter 
+using lopti::hook_jeevs_minimizer;			// minimizer class
+using lopti::make_objective;			
 
 // Array-type 
 typedef   lvv::array<double,2>   A;			// == double	X[2]

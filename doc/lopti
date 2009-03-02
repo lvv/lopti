@@ -25,10 +25,9 @@ All these solvers are derivative free and have open source (GPL or BSD like)
 licences.  Some of them (Condor) are unchanged and treated as black-box.  Some
 of them (NEWUOA - fortran source) went through heavy modification to interface
 with LOPTI.  And other (Hook-Jeevs) were completely rewritten into LOPTI native
-solver. Also I am developing my own solver, preliminary result are
+solver. Also I am developing my own solver, preliminary results are
 very promising, stay tuned.  3rd part is collection of object function and
-object function
-modifiers.
+object function modifiers.
 +++</div>+++
 
 [icon="under-construction.gif"]
@@ -45,7 +44,7 @@ include::example.cc[]
 ---------------------
 
 == Install
-It is possible to use just LOPTI headers. Lopti library (`liblopti.so` file) used only by `NEWUOA`. 
+It is possible to use just LOPTI headers. LOPTI library (`liblopti.so` file) used only by `NEWUOA`. 
 Running `make install` installs by default into `/usr/local/include` and `/usr/local/lib`
 For installation external solvers see corresponding section bellow. 
 
@@ -178,11 +177,11 @@ The Trust-Region (TR) solvers are iterative methods for solving nonlinear optimi
 TR solvers work by approximating OF with quadratic model function, which is constructed
 in such way that it passes through evaluation points near current minimum (basis).  Near means: at
 distance less then `rho`, which is dynamically changed by solver for each
-iteration.  To build an exact model,  `NP=(N+1)*(N+2)`  evaluation points are needed, so TR
+iteration.  To build an exact model,  +++`NP=(N+1)*(N+2)`+++  evaluation points are needed, so TR
 solvers at first `NP` iterations just evaluate `NP` points near `X0`. You can notice
 this slow start on convergence charts.  For high `N` (>10) this can be especially noticeable. 
 Instead of exact model it is possible with NEWUOA to use approximate model with less
-then `(N+1)*(N+2)` points.
+then +++`(N+1)*(N+2)`+++ points.
 
 Uses member `rho_begin(T)`, instead of `S0(V)`,  defaults to
 0.2.  Because `rho` is scalar (applied equally to all directions) it is recommended
