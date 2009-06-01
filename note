@@ -1,18 +1,47 @@
+Test Functions
+	http://www.mat.univie.ac.at/~neum/glopt/test.html
+	http://www.princeton.edu/~rvdb/ampl/nlmodels/hs/index.html
+	функция Химельблау (4 minium:
+		set samples 100,100; set isosamples 100,100; set pm3d;  set contour both; set zrange [0:400]; splot [-6:6][-6:6] (x*x +y -11)**2 + (x+y*y-7)**2
 
+---------------------------------------------------------
 
-		// plot:  opt_dist (iter)
-		//*log_file << format("# :gnuplot+: \"pipe\" using 1:(log10($2)) with lines title \"%s(%s)\",  \n")  %title % wrapped_loft_v->name();
+	// plot:  opt_dist (iter)
+	//*log_file << format("# :gnuplot+: \"pipe\" using 1:(log10($2)) with lines title \"%s(%s)\",  \n")  %title % wrapped_loft_v->name();
 
-		// splot:  path 
-		/*
-		#undef	 GP_F
-		#define  GP_F "set view 0,0,1.7;  splot [-2:1.5][-0.5:2] log(100 * (y - x*x)**2 + (1 - x)**2),  "
-		*log_file << format(
-			"# :gnuplot2: set font \"arial,6\"; set dgrid3d;  set key off;"
-			"set contour surface;  set cntrparam levels 20;  set isosample 40;"
-			GP_F "\"pipe\" using 4:5:2:1 with labels title \"%s(%s)\" ; \n" 
-		)  %title % wrapped_loft_v->name();
-		 
-		// col header
-		*log_file << "# iter \t y=f(X) \t |y-opt| \t X\n";
-		*/
+	// splot:  path 
+	/*
+	#undef	 GP_F
+	#define  GP_F "set view 0,0,1.7;  splot [-2:1.5][-0.5:2] log(100 * (y - x*x)**2 + (1 - x)**2),  "
+	*log_file << format(
+		"# :gnuplot2: set font \"arial,6\"; set dgrid3d;  set key off;"
+		"set contour surface;  set cntrparam levels 20;  set isosample 40;"
+		GP_F "\"pipe\" using 4:5:2:1 with labels title \"%s(%s)\" ; \n" 
+	)  %title % wrapped_loft_v->name();
+	 
+	// col header
+	*log_file << "# iter \t y=f(X) \t |y-opt| \t X\n";
+	*/
+
+Backtracing Line Search
+	
+	S.Boyd, Cove
+
+	Most line searches used in practice are inexact : the step length is chosen to approximately
+	minimize f along the ray {x + t*Δx | t ≥ 0}, or even to just reduce
+	f ‘enough’. Many inexact line search methods have been proposed. One inexact
+	line search method that is very simple and quite effective is called backtracking line
+	search. It depends on two constants α, β with 0 < α < 0.5, 0 < β < 1.
+
+	Algorithm 9.2 Backtracking line search.
+		given a descent direction Δx for f at x ∈ domf, α ∈ (0, 0.5), β ∈ (0, 1).
+		t := 1.
+		while f(x + t*Δx) > f(x) + α*t*∇f(x)*Δx,  
+			t := β*t.
+
+	gnuplot chart)
+		f(x)=x**2;  df(x)=2*x;  x0=-3;  set grid;   plot [t=-1:6] [-2:12]  f(x0+t),  f(x0)+t*df(x0),  f(x0)+0.5*t*df(x0)
+
+	Goldstain and Wolf conditions
+		http://books.google.com.ua/books?id=ryMWTt-gbCQC&pg=PA294&lpg=PA294&dq=armijo+goldstin&source=bl&ots=qCt_Vs74Ng&sig=sbCAVtfJyyg7NIkLlaZ-DXqeFEk&hl=en&ei=nC3GScmbKdqHsAbNorniCw&sa=X&oi=book_result&resnum=3&ct=result#PPA294,M1
+		http://books.google.com.ua/books?id=epc5fX0lqRIC&pg=PA41&lpg=PA41&dq=Goldstein+conditions&source=bl&ots=a8CGDCA9iv&sig=hat59Q1NrTIFKB-qY9vXXWQdmjc&hl=uk&ei=vEnGSfLpKtuMsAan9PjpCw&sa=X&oi=book_result&resnum=4&ct=result#PPA41,M1

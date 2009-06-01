@@ -51,7 +51,7 @@ struct	minimizer {
 					OBJECTIVE_TYPES;
 
 			//objective_p_t			objective_v;	
-			shared_ptr<objective_base<V>>	objective_v;	
+			shared_ptr<objective_base<V> >	objective_v;	
 			int				max_iter_;
 			bool				verbose_;
 			V				X;
