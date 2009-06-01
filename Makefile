@@ -4,11 +4,11 @@
 	
 SPEED ?= DEBUG
 PREFIX ?= /usr/local
-VERSION = 0.2
+VERSION = 0.3
 #FCFLAGS +=  -O2
 FCFLAGS += -frange-check -fbounds-check -O0 -ggdb3
-LDFLAGS += -L. -L external/condor  -L /usr/local/lib  -lgsl -lgslcblas -lcondor -llopti -lgfortran 
-CXXFLAGS += -std=c++0x -I ./external -I ..
+LDFLAGS += -L. -L /usr/local/lib  -lgsl -lgslcblas -lcondor -llopti -lgfortran 
+CXXFLAGS += -std=c++0x -I /usr/local/include/ -I .. -I .
 XGRAPHIC = xgraphic  -scat -markcol=-1  -g2 -logy -leg -legpos=3  -legsiz=1 -legtyp=2 -titgen="Convergance speed for dirivative-free algorithms" -titx="Objective function evaluation count" -tity="Distance to optimum:  log10 ( | X - X_opt | )" 
 
 #.DEFAULT_GOAL := t-lopti-r
@@ -33,9 +33,8 @@ clean:
  
 liblopti.so: *.h newuoa/bigden.o newuoa/biglag.o newuoa/calfun.o newuoa/trsapp.o newuoa/update.o 
 	$(FC) $(FCFLAGS) -fPIC -c newuoa/{bigden,biglag,calfun,trsapp,update}.f
-	gcc -shared -Wl,-soname,liblopti.so.0 -o liblopti.so.$(VERSION) *.o
-	ln -sf liblopti.so.$(VERSION) liblopti.so.0
-	ln -sf liblopti.so.0 liblopti.so
+	gcc -shared -Wl,-soname,liblopti.so.$(VERSION) -o liblopti.so.$(VERSION) *.o
+	ln -sf liblopti.so.$(VERSION) liblopti.so
 
 t-%: t-%.cc *.h liblopti.so
 

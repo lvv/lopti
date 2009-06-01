@@ -14,10 +14,6 @@
 		using boost::function;
 
 	///////////////////////////////////////////////////////////////////  SELECT SOLVER
-	#ifdef NEWUOA
-		#include   	<lopti/newuoa-wrap.h>
-	#endif
-
 	#ifdef NM
 		#include   	<lopti/gsl-nelder-mead-wrap.h>
 	#endif
@@ -30,9 +26,14 @@
 		#include   	<lopti/hook-jeevs.h>
 	#endif
 
-							#ifndef MINIMIZER
-								#error "error:  no minimizer is selected"
-							#endif
+	#ifdef NEWUOA
+		#include   	<lopti/newuoa-wrap.h>
+	#endif
+
+	#ifndef MINIMIZER
+		#include   	<lopti/newuoa-wrap.h>
+		// #error "error:  no minimizer is selected"
+	#endif
 							
 
 	///////////////////////////////////////////////////////////////////  SELECT OBJECTIVE
@@ -71,6 +72,8 @@ int main(int argc, char **argv) {
 		mzr	.x0		(X0);	// X[1..N]
 		#ifdef ITER
 			mzr	.max_iter	(ITER);
+		#else
+			mzr	.max_iter	(500);
 		#endif
 
 		V X_opt = mzr.argmin();

@@ -32,8 +32,8 @@
 		static double	eval	(const gsl_vector* gX, void * var)	{ V X;    X << gX;    return  (*objective_v)(X); }	
  };
 
-//template<typename V>  objective_base<V>* gsl_of_wrap<V>::objective_v; // this is in gsl_of_wrap class, but we need to decl it 1 more time for compiler
-template<typename V>  shared_ptr<objective_base<V>> gsl_of_wrap<V>::objective_v; // this is in gsl_of_wrap class, but we need to decl it 1 more time for compiler
+//template<typename V>  objective0<V>* gsl_of_wrap<V>::objective_v; // this is in gsl_of_wrap class, but we need to decl it 1 more time for compiler
+template<typename V>  shared_ptr<objective0<V>> gsl_of_wrap<V>::objective_v; // this is in gsl_of_wrap class, but we need to decl it 1 more time for compiler
 
                  template<typename V>
 struct	gsl_nelder_mead_minimizer  :  minimizer<V> {

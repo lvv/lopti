@@ -28,23 +28,23 @@
 
 
 						 #define         OBJECTIVE_MEMBERS    \
-							using           objective_base<V>::iter_; \
-							using           objective_base<V>::wrapped_objective_v; \
-							using           objective_base<V>::name_; \
-							using           objective_base<V>::name; \
-							using           objective_base<V>::X_opt_; \
-							static	const int B = V::ibg; \
+							using		objective0<V>::iter_; \
+							using		objective0<V>::wrapped_objective_v; \
+							using		objective0<V>::name_; \
+							using		objective0<V>::name; \
+							using		objective0<V>::X_opt_; \
+							static const int B = V::ibg; \
 							static const int N = V::sz;
 
 						#define 	OBJECTIVE_TYPES	\
-							typedef		shared_ptr<objective_base<V> >	objective_p_t; \
-							typedef 	const objective_base<V>&		objective_cref_t;	\
+							typedef		shared_ptr<objective0<V> >	objective_p_t; \
+							typedef 	const objective0<V>&		objective_cref_t;	\
 							typedef		typename V::value_type		T;
 
 						
 						#define		NaN	numeric_limits<T>::quiet_NaN()
 			template<typename V>
-struct	objective_base		{									// Lopti Object FuncTor
+struct	objective0		{									// Lopti Object FuncTor
 
 				OBJECTIVE_TYPES;
 
@@ -54,14 +54,14 @@ struct	objective_base		{									// Lopti Object FuncTor
 			objective_p_t		wrapped_objective_v;
 
 	// CTOR
-	explicit		objective_base	()			:  	iter_(0)				{ X_opt_ = -1; };
-	explicit		objective_base	(const string& s)	:  	iter_(0),	name_(s)		{ X_opt_ = -1; };
-	virtual			~objective_base	()	= 0;
-	virtual objective_base<V>&	clone		() const = 0; 
+	explicit		objective0	()			:  	iter_(0)				{ X_opt_ = -1; };
+	explicit		objective0	(const string& s)	:  	iter_(0),	name_(s)		{ X_opt_ = -1; };
+	virtual			~objective0	()	= 0;
+	virtual objective0<V>&	clone		() const = 0; 
 
 	// set-ters
 	void 			known_optimum	(const V& X_answ)	{ X_opt_ = X_answ; };		// known optimum, used for testing optimizers
-	virtual void		objective		(objective_cref_t objective_cref)	{ wrapped_objective_v = objective_p_t(&objective_cref.clone());	name_ = objective_cref.name(); };
+	virtual void		objective	(objective_cref_t objective_cref)	{ wrapped_objective_v = objective_p_t(&objective_cref.clone());	name_ = objective_cref.name(); };
 
 	// get-ers
 	virtual const string	name		()	const		{ return  name_; };
@@ -79,14 +79,14 @@ struct	objective_base		{									// Lopti Object FuncTor
 	//virtual void		reset		()		{ iter_ = 0; };
  };
 
-	template<typename V>	objective_base<V>::~objective_base () {}; 				// we need this (see http://www.devx.com/tips/Tip/12729)
+	template<typename V>	objective0<V>::~objective0 () {}; 				// we need this (see http://www.devx.com/tips/Tip/12729)
 
  /////////////////////////////////////////////////////////////////////////////////////////  OF: CHEBYQUAD
 
 			template<typename V> 
-struct  chebyquad: objective_base<V>		{	 OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(chebyquad)		// The Chebyquad test problem (Fletcher, 1965) 
+struct  chebyquad: objective0<V>		{	 OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(chebyquad)		// The Chebyquad test problem (Fletcher, 1965) 
 
-			chebyquad		()	: objective_base<V>("chebyquad") 	{};
+			chebyquad		()	: objective0<V>("chebyquad") 	{};
 
 	T		operator() 		(V& X)  {
 
@@ -119,25 +119,25 @@ struct  chebyquad: objective_base<V>		{	 OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  C
 	}
  };
  /////////////////////////////////////////////////////////////////////////////////////////  ADAPTER: PLAIN_FN
-template<typename V>	struct	make_objective : objective_base<V>		{  				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(make_objective)
+template<typename V>	struct	make_objective : objective0<V>		{  				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(make_objective)
 						function<T(V&)>	of;
-	explicit	make_objective	(function<T(V&)> _of, const string& _name)	 : objective_base<V>(_name) , of(_of)   {};
+	explicit	make_objective	(function<T(V&)> _of, const string& _name)	 : objective0<V>(_name) , of(_of)   {};
 	T	operator()	(V&  X)	  { assert(!of.empty() && ">> NOT DEFINED OBJ FUNC <<");  iter_++;   T y = (of)(X); return y; }
  };
  /////////////////////////////////////////////////////////////////////////////////////////  OF: ROSENBERG
-template<typename V>	struct	rosenberg  : objective_base<V> { 				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(rosenberg)
-	rosenberg	()	: objective_base<V>("rosenberg") 	{ V const  X_answ = {{ 1.0, 1.0 }};   known_optimum(X_answ); };
+template<typename V>	struct	rosenberg  : objective0<V> { 				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(rosenberg)
+	rosenberg	()	: objective0<V>("rosenberg") 	{ V const  X_answ = {{ 1.0, 1.0 }};   known_optimum(X_answ); };
 	T	operator() 		(V& X)  {  iter_++;      return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
  };
 
  template<typename V>   typename V::value_type    plain_fn_rosenberg  (V& X) { const int B = V::ibg;   return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
  /////////////////////////////////////////////////////////////////////////////////////////  OF: BAD SCALE ROSENBERG
-template<typename V, int FACTOR>	struct	bad_scale_rosenberg	 : objective_base<V> { 	OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(bad_scale_rosenberg);
-	bad_scale_rosenberg() : objective_base<V>("bad_scale_rosenberg") { V const  X_answ = {{ 1.0, 1.0*FACTOR }};   known_optimum(X_answ); };
+template<typename V, int FACTOR>	struct	bad_scale_rosenberg	 : objective0<V> { 	OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(bad_scale_rosenberg);
+	bad_scale_rosenberg() : objective0<V>("bad_scale_rosenberg") { V const  X_answ = {{ 1.0, 1.0*FACTOR }};   known_optimum(X_answ); };
 	T	operator() 		(V& X)   {  iter_++; return  100 * pow2(X[1+B]/FACTOR-pow2(X[0+B])) + pow2(1-X[0+B]); };
  };
  /////////////////////////////////////////////////////////////////////////////////////////  WRAPPER: RESCALE
-template<typename V>	struct	rescale :  objective_base<V> 	{				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(rescale)
+template<typename V>	struct	rescale :  objective0<V> 	{				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(rescale)
 				V R;
 			rescale		(objective_cref_t objective_v, V& _R)  : 	R(_R)  {  X_opt_ = objective_v.X_opt_; X_opt_ /= _R;   objective(objective_v); /*cout << "rescaled opt: " << X_opt_ << endl <<  "opt: " << objective_v.X_opt_ << endl;*/  };
 	const string	name		()	const	{ return  name_ + " rescaled"; };
@@ -147,7 +147,7 @@ template<typename V>	struct	rescale :  objective_base<V> 	{				OBJECTIVE_TYPES; 
  /////////////////////////////////////////////////////////////////////////////////////////  WRAPPER:  XG_LOG (xgraphic)
  template<typename V> class minimizer;
 
-template<typename V>	struct	xg_log : objective_base<V> 		{				OBJECTIVE_TYPES;   OBJECTIVE_MEMBERS;  CLONER(xg_log)
+template<typename V>	struct	xg_log : objective0<V> 		{				OBJECTIVE_TYPES;   OBJECTIVE_MEMBERS;  CLONER(xg_log)
 				shared_ptr<ofstream>	log_file;  // need smart ptr becase xg_log dtor-ed on coping
 	xg_log	 (objective_cref_t _objective_v, minimizer<V>& mzr)	{
 		objective(_objective_v);											assert(log_file == 0 );
@@ -164,7 +164,7 @@ template<typename V>	struct	xg_log : objective_base<V> 		{				OBJECTIVE_TYPES;  
 	};
  };
 
-template<typename V>	struct	trace : objective_base<V> 		{				  CLONER(trace); OBJECTIVE_TYPES;   OBJECTIVE_MEMBERS;
+template<typename V>	struct	trace : objective0<V> 		{				  CLONER(trace); OBJECTIVE_TYPES;   OBJECTIVE_MEMBERS;
 	Timer	timer;
 	trace	 (objective_cref_t _objective_v)	{ objective(_objective_v);	};
 
