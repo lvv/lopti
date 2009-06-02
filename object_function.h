@@ -36,6 +36,7 @@
 							static const int B = V::ibg; \
 							static const int N = V::sz;
 
+						
 						#define 	OBJECTIVE_TYPES	\
 							typedef		shared_ptr<objective0<V> >	objective_p_t; \
 							typedef 	const objective0<V>&		objective_cref_t;	\
@@ -61,7 +62,7 @@ struct	objective0		{									// Lopti Object FuncTor
 
 	// set-ters
 	void 			known_optimum	(const V& X_answ)	{ X_opt_ = X_answ; };		// known optimum, used for testing optimizers
-	virtual void		objective	(objective_cref_t objective_cref)	{ wrapped_objective_v = objective_p_t(&objective_cref.clone());	name_ = objective_cref.name(); };
+	virtual void		objective	(objective_cref_t ref)	{ wrapped_objective_v = objective_p_t(&ref.clone());	name_ = ref.name(); };
 
 	// get-ers
 	virtual const string	name		()	const		{ return  name_; };

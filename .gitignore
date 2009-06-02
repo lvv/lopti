@@ -4,3 +4,4 @@ log
 t-lopti.ps
 external
 liblopti.so*
+t-rval-ref

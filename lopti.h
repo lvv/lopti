@@ -50,8 +50,7 @@ namespace lopti {
 struct	minimizer {
 					OBJECTIVE_TYPES;
 
-			//objective_p_t			objective_v;	
-			shared_ptr<objective0<V> >	objective_v;	
+			objective_p_t			objective_v;	
 			int				max_iter_;
 			bool				verbose_;
 			V				X;
@@ -76,10 +75,10 @@ struct	minimizer {
 
 
 	// set-ters
-	//virtual minimizer<V>&		objective			(objective_cref_t  ref)	{  objective_v = &ref.clone();   return *this;  };
-	virtual minimizer<V>&		objective			(objective_cref_t  ref)	{  objective_v = shared_ptr<objective0<V>>(&ref.clone());   return *this;  };
-	//virtual void			objective			(objective_cref_t objective_cref)	{ wrapped_objective_v = shared_ptr<objective0<V>>(&objective_cref.clone());	name_ = objective_cref.name(); };
-	virtual minimizer<V>&		x0			(V& _X) 		{  X  = _X;	return *this;  };
+
+        virtual minimizer<V>&		objective		(objective_cref_t ref)	{  objective_v = objective_p_t(&ref.clone());   return *this; };
+
+	virtual minimizer<V>&		x0			(V& _X) 		{  X  = _X;		return *this;  };
 	virtual minimizer<V>&		max_iter		(int mx)		{  max_iter_   = mx;	return *this;  };
 	virtual minimizer<V>&		verbose			(bool flag)		{  verbose_ = flag;	return *this;  };
 
