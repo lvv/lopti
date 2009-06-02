@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
 	
 
 			#if  ! defined(FN) 
-				#define FN rosenberg
+				#define FN rosenbrock
 			#endif
 
 			#define RHO_BEGIN 0.2

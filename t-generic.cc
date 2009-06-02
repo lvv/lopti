@@ -40,7 +40,7 @@
 	
 	#if  ! defined(FN) 
 		#if  _N > 2 
-			#define FN rosenberg
+			#define FN rosenbrock
 		#else
 			#define FN chebyquad
 		#endif

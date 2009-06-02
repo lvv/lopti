@@ -12,8 +12,7 @@ CXXFLAGS += -std=c++0x -I/usr/local/include -I$(PREFIX)/include/lopti
 show: localweb
 	firefox $(WEB_DESTDIR)/index.html
 
-example:
-
+example:	LDFLAGS=-lm
 example-gsl:	LDFLAGS=-lgsl
 example-newuoa:	LDFLAGS=-llopti
 
@@ -25,5 +24,5 @@ localweb: 	 index.html *.gif example*.cc
 	cp -uv $^ $(WEB_DESTDIR)
 
 clean:
-	rm -f *.html
+	rm -f *.html /tmp/localweb
 	git clean -df

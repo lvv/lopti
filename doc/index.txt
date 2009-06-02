@@ -1,6 +1,6 @@
 = LOPTI - mathematical optimization library.
 Leonid Volnitsky <leonid@volnitsky.com>
-v0.2 (alpha) Feb 2009
+v0.3 (alpha) Jul 2009
 :icons: Yes
 :iconsdir: /
 :language: cpp
@@ -233,7 +233,7 @@ Can use only exact  model, so it use might be problematic for big N.
 LOPTI will look for `<condor/Vector.h>` from `condorlib` subdirectory in Condor source directory.
 
 CAUTION: Sometimes Condor can get stuck at high precision, it is not clear if it is rounding error or algorithm limitation. 
-Also sometimes aborts at FP illegal ops in the middle of optimization run. 
+Also it sometimes aborts at FP illegal ops in the middle of optimization run. 
 
 Only `double` vector,  index should start from 0. 
 
@@ -244,15 +244,14 @@ Kiselev, 1998 implementation (+++netlib.org/c++/linalg.tgz+++) . Old and
 usually slow solver. 
 But sometimes can outperform all other at not trivial high dimension tasks. 
 
-CAUTION: My app, segfaulted when I used this
-solver.  Lowering optimization from -O3 to -O2 (gcc-4.3.2 x86_64) solved this segfault problem. 
+CAUTION: Might segfaulted.   Lowerer optimization from -O3 to -O2 to fix.
 
 Code still needs some style cleanup, and thread safety. 
-Any V type, any index start.
+
 
 
 == Object Function
-Object function are defined in class derived from `class objective_base`. Object function also can be wrapped in multiple wrappers, 
+Object function are defined in class derived from `class objective0`. Object function also can be wrapped in multiple wrappers, 
 such as rescaler, logger, tracer, adapter,  etc. 
 Planned wrappers are also noise-adder, constrain-adder-by-barrier-function, 
 
@@ -316,7 +315,7 @@ V   R  = {{ 1, 0.0100 }};		// rescale vector
 V   X0 = {{ -1.2, 1 }}; 			
 V   X_opt;				// answer
 condor_minimizer<V0>	mzr;
-	mzr	.objective		(rescale<V0>( trace<V0>(rosenberg<V0>()), R));
+	mzr	.objective		(rescale<V0>( trace<V0>(rosenbrock<V0>()), R));
 	mzr	.x0		(X/=R);
 	mzr	.rho_begin	(1);
 	mzr	.rho_end	(0.01);
@@ -347,5 +346,6 @@ include::../../volnitsky.com/project/howto-submit-patch.txt[]
 Journal of Computational and Applied Mathematics, Elsevier, Volume 181, Issue 1, September 2005, Pages 157-175
 - [[[5]]] 'Intel Math Kernel Library Reference Manual'. Optimization Solver Routines: www.intel.com/software/products/mkl/docs/WebHelp/osr/osr_Intro.html
 - [[[6]]] Stefen Boyd, Stanford Engineering Open Courseware, 'Convex Optimization' - see.stanford.edu/see/lecturelist.aspx?coll=2db7ced4-39d1-4fdb-90e8-364129597c87
+- [[[7]]] Anita H.M, 'Numerical Methods for Scientists and Engineers' MacGraw-Hill, 1991, ISBN 0074600133  (p366 - Newton, QausiNewton, BFG, BFGS)
 
 // vim: set filetype=asciidoc nu:

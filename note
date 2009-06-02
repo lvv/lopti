@@ -1,8 +1,18 @@
+IMPLEMENTATIONS
+	BRENT Algorithms for Minimization Without Derivatives
+		file:///home/BOOKS/SHELF/REF/Numeric%20Methods/Burkat/cpp_src/brent/brent.html
+	TR
+		file:///home/BOOKS/SHELF/REF/Numeric%20Methods/Burkat/m_src/entrust/entrust.html
+		file:///home/BOOKS/SHELF/REF/Numeric%20Methods/Burkat/f77_src/toms611/toms611.html
+-------------------------------------
 Test Functions
+	TEST_OPT - Optimization of a Scalar Function Test Problems
+		file:///home/BOOKS/SHELF/REF/Numeric%20Methods/Burkat/f_src/test_opt/test_opt.html
 	http://www.mat.univie.ac.at/~neum/glopt/test.html
 	http://www.princeton.edu/~rvdb/ampl/nlmodels/hs/index.html
 	функция Химельблау (4 minium:
 		set samples 100,100; set isosamples 100,100; set pm3d;  set contour both; set zrange [0:400]; splot [-6:6][-6:6] (x*x +y -11)**2 + (x+y*y-7)**2
+
 
 ---------------------------------------------------------
 

@@ -126,15 +126,15 @@ template<typename V>	struct	make_objective : objective0<V>		{  				OBJECTIVE_TYP
 	T	operator()	(V&  X)	  { assert(!of.empty() && ">> NOT DEFINED OBJ FUNC <<");  iter_++;   T y = (of)(X); return y; }
  };
  /////////////////////////////////////////////////////////////////////////////////////////  OF: ROSENBERG
-template<typename V>	struct	rosenberg  : objective0<V> { 				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(rosenberg)
-	rosenberg	()	: objective0<V>("rosenberg") 	{ V const  X_answ = {{ 1.0, 1.0 }};   known_optimum(X_answ); };
+template<typename V>	struct	rosenbrock  : objective0<V> { 				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(rosenbrock)
+	rosenbrock	()	: objective0<V>("rosenbrock") 	{ V const  X_answ = {{ 1.0, 1.0 }};   known_optimum(X_answ); };
 	T	operator() 		(V& X)  {  iter_++;      return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
  };
 
- template<typename V>   typename V::value_type    plain_fn_rosenberg  (V& X) { const int B = V::ibg;   return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
+ template<typename V>   typename V::value_type    plain_fn_rosenbrock  (V& X) { const int B = V::ibg;   return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
  /////////////////////////////////////////////////////////////////////////////////////////  OF: BAD SCALE ROSENBERG
-template<typename V, int FACTOR>	struct	bad_scale_rosenberg	 : objective0<V> { 	OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(bad_scale_rosenberg);
-	bad_scale_rosenberg() : objective0<V>("bad_scale_rosenberg") { V const  X_answ = {{ 1.0, 1.0*FACTOR }};   known_optimum(X_answ); };
+template<typename V, int FACTOR>	struct	bad_scale_rosenbrock	 : objective0<V> { 	OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(bad_scale_rosenbrock);
+	bad_scale_rosenbrock() : objective0<V>("bad_scale_rosenbrock") { V const  X_answ = {{ 1.0, 1.0*FACTOR }};   known_optimum(X_answ); };
 	T	operator() 		(V& X)   {  iter_++; return  100 * pow2(X[1+B]/FACTOR-pow2(X[0+B])) + pow2(1-X[0+B]); };
  };
  /////////////////////////////////////////////////////////////////////////////////////////  WRAPPER: RESCALE

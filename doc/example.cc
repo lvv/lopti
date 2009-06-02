@@ -7,7 +7,7 @@ using lopti::make_objective;
 typedef   lvv::array<double,2>   V;			// == double	X[2]
 
 // Objective Function
-double   rosenberg_fn (V& X)    {  return  100 * (X[1]-X[0]*X[0])*(X[1]-X[0]*X[0]) + (1-X[0])*(1-X[0]);  };
+double   rosenbrock_fn (V& X)    {  return  100 * (X[1]-X[0]*X[0])*(X[1]-X[0]*X[0]) + (1-X[0])*(1-X[0]);  };
 
 int main() {
 
@@ -17,7 +17,7 @@ int main() {
 	hook_jeevs_minimizer<V>	  m;
 
 	// minimizer config 
-	m.objective     ( make_objective<V> (&rosenberg_fn,"rosenberg") );
+	m.objective     ( make_objective<V> (&rosenbrock_fn,"rosenbrock") );
 	m.x0       	(X);
 	m.step0    	(S);
 	m.max_iter 	(500);

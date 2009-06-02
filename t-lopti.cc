@@ -44,13 +44,13 @@ int main(int argc, char **argv) {
 			#endif
 
 			#if  ! defined(FN) 
-				#define FN rosenberg
+				#define FN rosenbrock
 			#endif
 
 			//#define STOP_AT_X_STEP 1e-3
 			#define		STOP_AT_X_STEP 1e-15
 				
-			#if 	( FN == rosenberg )
+			#if 	( FN == rosenbrock )
 				#undef _N
 				#define _N 2
 			#endif
@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
 
 		#ifdef  PLAIN_FN
 		{  condor_minimizer<V0> mzr;////  CONDOR  x PLAIN_FN  ROSENBERG		// TODO: why results deffrent from objective?
-			mzr	.objective			( make_objective<V0> (&plain_fn_rosenberg<V0>, "make_objective") );
+			mzr	.objective			( make_objective<V0> (&plain_fn_rosenbrock<V0>, "make_objective") );
 			mzr	.x0			(_X0);	// X[0..N-1]	
 			mzr	.rho_begin		(1);
 			mzr	.rho_end		(STOP_AT_X_STEP);
@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
 
 		#ifdef  NAKED
 		{  condor_minimizer<V0>	mzr;	////  CONDOR  x NAKED ROSENBERG
-			mzr	.objective		(  rosenberg<V0>() );
+			mzr	.objective		(  rosenbrock<V0>() );
 			mzr	.x0		(_X0);
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
@@ -108,8 +108,8 @@ int main(int argc, char **argv) {
 
 		#ifdef  RESCALE
 		{  	V0 R = {{ 1, 0.0100 }};   V0 X = _X0; V0  X_opt;
-		condor_minimizer<V0>	mzr;////  condor  logged RESCALED rosenberg
-			mzr	.objective		(xg_log<V0>  (rescale<V0>  ( trace<V0>(rosenberg<V0>()), R),  mzr));
+		condor_minimizer<V0>	mzr;////  condor  logged RESCALED rosenbrock
+			mzr	.objective		(xg_log<V0>  (rescale<V0>  ( trace<V0>(rosenbrock<V0>()), R),  mzr));
 			mzr	.x0		(X/=R);	// X[0..N-1]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
