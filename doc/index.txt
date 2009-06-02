@@ -204,7 +204,7 @@ defaults to 1/infinity.
 class newuoa_minimizer<V,[NP=2*N+1]>
 ----------------------
 
-`LDFLAGS=-llopti`
+`LDFLAGS=-llopti -lgfortran`
 
 One of the best solvers in this collection.
 Optional second template parameters NP -  is Number-of-Points used for building model, defaults to `2*N+1` (approximate model). 
