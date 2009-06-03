@@ -346,6 +346,18 @@ include::../../volnitsky.com/project/howto-submit-patch.txt[]
 Journal of Computational and Applied Mathematics, Elsevier, Volume 181, Issue 1, September 2005, Pages 157-175
 - [[[5]]] 'Intel Math Kernel Library Reference Manual'. Optimization Solver Routines: www.intel.com/software/products/mkl/docs/WebHelp/osr/osr_Intro.html
 - [[[6]]] Stefen Boyd, Stanford Engineering Open Courseware, 'Convex Optimization' - see.stanford.edu/see/lecturelist.aspx?coll=2db7ced4-39d1-4fdb-90e8-364129597c87
-- [[[7]]] Anita H.M, 'Numerical Methods for Scientists and Engineers' MacGraw-Hill, 1991, ISBN 0074600133  (p366 - Newton, QausiNewton, BFG, BFGS)
+	* Backtraking Line Search, Armijo-Goldstein condition (ee364a lecture 15,  18min)
+	* Gradient Descent method (ee364a lecture 15,  24 min)
+	* Steepest Descent method (ee364a lecture 15,  32.1 min)
+- [[[7]]] Anita H.M, 'Numerical Methods for Scientists and Engineers' MacGraw-Hill, 1991, ISBN 0074600133  
+	* Newton, Qausi-Newton, BFG, BFGS (p366)
+	* Direction Set Methods  (p370)
+	* Conjucate Gradient method  (p376)
+- [[[8]]] Bjoerck A., Dahlquist G.'Numerical mathematics and scientific computation' (web draft, 1999) Vols.2,3. 
+	* Steepest Descent       (p400, 11.2.2)
+	* Newton                 (p401, 11.2.3)
+	* Quasi-Newton Methods   (p406, 11.2.3)
+- [[[9]]] S.D.Conte, Carl de Boor 'Elementary Numerical Analysis - An Algorithmic Approach' MacGraw-Hill 1980 3rd-Ed
+	* Steepest Descent	(p211 5.1)
 
 // vim: set filetype=asciidoc nu:
