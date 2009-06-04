@@ -1,5 +1,9 @@
+	Steepest Descent -- Couchy 1848 
 	Boyd Lecture 15, 18min
 		Armijo-Goldstain
+			".. this condition sometimes is called Armijo, or .. I really
+			wish it should be called Armijo-Goldstain,  really Goldstain,
+			he is from Moscow, I am almost certun this where it came from"
 
 IMPLEMENTATIONS
 	BRENT Algorithms for Minimization Without Derivatives
@@ -15,7 +19,6 @@ Test Functions
 	http://www.princeton.edu/~rvdb/ampl/nlmodels/hs/index.html
 	функция Химельблау (4 minium:
 		set samples 100,100; set isosamples 100,100; set pm3d;  set contour both; set zrange [0:400]; splot [-6:6][-6:6] (x*x +y -11)**2 + (x+y*y-7)**2
-
 
 ---------------------------------------------------------
 

@@ -3,5 +3,6 @@
 log
 t-lopti.ps
 external
+index.txt
 liblopti.so*
 t-rval-ref

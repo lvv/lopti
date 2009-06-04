@@ -82,6 +82,44 @@ struct	objective0		{									// Lopti Object FuncTor
 
 	template<typename V>	objective0<V>::~objective0 () {}; 				// we need this (see http://www.devx.com/tips/Tip/12729)
 
+			template<typename V>
+struct	objective1: objective0<V>	{									// Lopti Object FuncTor
+	// do-ers
+	virtual T		eval0	(V&  X)			{
+					assert( wrapped_objective_v != 0 );
+		T   y = (*wrapped_objective_v).eval0(X);
+		return y;
+	}
+	virtual V		eval1	(V&  X)			{
+					assert( wrapped_objective_v != 0 );
+		V   G = (*wrapped_objective_v).eval1(X);
+		return G;
+	}
+}
+
+ /////////////////////////////////////////////////////////////////////////////////////////  OF: ROSENBROCK
+template<typename V>	struct	rosenbrock  : objective0<V> { 				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(rosenbrock)
+	rosenbrock	()	: objective0<V>("rosenbrock") 	{ V const  X_answ = {{ 1.0, 1.0 }};   known_optimum(X_answ); };
+	T	operator() 		(V& X)  {  iter_++;      return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
+	T	eval0	 		(V& X)  {  operator() (X) };
+	V&&	eval1	 		(V& X)  {
+				V G; 
+				G[0+B] = -400 * X[0+B] * (X[1+B]-pow2(X[0+B])) ;
+				G[1+B] =  200 *          (X[1+B]-pow2(X[0+B])) ;
+		};
+									// (%o3) rb(x0,x1):=100*(x1-x0^2)^2+(1-x0)^2
+									// (%i5) diff(rb(x0,x1),x0);
+									// (%o5) 	-400*x0*(x1-x0^2)-2*(1-x0)
+									// (%i6) diff(rb(x0,x1),x1);
+									// (%o6) 	200*(x1-x0^2)
+ };
+
+ template<typename V>   typename V::value_type    plain_fn_rosenbrock  (V& X) { const int B = V::ibg;   return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
+ /////////////////////////////////////////////////////////////////////////////////////////  OF: BAD SCALE ROSENBROCK
+template<typename V, int FACTOR>	struct	bad_scale_rosenbrock	 : objective0<V> { 	OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(bad_scale_rosenbrock);
+	bad_scale_rosenbrock() : objective0<V>("bad_scale_rosenbrock") { V const  X_answ = {{ 1.0, 1.0*FACTOR }};   known_optimum(X_answ); };
+	T	operator() 		(V& X)   {  iter_++; return  100 * pow2(X[1+B]/FACTOR-pow2(X[0+B])) + pow2(1-X[0+B]); };
+ };
  /////////////////////////////////////////////////////////////////////////////////////////  OF: CHEBYQUAD
 
 			template<typename V> 
@@ -118,24 +156,6 @@ struct  chebyquad: objective0<V>		{	 OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONE
 
 			return F;
 	}
- };
- /////////////////////////////////////////////////////////////////////////////////////////  ADAPTER: PLAIN_FN
-template<typename V>	struct	make_objective : objective0<V>		{  				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(make_objective)
-						function<T(V&)>	of;
-	explicit	make_objective	(function<T(V&)> _of, const string& _name)	 : objective0<V>(_name) , of(_of)   {};
-	T	operator()	(V&  X)	  { assert(!of.empty() && ">> NOT DEFINED OBJ FUNC <<");  iter_++;   T y = (of)(X); return y; }
- };
- /////////////////////////////////////////////////////////////////////////////////////////  OF: ROSENBERG
-template<typename V>	struct	rosenbrock  : objective0<V> { 				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(rosenbrock)
-	rosenbrock	()	: objective0<V>("rosenbrock") 	{ V const  X_answ = {{ 1.0, 1.0 }};   known_optimum(X_answ); };
-	T	operator() 		(V& X)  {  iter_++;      return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
- };
-
- template<typename V>   typename V::value_type    plain_fn_rosenbrock  (V& X) { const int B = V::ibg;   return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
- /////////////////////////////////////////////////////////////////////////////////////////  OF: BAD SCALE ROSENBERG
-template<typename V, int FACTOR>	struct	bad_scale_rosenbrock	 : objective0<V> { 	OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(bad_scale_rosenbrock);
-	bad_scale_rosenbrock() : objective0<V>("bad_scale_rosenbrock") { V const  X_answ = {{ 1.0, 1.0*FACTOR }};   known_optimum(X_answ); };
-	T	operator() 		(V& X)   {  iter_++; return  100 * pow2(X[1+B]/FACTOR-pow2(X[0+B])) + pow2(1-X[0+B]); };
  };
  /////////////////////////////////////////////////////////////////////////////////////////  WRAPPER: RESCALE
 template<typename V>	struct	rescale :  objective0<V> 	{				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(rescale)
@@ -185,5 +205,11 @@ template<typename V>	struct	trace : objective0<V> 		{				  CLONER(trace); OBJECT
 	};
  };
 
+ /////////////////////////////////////////////////////////////////////////////////////////  ADAPTER: PLAIN_FN
+template<typename V>	struct	make_objective : objective0<V>		{  				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(make_objective)
+						function<T(V&)>	of;
+	explicit	make_objective	(function<T(V&)> _of, const string& _name)	 : objective0<V>(_name) , of(_of)   {};
+	T	operator()	(V&  X)	  { assert(!of.empty() && ">> NOT DEFINED OBJ FUNC <<");  iter_++;   T y = (of)(X); return y; }
+ };
  }; // namespace lopti
  #endif // LOPTI_OF_H

@@ -352,9 +352,9 @@ Journal of Computational and Applied Mathematics, Elsevier, Volume 181, Issue 1,
 - [[[7]]] Anita H.M, 'Numerical Methods for Scientists and Engineers' MacGraw-Hill, 1991, ISBN 0074600133  
 	* Newton, Qausi-Newton, BFG, BFGS (p366)
 	* Direction Set Methods  (p370)
-	* Conjucate Gradient method  (p376)
+	* Conjugate Gradient method  (p376)
 - [[[8]]] Bjoerck A., Dahlquist G.'Numerical mathematics and scientific computation' (web draft, 1999) Vols.2,3. 
-	* Steepest Descent       (p400, 11.2.2)
+	* Steepest Descent       (p403, 11.2.2)
 	* Newton                 (p401, 11.2.3)
 	* Quasi-Newton Methods   (p406, 11.2.3)
 - [[[9]]] S.D.Conte, Carl de Boor 'Elementary Numerical Analysis - An Algorithmic Approach' MacGraw-Hill 1980 3rd-Ed
