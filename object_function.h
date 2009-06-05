@@ -60,7 +60,7 @@ struct	objective0		{									// Lopti Object FuncTor
 	// CTOR
 	explicit		objective0	()			:  	iter_(0)				{ X_opt_ = -1; };
 	explicit		objective0	(const string& s)	:  	iter_(0),	name_(s)		{ X_opt_ = -1; };
-	virtual			~objective0	()	= 0;
+	virtual			~objective0	()	 = 0;
 	virtual objective0<V>&	clone		() const = 0; 
 
 	// set-ters
@@ -75,13 +75,16 @@ struct	objective0		{									// Lopti Object FuncTor
 
 	// do-ers
 	virtual T		operator()	(const V&  X)			{
-					assert( wrapped_objective_v != 0 );
+									assert( wrapped_objective_v != 0 );
 		T   y = (*wrapped_objective_v)(X);
 		return y;
 	}
 
-	virtual T		eval0		(const V&  X) 		{ return  operator()(X); }
-	virtual V&&		eval1		(const V&  X) 		{ return  std::move(V()); }
+	virtual T		eval0		(const V&  X) 		{ return  operator()(X); };
+	virtual V&&		eval1		(const V&  X) 		{ assert(false); return std::move(V()); };
+
+	//virtual T		eval0		(const V&  X) 		{ return  operator()(X); }
+	//virtual V&&		eval1		(const V&  X) 		{ return  std::move(V()); }
 
 	//virtual void		reset		()		{ iter_ = 0; };
  };
@@ -91,6 +94,7 @@ struct	objective0		{									// Lopti Object FuncTor
 			template<typename V>
 struct	objective1: objective0<V>	{			OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(objective1);  	// Lopti Object FuncTor
 	// do-ers
+	/*
 	virtual T		eval0	(V&  X)			{
 					assert( wrapped_objective_v != 0 );
 		T   y = (*wrapped_objective_v).eval0(X);
@@ -100,17 +104,18 @@ struct	objective1: objective0<V>	{			OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONE
 					assert( wrapped_objective_v != 0 );
 		V   G = (*wrapped_objective_v).eval1(X);
 		return G;
-	}
+	}*/
  };
 
  /////////////////////////////////////////////////////////////////////////////////////////  OF: ROSENBROCK
-template<typename V>	struct	rosenbrock  : objective0<V> { 				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(rosenbrock)
+template<typename V>	struct	rosenbrock  : objective0<V> { 
+			OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(rosenbrock)
 	rosenbrock	()	: objective0<V>("rosenbrock") 	{ V const  X_answ = {{ 1.0, 1.0 }};   known_optimum(X_answ); };
 									// unset view; set surface;  set isosamples 150,150;  set contour base; set cntrparam levels 20; splot  [-3:4] [-2:8]  log10 (100*(y-x**2)**2 + (1-x)**2)
 									// set view map ; unset surface;  set grid ; set samples 500,500;  set contour base; set cntrparam levels 20; splot  [-3:4] [-2:8]  log10 (100*(y-x**2)**2 + (1-x)**2)
-	T	operator() 		(V& X)  {  iter_++;      return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
-	T	eval0	 		(V& X)  {  operator() (X); };
-	V&&	eval1	 		(V& X)  {
+	T	operator() 		(const V& X)  {  iter_++;      return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
+	T	eval0	 		(const V& X)  {  operator() (X); };
+	V&&	eval1	 		(const V& X)  {
 				V G; 
 				G[0+B] = -400 * X[0+B] * (X[1+B] - pow2(X[0+B]))  -  2*(1-X[0+B]) ;
 				G[1+B] =  200 *          (X[1+B] - pow2(X[0+B])) ;
