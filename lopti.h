@@ -8,8 +8,6 @@
 
 	#include <boost/format.hpp>
 		using boost::format;
-	//#include <cstdio>
-		// sprintf
 
 	#include <limits>
 		using 	std::numeric_limits;

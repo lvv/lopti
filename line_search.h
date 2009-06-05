@@ -7,7 +7,7 @@
 	#include <cassert>
 		//using namespace std;
 
-	//#include <lvv/array.h>
+	#include <lvv/array.h>
 		using lvv::array;
 
 	//  ALGORITHM FROM [[[6]]] Stefen Boyd, "Backtraking Line Search, Armijo-Goldstein condition" (ee364a lecture 15,  18min)
@@ -39,18 +39,20 @@
 namespace lopti  {
 
 		template<typename V>
-struct 	line_search_backtracking_t   {
+struct 	line_search_backtracking_t   {	
+						OBJECTIVE_TYPES;
 				objective_p_t	objective_v;	
 				const T		alpha;
 				const T		beta;
 				const T		t0;
 	line_search_backtracking_t (
-		objective_p_t	objective_v,
+		//virtual void		objective	(objective_cref_t ref)	{ wrapped_objective_v = objective_p_t(&ref.clone());	name_ = ref.name(); };
+		objective_cref_t ref,
 		const T		alpha = 0.5,
 		const T		beta  = 0.5,
 		const T		t0    = 1. 
 	) :
-		objective_v	(objective_v),
+		objective_v	(&ref.clone()),
 		alpha		(alpha),
 		beta		(beta),
 		t0		(t0)
@@ -59,20 +61,23 @@ struct 	line_search_backtracking_t   {
 
 	V&&	find( const V&	X0,	const V& DX) {
 				T  t       = t0;
-				T  f0      = objective_v->eval0 (X0);
-				V  G0      = objective_v->eval1 (X0);
-				V          X;
+				T  f0      ( objective_v->eval0 (X0));
+				V  G0      ( objective_v->eval1 (X0));
+				V  X;
 
 		for (int i = 1;  i< 50;  i++) {
 			X = X0 + t * DX;
 			T f = objective_v->eval0(X);
 			if ( f  <  f0 + alpha * t * dot(G0,DX)) 	 {
-				return  X;
+				return  std::move(X);
 			}
 			t = beta * t;
 		}
-	}
- }
+
+		assert(false);
+		return  std::move(X);
+	};
+ };
 
 	} // namespace lopti
 	#endif  // LOPTI_H

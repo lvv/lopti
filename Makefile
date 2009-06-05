@@ -1,6 +1,6 @@
 
 # this include is part of lvvlib
-#include  ../lvv/include.mk
+include  ../lvv/include.mk
 	
 SPEED ?= DEBUG
 PREFIX ?= /usr/local
@@ -37,6 +37,7 @@ liblopti.so: *.h newuoa/bigden.o newuoa/biglag.o newuoa/calfun.o newuoa/trsapp.o
 	ln -sf liblopti.so.$(VERSION) liblopti.so
 
 t-%: t-%.cc *.h liblopti.so
+t-%: SPEED=DEBUG
 
 t-lopti: t-lopti.cc liblopti.so
 

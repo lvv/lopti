@@ -18,6 +18,9 @@
 		using lvv::array;
 		using lvv::matrix;
 
+	#include	<lvv/math.h>
+		using lvv::pow2;
+
 	//#include <boost/function.hpp>
 	//	using boost::function;
 
@@ -48,9 +51,6 @@
 struct	objective0		{									// Lopti Object FuncTor
 
 				OBJECTIVE_TYPES;
-//							typedef		boost::shared_ptr<lopti::objective0<V> >	objective_p_t;
-//							typedef 	const objective0<V>&		objective_cref_t;
-//							typedef		typename V::value_type		T;
 
 			string			name_;
 			V			X_opt_;
@@ -74,11 +74,14 @@ struct	objective0		{									// Lopti Object FuncTor
 	virtual	bool 		empty		()	const		{ return  ! wrapped_objective_v;  };
 
 	// do-ers
-	virtual T		operator()	(V&  X)			{
+	virtual T		operator()	(const V&  X)			{
 					assert( wrapped_objective_v != 0 );
 		T   y = (*wrapped_objective_v)(X);
 		return y;
 	}
+
+	virtual T		eval0		(const V&  X) 		{ return  operator()(X); }
+	virtual V&&		eval1		(const V&  X) 		{ return  std::move(V()); }
 
 	//virtual void		reset		()		{ iter_ = 0; };
  };
@@ -93,7 +96,7 @@ struct	objective1: objective0<V>	{			OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONE
 		T   y = (*wrapped_objective_v).eval0(X);
 		return y;
 	}
-	virtual V		eval1	(V&  X)			{
+	virtual V&&		eval1	(V&  X)			{
 					assert( wrapped_objective_v != 0 );
 		V   G = (*wrapped_objective_v).eval1(X);
 		return G;
