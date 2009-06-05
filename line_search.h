@@ -1,10 +1,8 @@
 
-	// NOTE: there is 2nd implementation:  http://www.netlib.org/opt/hooke.c
 	#ifndef LOPTI_LINE_SEARCH
 	#define LOPTI_LINE_SEARCH
 
-	//#include <lopti/lopti.h>
-
+	#include <lopti/lopti.h>
 
 	#include <cassert>
 		//using namespace std;
@@ -40,8 +38,8 @@
 	// 	
 namespace lopti  {
 
-		template<V>
-struct 	line_search_backtracking_t {
+		template<typename V>
+struct 	line_search_backtracking_t   {
 				objective_p_t	objective_v;	
 				const T		alpha;
 				const T		beta;
@@ -73,13 +71,8 @@ struct 	line_search_backtracking_t {
 			}
 			t = beta * t;
 		}
-		
 	}
-
-
  }
-
-}
 
 	} // namespace lopti
 	#endif  // LOPTI_H

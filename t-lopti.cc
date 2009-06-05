@@ -1,5 +1,5 @@
 	
-	/////////////////////////////////////////////////////////////////////////////// 
+	//////////////////////////////////////////////////////////////////// 
 	#include <lvv/lvv.h>
 	#include <lvv/math.h>
 		using lvv::pow2;
@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
 		}
 
 		#ifdef  PLAIN_FN
-		{  condor_minimizer<V0> mzr;////  CONDOR  x PLAIN_FN  ROSENBERG		// TODO: why results deffrent from objective?
+		{  condor_minimizer<V0> mzr;////  CONDOR  x PLAIN_FN  ROSENBROCK		// TODO: why results deffrent from objective?
 			mzr	.objective			( make_objective<V0> (&plain_fn_rosenbrock<V0>, "make_objective") );
 			mzr	.x0			(_X0);	// X[0..N-1]	
 			mzr	.rho_begin		(1);

@@ -2,8 +2,8 @@
 	#ifndef LOPTI_OF_H
 	#define LOPTI_OF_H
 
-	#include <boost/shared_ptr.hpp>
-		using boost::shared_ptr; // used as ofstream ptr
+	//#include <boost/shared_ptr.hpp>
+		using std::shared_ptr; // used as ofstream ptr
 
 	//#include <gzstream.h>
 	#include <iostream>                                                                                                                                         
@@ -18,8 +18,8 @@
 		using lvv::array;
 		using lvv::matrix;
 
-	#include <boost/function.hpp>
-		using boost::function;
+	//#include <boost/function.hpp>
+	//	using boost::function;
 
  namespace lopti {
 
@@ -38,7 +38,7 @@
 
 						
 						#define 	OBJECTIVE_TYPES	\
-							typedef		shared_ptr<objective0<V> >	objective_p_t; \
+							typedef		std::shared_ptr<objective0<V> >	objective_p_t; \
 							typedef 	const objective0<V>&		objective_cref_t;	\
 							typedef		typename V::value_type		T;
 
@@ -48,6 +48,9 @@
 struct	objective0		{									// Lopti Object FuncTor
 
 				OBJECTIVE_TYPES;
+//							typedef		boost::shared_ptr<lopti::objective0<V> >	objective_p_t;
+//							typedef 	const objective0<V>&		objective_cref_t;
+//							typedef		typename V::value_type		T;
 
 			string			name_;
 			V			X_opt_;
@@ -83,7 +86,7 @@ struct	objective0		{									// Lopti Object FuncTor
 	template<typename V>	objective0<V>::~objective0 () {}; 				// we need this (see http://www.devx.com/tips/Tip/12729)
 
 			template<typename V>
-struct	objective1: objective0<V>	{									// Lopti Object FuncTor
+struct	objective1: objective0<V>	{			OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(objective1);  	// Lopti Object FuncTor
 	// do-ers
 	virtual T		eval0	(V&  X)			{
 					assert( wrapped_objective_v != 0 );
@@ -95,7 +98,7 @@ struct	objective1: objective0<V>	{									// Lopti Object FuncTor
 		V   G = (*wrapped_objective_v).eval1(X);
 		return G;
 	}
- }
+ };
 
  /////////////////////////////////////////////////////////////////////////////////////////  OF: ROSENBROCK
 template<typename V>	struct	rosenbrock  : objective0<V> { 				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(rosenbrock)
@@ -103,7 +106,7 @@ template<typename V>	struct	rosenbrock  : objective0<V> { 				OBJECTIVE_TYPES;  
 									// unset view; set surface;  set isosamples 150,150;  set contour base; set cntrparam levels 20; splot  [-3:4] [-2:8]  log10 (100*(y-x**2)**2 + (1-x)**2)
 									// set view map ; unset surface;  set grid ; set samples 500,500;  set contour base; set cntrparam levels 20; splot  [-3:4] [-2:8]  log10 (100*(y-x**2)**2 + (1-x)**2)
 	T	operator() 		(V& X)  {  iter_++;      return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
-	T	eval0	 		(V& X)  {  operator() (X) };
+	T	eval0	 		(V& X)  {  operator() (X); };
 	V&&	eval1	 		(V& X)  {
 				V G; 
 				G[0+B] = -400 * X[0+B] * (X[1+B] - pow2(X[0+B]))  -  2*(1-X[0+B]) ;
@@ -136,8 +139,7 @@ template<typename V, int FACTOR>	struct	bad_scale_rosenbrock	 : objective0<V> { 
  };
  /////////////////////////////////////////////////////////////////////////////////////////  OF: CHEBYQUAD
 
-			template<typename V> 
-struct  chebyquad: objective0<V>		{	 OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(chebyquad)		// The Chebyquad test problem (Fletcher, 1965) 
+template<typename V>	struct	chebyquad: objective0<V>		{	 OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(chebyquad)		// The Chebyquad test problem (Fletcher, 1965) 
 
 			chebyquad		()	: objective0<V>("chebyquad") 	{};
 
@@ -172,7 +174,7 @@ struct  chebyquad: objective0<V>		{	 OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONE
 	}
  };
  /////////////////////////////////////////////////////////////////////////////////////////  WRAPPER: RESCALE
-template<typename V>	struct	rescale :  objective0<V> 	{				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(rescale)
+template<typename V>	struct	rescale :  objective0<V> 	{		OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(rescale)
 				V R;
 			rescale		(objective_cref_t objective_v, V& _R)  : 	R(_R)  {  X_opt_ = objective_v.X_opt_; X_opt_ /= _R;   objective(objective_v); /*cout << "rescaled opt: " << X_opt_ << endl <<  "opt: " << objective_v.X_opt_ << endl;*/  };
 	const string	name		()	const	{ return  name_ + " rescaled"; };
@@ -182,8 +184,8 @@ template<typename V>	struct	rescale :  objective0<V> 	{				OBJECTIVE_TYPES;  OBJ
  /////////////////////////////////////////////////////////////////////////////////////////  WRAPPER:  XG_LOG (xgraphic)
  template<typename V> class minimizer;
 
-template<typename V>	struct	xg_log : objective0<V> 		{				OBJECTIVE_TYPES;   OBJECTIVE_MEMBERS;  CLONER(xg_log)
-				shared_ptr<ofstream>	log_file;  // need smart ptr becase xg_log dtor-ed on coping
+template<typename V>	struct	xg_log : objective0<V> 		{		OBJECTIVE_TYPES;   OBJECTIVE_MEMBERS;  CLONER(xg_log)
+				std::shared_ptr<ofstream>	log_file;  // need smart ptr becase xg_log dtor-ed on coping
 	xg_log	 (objective_cref_t _objective_v, minimizer<V>& mzr)	{
 		objective(_objective_v);											assert(log_file == 0 );
 		// FIXME: test if there is a "log" dir
@@ -199,7 +201,7 @@ template<typename V>	struct	xg_log : objective0<V> 		{				OBJECTIVE_TYPES;   OBJ
 	};
  };
 
-template<typename V>	struct	trace : objective0<V> 		{				  CLONER(trace); OBJECTIVE_TYPES;   OBJECTIVE_MEMBERS;
+template<typename V>	struct	trace : objective0<V> 		{		  CLONER(trace); OBJECTIVE_TYPES;   OBJECTIVE_MEMBERS;
 	Timer	timer;
 	trace	 (objective_cref_t _objective_v)	{ objective(_objective_v);	};
 
@@ -221,8 +223,8 @@ template<typename V>	struct	trace : objective0<V> 		{				  CLONER(trace); OBJECT
 
  /////////////////////////////////////////////////////////////////////////////////////////  ADAPTER: PLAIN_FN
 template<typename V>	struct	make_objective : objective0<V>		{  				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(make_objective)
-						function<T(V&)>	of;
-	explicit	make_objective	(function<T(V&)> _of, const string& _name)	 : objective0<V>(_name) , of(_of)   {};
+						std::function<T(V&)>	of;
+	explicit	make_objective	(std::function<T(V&)> _of, const string& _name)	 : objective0<V>(_name) , of(_of)   {};
 	T	operator()	(V&  X)	  { assert(!of.empty() && ">> NOT DEFINED OBJ FUNC <<");  iter_++;   T y = (of)(X); return y; }
  };
  }; // namespace lopti

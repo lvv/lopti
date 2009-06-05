@@ -14,15 +14,7 @@
 	#include <limits>
 		using 	std::numeric_limits;
 
-	// functional  		// TODO: try to remove 
-	//#include <functional>
-		//using std::binder1st;
-		//using std::unary_function;
-		//using std::mem_fun;
-	#include <boost/function.hpp>
-		using boost::function;
 	#include <boost/bind.hpp>
-		//using boost::bind;
 	
 	#include <lopti/object_function.h>
 
