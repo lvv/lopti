@@ -1,9 +1,12 @@
 	Steepest Descent -- Couchy 1848 
-	Boyd Lecture 15, 18min
-		Armijo-Goldstain
+
+	Armijo-Goldstain
+		Boyd Lecture 15, 18min
 			".. this condition sometimes is called Armijo, or .. I really
 			wish it should be called Armijo-Goldstain,  really Goldstain,
 			he is from Moscow, I am almost certun this where it came from"
+		Goldstein A. A. and Price J. B. (1967) An Effective Algorithm for Minimization.
+		Numer. Math 10: 184–189
 
 IMPLEMENTATIONS
 	BRENT Algorithms for Minimization Without Derivatives

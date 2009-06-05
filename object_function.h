@@ -95,23 +95,37 @@ struct	objective1: objective0<V>	{									// Lopti Object FuncTor
 		V   G = (*wrapped_objective_v).eval1(X);
 		return G;
 	}
-}
+ }
 
  /////////////////////////////////////////////////////////////////////////////////////////  OF: ROSENBROCK
 template<typename V>	struct	rosenbrock  : objective0<V> { 				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(rosenbrock)
 	rosenbrock	()	: objective0<V>("rosenbrock") 	{ V const  X_answ = {{ 1.0, 1.0 }};   known_optimum(X_answ); };
+									// unset view; set surface;  set isosamples 150,150;  set contour base; set cntrparam levels 20; splot  [-3:4] [-2:8]  log10 (100*(y-x**2)**2 + (1-x)**2)
+									// set view map ; unset surface;  set grid ; set samples 500,500;  set contour base; set cntrparam levels 20; splot  [-3:4] [-2:8]  log10 (100*(y-x**2)**2 + (1-x)**2)
 	T	operator() 		(V& X)  {  iter_++;      return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
 	T	eval0	 		(V& X)  {  operator() (X) };
 	V&&	eval1	 		(V& X)  {
 				V G; 
-				G[0+B] = -400 * X[0+B] * (X[1+B]-pow2(X[0+B])) ;
-				G[1+B] =  200 *          (X[1+B]-pow2(X[0+B])) ;
-		};
+				G[0+B] = -400 * X[0+B] * (X[1+B] - pow2(X[0+B]))  -  2*(1-X[0+B]) ;
+				G[1+B] =  200 *          (X[1+B] - pow2(X[0+B])) ;
 									// (%o3) rb(x0,x1):=100*(x1-x0^2)^2+(1-x0)^2
 									// (%i5) diff(rb(x0,x1),x0);
 									// (%o5) 	-400*x0*(x1-x0^2)-2*(1-x0)
 									// (%i6) diff(rb(x0,x1),x1);
 									// (%o6) 	200*(x1-x0^2)
+				return G;
+		};
+
+	/*			typedef   matrix<T,V::sz, V::sz>   M; 
+
+	M&&	eval2	 		(V& X)  {
+				M H; 
+				H[1,1] = 1200*pow2(X[0+B]) − 400*X[1+B] + 2; 		H[1,2] = −400 * X[0+B];
+				H[2,1] = -400*X[0+B]; 					H[2,2] = 200;
+
+
+				return H;
+		}; */
  };
 
  template<typename V>   typename V::value_type    plain_fn_rosenbrock  (V& X) { const int B = V::ibg;   return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };

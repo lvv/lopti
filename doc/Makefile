@@ -1,11 +1,6 @@
 
 
-example:	
-
-example-gsl:	LDFLAGS=-lgsl
-
-example-newuoa:	LDFLAGS=-llopti -lgfortran
-
+######################################################   HTML
 
 PREFIX ?= /usr/local
 WEB_DESTDIR ?= /tmp/localweb
@@ -27,3 +22,12 @@ localweb: 	 index.html *.gif example*.cc
 clean:
 	rm -f *.html /tmp/localweb
 	git clean -df
+
+######################################################   EXAMPLES
+
+example:	
+
+example-gsl:	LDFLAGS=-lgsl
+
+example-newuoa:	LDFLAGS=-llopti -lgfortran
+
