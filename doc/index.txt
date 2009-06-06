@@ -354,27 +354,27 @@ include::../../volnitsky.com/project/howto-submit-patch.txt[]
 	* Direction Set Methods  (p370)
 	* Conjugate Gradient method  (p376)
 - [[[8]]] Bjoerck A., Dahlquist G.'Numerical mathematics and scientific computation' (web draft, 1999) Vols.2,3. 
-	* Steepest Descent       (p403, 11.2.2)
-	* Newton                 (p401, 11.2.3)
-	* Quasi-Newton Methods   (p406, 11.2.3)
+	* Steepest Descent       (p403, §11.2.2)
+	* Newton                 (p401, §11.2.3)
+	* Quasi-Newton Methods   (p406, §11.2.3)
 - [[[9]]] S.D.Conte, Carl de Boor 'Elementary Numerical Analysis - An Algorithmic Approach' MacGraw-Hill 1980 3rd-Ed
 	* Steepest Descent	(p211 5.1)
 - [[[10]]]  W.H., Teukolsky S.A., Vetterling W.T., Flannery B.P. 'Numerical Recipes - The Art of Scientific Computing'
 	3nd ed, Cambridge University Press 2007(1988), ISBN-13 978-0-511-33555-6, ISBN-13 978-0-521-88068-8
-	* Simplex Method	(p502 10.5)
-	* Direction Set (Powell's) method	(p509 10.7)
-	* Quasi-Newton (BFGS)			(p521 10.9)
+	* Simplex Method	(p502 §10.5)
+	* Direction Set (Powell's) method	(p509 §10.7)
+	* Quasi-Newton (BFGS)			(p521 §10.9)
 
 - [[[11]]] Quarteroni A., Sacco R., Saleri F. 'Numerical mathematics',  2nd ed., Springer 2007
-	* The Hooke and Jeeves Method (p300 7.2.1)
-	* Descent Methods (good overview, Newton, quasi-Newton, Gradient, Conjugate Gradient method) (p306 7.2.2)
-	* Newton  (p313 7.2.6)
-	* quasi-Newton  (p313 7.2.7)
+	* The Hooke and Jeeves Method (p300 §7.2.1)
+	* Descent Methods (good overview, Newton, quasi-Newton, Gradient, Conjugate Gradient method) (p306 §7.2.2)
+	* Newton  (p313 §7.2.6)
+	* quasi-Newton  (p313 §7.2.7)
 
 - [[[12]]]  Schwartz R. 'Biological modeling and simulation. A survey of practical models, algorithms, and numerical methods' MIT-2008,  ISBN 0262195844
-	* The Levenberg–Marquardt Method (p90 5.6.2) 
+	* The Levenberg–Marquardt Method (p90 §5.6.2) 
 
 - [[[13]]] Zarowsky C.J. 'An introduction to numerical analysis for electrical and computer engineers',  Wiley 2004
 	* Backtraking Line Search (p353) 
-	* Newton’s algorithm with the backtracking (p353 8.4)
+	* Newton’s algorithm with the backtracking (p353 §8.4)
 // vim: set filetype=asciidoc nu:

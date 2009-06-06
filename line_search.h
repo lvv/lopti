@@ -48,7 +48,7 @@ struct 	line_search_backtracking_t   {
 	line_search_backtracking_t (
 		objective_cref_t   ref,
 		const T		alpha = 0.5,
-		const T		beta  = 0.5,
+		const T		beta  = 0.9,
 		const T		t0    =   1. 
 	) :
 		objective_v	((objective0<V>*)(&ref.clone())),

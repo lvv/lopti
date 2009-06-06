@@ -36,7 +36,10 @@ liblopti.so: *.h newuoa/bigden.o newuoa/biglag.o newuoa/calfun.o newuoa/trsapp.o
 	gcc -shared -Wl,-soname,liblopti.so.$(VERSION) -o liblopti.so.$(VERSION) *.o
 	ln -sf liblopti.so.$(VERSION) liblopti.so
 
-t-%: t-%.cc *.h liblopti.so
+t-%: t-%.cc %.h *.h   liblopti.so
+
+t-%-r: t-%.cc *.h liblopti.so
+
 t-%: SPEED=DEBUG
 
 t-lopti: t-lopti.cc liblopti.so
@@ -59,8 +62,12 @@ t-condor: LDFLAGS  +=   -L /usr/local/lib/ -lcondor  -lm
 t-condor: t-condor.cc condor-wrap.h
 	$(CXX) $(CXXFLAGS) -DOPTI=CONDOR  $< -o $@ $(LDFLAGS)
 
+t-line_search: t-line_search.cc line_search.h 
+	$(CXX) $(CXXFLAGS) -DOPTI=NM  $< -o $@ $(LDFLAGS)
+
 t-nm: t.cc  gsl-nelder-mead-wrap.h
 	$(CXX) $(CXXFLAGS) -DOPTI=NM  $< -o $@ $(LDFLAGS)
+
 
 t-newuoa-old: newuoa/t-newuoa.cc newuoa-wrap.h  lopti.h
 	#	rm -f *.o
