@@ -47,10 +47,10 @@ struct  newuoa_minimizer:  trust_region_minimizer<V> {
 
 						MINIMIZER_MEMBERS;  TR_MINIMIZER_MEMBERS;  OBJECTIVE_TYPES;
 	array<double,N,1>	Xd;	
-	explicit 		newuoa_minimizer	():   trust_region_minimizer<V>("newoua") {};
+	//explicit 		newuoa_minimizer	():   trust_region_minimizer<V>("newoua") {};
 	minimizer<V>&		x0			(V& _X) 	{  X  = _X;    Xd = _X;  	return *this;  };
 	virtual V&		argmin			();
-	virtual const string	name			() 	const	{  return (format("%s-%d-%d") %name_  %(V::size())  %NPT ).str(); };
+	virtual const string	name			() 	const	{  return minimizer<V>::mk_name("newoua"); };
 	//virtual const string	name			() 	const	{  char buf[100];   sprintf(buf,"%s-%d-%d", name_.c_str(),  V::size(),  NPT); return string(buf); };
 
 };

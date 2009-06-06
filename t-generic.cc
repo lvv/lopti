@@ -48,7 +48,7 @@
 
 	#if  ! defined(_N) 
 		#define _N 2
-		#warning 	"using default N=2"
+		//#warning 	"using default N=2"
 	#endif
 
 

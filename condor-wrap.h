@@ -80,9 +80,10 @@ struct	condor_minimizer: trust_region_minimizer<V>   {
 			CONDOR::Vector			cX;		// param in condor format
 			CONDOR::Vector			cR;		// rescale divider
 									//	void		rescale			(V& R) 		{ cR << R; c_rof_wrap = new CONDOR::CorrectScaleOF(2, c_of, cR); };
-	explicit 			condor_minimizer	()			: trust_region_minimizer<V>("condor") {};
-	virtual	minimizer<V>&	 	verbose			(bool flag)	{ verbose_     = flag; c_of.verbose = flag; return *this; };
-	virtual V&		 	argmin			()		{
+	//explicit 			condor_minimizer	()			: trust_region_minimizer<V>("condor") {};
+	minimizer<V>&	 	verbose			(bool flag)	{ verbose_     = flag; c_of.verbose = flag; return *this; };
+	const string		name			() 	const	{  return minimizer<V>::mk_name("condor"); };
+	V&		 	argmin			()		{
 							assert(objective_v != 0 );  assert(!isnan(rho_begin_) && !isnan(rho_end_));
 		c_of.init(objective_v, X);
 		globalPrintLevel = 10;		// off

@@ -31,9 +31,10 @@ struct   hook_jeevs_minimizer   : minimizer<V>  {
 					#define  EPSILON 0.000001
 						T	tau_;	   // Termination criterium        
 
-	explicit			hook_jeevs_minimizer	()		: minimizer<V>("hook-jeevs"), tau_(10*EPSILON) { S.assign(0.2);};
-	virtual	minimizer<V>&	 	tau			(T _tau)	{ tau_ = _tau; return *this; };
-	virtual minimizer<V>&		step0			(V& _S)		{ S=_S; return *this; };
+	explicit			hook_jeevs_minimizer	()		:  tau_(10*EPSILON) { S.assign(0.2);};
+	const string		name			() 	const	{  return minimizer<V>::mk_name("hook-jeevs"); };
+	minimizer<V>&	 	tau			(T _tau)	{ tau_ = _tau; return *this; };
+	minimizer<V>&		step0			(V& _S)		{ S=_S; return *this; };
 
 	V&		 	argmin			()		{
 					const T	threshold = 1e-12;	   // Threshold for the function   

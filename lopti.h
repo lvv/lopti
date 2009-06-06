@@ -27,7 +27,7 @@ namespace lopti {
 							using minimizer<V>::ymin_;		\
 							using minimizer<V>::Xmin_;		\
 							using minimizer<V>::name;		\
-							using minimizer<V>::name_;		\
+							using minimizer<V>::name_base;		\
 							using minimizer<V>::found_;		\
 							using minimizer<V>::objective_v;
 
@@ -48,12 +48,12 @@ struct	minimizer {
 			T				ymin_;
 			int				iter_;
 			bool				found_;
-			string				name_;
+			string				name_base;
 
 				explicit 		
-	minimizer		(const string& _name = "unknown")  
+	minimizer		()
 	:
-		name_		(_name),
+		name_base	(""),	
 		max_iter_	(10000),
 		ymin_    	(numeric_limits<T>::quiet_NaN ()),
 		iter_    	(0),
@@ -74,12 +74,8 @@ struct	minimizer {
 
 
 	// get-ters
-	virtual const string		name			() 	const	{  return (format("%s-%d")  %name_  %(V::size()) ).str(); };
-	/*virtual const string		name			() 	const	{ 
-			char	buf[100];
-			sprintf(buf, "%s-%d",  name_.c_str(), V::size());
-			return string(buf);
-	};*/
+	virtual const string		name			() 	const	{  return mk_name(""); };
+		const string		mk_name			(const string&& name_base) 	const	{  return (format("%s-%d")  %name_base  %(V::size()) ).str(); };
 	virtual T 	 		ymin			()	const	{  return ymin_; };
 	virtual V 	 		Xmin			()	const	{  return Xmin_; };
 	virtual T 	 		iter			()	const	{  return iter_; };
@@ -104,7 +100,7 @@ struct	trust_region_minimizer : minimizer<V>    {
 			T 				rho_begin_, rho_end_;
 
 	explicit		trust_region_minimizer		(const char* _name= "unknown (trust region type)")
-	:	minimizer<V>(_name),
+	:	//minimizer<V>(_name),
 		rho_begin_ 	(1.0),
 		//rho_end_   	(0.1)
 		rho_end_   	(numeric_limits<T>::min()*1000)

@@ -18,11 +18,7 @@
 int main() { 
 
 		typedef 	array<float,2,1>		V;	
-	//	objective1<V>*	objective_v  = objective1<V>*(trace<V>(rosenbrock<V>()));
-	//	line_search_backtracking_t<V>	lls(trace<V>(rosenbrock<V>()));
-		line_search_backtracking_t<V>	ls = line_search_backtracking_t<V>(rosenbrock<V>());
-	//	line_search_backtracking_t<V>	ls(*new rosenbrock<V>);
-	//	line_search_backtracking_t<V>	lls(*objective_v);
+		line_search_backtracking_t<V>	ls = line_search_backtracking_t<V>(trace<V>(rosenbrock<V>()));
 		const V		X0 = {{ 1, 0 }};
 		const V		DX = {{ 0, 1 }};
 

@@ -66,12 +66,23 @@ int main(int argc, char **argv) {
 			#if 	(FN == chebyquad)
 				for (int i=0; i <_N; i++)   _X0[i] = (i+1.)/(i+2.);
 				const double RHO_BEGIN = 0.2* _X0[0];
-				cout << "x0: "<< _X0 << endl;
+				cout << "*** initial X: "<< _X0 << endl;
 			#else
 				#define 	RHO_BEGIN	0.1
 			#endif
 
 			
+cout << "@@@@@@@  " << rosenbrock<V1>().name() << endl; 
+cout << "@@@@@@@  " << chebyquad<V1>().name() << endl; 
+cout << "@@@@@@@  " << (trace<V1>(chebyquad<V1>())).name() << endl; 
+V1 RR;
+cout << "@@@@@@@  " << rescale<V1>
+			(
+				rosenbrock<V1>(),
+				RR
+			)
+			.name() << endl; 
+//cout << "@@@@@@@  " << rescale<V1>(rosenbrock<V1>(), (const V1)()) .name() << endl; 
 
 	#ifdef CONDOR
 
@@ -137,7 +148,6 @@ int main(int argc, char **argv) {
 		}*/
 
 		{//  ANY V  (<float,2,0>)
-		cout << "<float,2,0>\n";
 		typedef		array<float,2,1>		V;
 		V X0 = {{-1.2, 1}};
 		X0 = _X0;
@@ -150,7 +160,6 @@ int main(int argc, char **argv) {
 			mzr	.argmin		();
 			mzr	.print		();
 		}
-		cout << _X0 << endl;
 
 
 

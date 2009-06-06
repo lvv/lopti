@@ -46,7 +46,6 @@ struct 	line_search_backtracking_t   {
 				const T		beta;
 				const T		t0;
 	line_search_backtracking_t (
-		//virtual void		objective	(objective_cref_t ref)	{ wrapped_objective_v = objective_p_t(&ref.clone());	name_ = ref.name(); };
 		objective_cref_t   ref,
 		const T		alpha = 0.5,
 		const T		beta  = 0.5,

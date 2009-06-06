@@ -45,8 +45,9 @@ struct	gsl_nelder_mead_minimizer  :  minimizer<V> {
 		gsl_multimin_function		minex_func;
 		double 				characteristic_size_;
 
+	const string		name			() 	const	{  return minimizer<V>::mk_name("nelder-meed"); };
 	explicit 		gsl_nelder_mead_minimizer	() :
-			minimizer<V>("nelder-mead"),
+			//minimizer<V>("nelder-mead"),
 			gsl_minimizer_type_ptr(gsl_multimin_fminimizer_nmsimplex),
 			gX(0),
 			gS(0)

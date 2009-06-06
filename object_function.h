@@ -29,12 +29,9 @@
 						#define CLONER(CLASS)		\
 							virtual CLASS& 	clone()  const		{  return  *new CLASS(*this); }
 
-
+						
 						 #define         OBJECTIVE_MEMBERS    \
 							using		objective0<V>::iter_; \
-							using		objective0<V>::wrapped_objective_v; \
-							using		objective0<V>::name_; \
-							using		objective0<V>::name; \
 							using		objective0<V>::X_opt_; \
 							static const int B = V::ibg; \
 							static const int N = V::sz;
@@ -47,75 +44,67 @@
 
 						
 						#define		NaN	numeric_limits<T>::quiet_NaN()
+
 			template<typename V>
-struct	objective0		{									// Lopti Object FuncTor
+struct	objective0		{									
 
 				OBJECTIVE_TYPES;
 
-			string			name_;
 			V			X_opt_;
 			int			iter_;
-			objective_p_t		wrapped_objective_v;
 
 	// CTOR
 	explicit		objective0	()			:  	iter_(0)				{ X_opt_ = -1; };
-	explicit		objective0	(const string& s)	:  	iter_(0),	name_(s)		{ X_opt_ = -1; };
 	virtual			~objective0	()	 = 0;
 	virtual objective0<V>&	clone		() const = 0; 
 
 	// set-ters
 	void 			known_optimum	(const V& X_answ)	{ X_opt_ = X_answ; };		// known optimum, used for testing optimizers
-	virtual void		objective	(objective_cref_t ref)	{ wrapped_objective_v = objective_p_t(&ref.clone());	name_ = ref.name(); };
 
 	// get-ers
-	virtual const string	name		()	const		{ return  name_; };
-	virtual int 		iter		()	const		{ return  ! wrapped_objective_v  ?  iter_  :  wrapped_objective_v->iter(); };
-	virtual	T 		opt_distance	(V& X)	const		{ return  distance_norm2(X_opt_, X);  };
-	virtual	bool 		empty		()	const		{ return  ! wrapped_objective_v;  };
+	virtual const string	name		()	const		{ return  "not-defined"; };
+	virtual int 		iter		()	const		{ return  iter_;  };
+	virtual	T 		opt_distance	(const V& X) const	{ return  distance_norm2(X_opt_, X);  };
 
 	// do-ers
-	virtual T		operator()	(const V&  X)			{
-									assert( wrapped_objective_v != 0 );
-		T   y = (*wrapped_objective_v)(X);
-		return y;
-	}
-
+	virtual T		operator()	(const V&  X) = 0;
 	virtual T		eval0		(const V&  X) 		{ return  operator()(X); };
-	virtual V&&		eval1		(const V&  X) 		{ assert(false); return std::move(V()); };
-
-	//virtual T		eval0		(const V&  X) 		{ return  operator()(X); }
-	//virtual V&&		eval1		(const V&  X) 		{ return  std::move(V()); }
-
-	//virtual void		reset		()		{ iter_ = 0; };
+	virtual V&&		eval1		(const V&  X) 		{ assert(false);      return std::move(V()); };
  };
 
 	template<typename V>	objective0<V>::~objective0 () {}; 				// we need this (see http://www.devx.com/tips/Tip/12729)
 
 			template<typename V>
-struct	objective1: objective0<V>	{			OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(objective1);  	// Lopti Object FuncTor
-	// do-ers
-	/*
-	virtual T		eval0	(V&  X)			{
-					assert( wrapped_objective_v != 0 );
-		T   y = (*wrapped_objective_v).eval0(X);
+struct	wrapper: objective0<V>		{							
+				OBJECTIVE_TYPES;
+			objective_p_t		objective_v;
+
+	virtual void		objective	(objective_cref_t ref)	{ objective_v = objective_p_t(&ref.clone()); };
+	virtual int 		iter		()	const		{ return   objective_v->iter(); };
+	        const string	name		()	const		{ return   objective_v->name(); };
+	virtual T		operator()	(const V&  X)		{
+										assert( objective_v != 0 );
+		T   y = (*objective_v)(X);
 		return y;
 	}
-	virtual V&&		eval1	(V&  X)			{
-					assert( wrapped_objective_v != 0 );
-		V   G = (*wrapped_objective_v).eval1(X);
-		return G;
-	}*/
+	virtual T		eval0		(const V&  X) 		{ return  operator()(X); };
+	virtual V&&		eval1		(const V&  X) 		{
+						assert( objective_v != 0 );
+		return objective_v->eval1(X);
+	};
  };
 
+//
  /////////////////////////////////////////////////////////////////////////////////////////  OF: ROSENBROCK
 template<typename V>	struct	rosenbrock  : objective0<V> { 
 			OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(rosenbrock)
-	rosenbrock	()	: objective0<V>("rosenbrock") 	{ V const  X_answ = {{ 1.0, 1.0 }};   known_optimum(X_answ); };
+	explicit 	rosenbrock		()		{ V const  X_answ = {{ 1.0, 1.0 }};   known_optimum(X_answ); };
 									// unset view; set surface;  set isosamples 150,150;  set contour base; set cntrparam levels 20; splot  [-3:4] [-2:8]  log10 (100*(y-x**2)**2 + (1-x)**2)
 									// set view map ; unset surface;  set grid ; set samples 500,500;  set contour base; set cntrparam levels 20; splot  [-3:4] [-2:8]  log10 (100*(y-x**2)**2 + (1-x)**2)
-	T	operator() 		(const V& X)  {  iter_++;      return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
-	T	eval0	 		(const V& X)  {  operator() (X); };
-	V&&	eval1	 		(const V& X)  {
+	virtual const string	name() const  		{  return  "rosenbrock";  };
+	T		operator() 		(const V& X)	{  iter_++;      return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
+	T		eval0	 		(const V& X)	{  return operator() (X); };
+	V&&		eval1	 		(const V& X)	{
 				V G; 
 				G[0+B] = -400 * X[0+B] * (X[1+B] - pow2(X[0+B]))  -  2*(1-X[0+B]) ;
 				G[1+B] =  200 *          (X[1+B] - pow2(X[0+B])) ;
@@ -124,7 +113,7 @@ template<typename V>	struct	rosenbrock  : objective0<V> {
 									// (%o5) 	-400*x0*(x1-x0^2)-2*(1-x0)
 									// (%i6) diff(rb(x0,x1),x1);
 									// (%o6) 	200*(x1-x0^2)
-				return G;
+				return std::move(G);
 		};
 
 	/*			typedef   matrix<T,V::sz, V::sz>   M; 
@@ -142,16 +131,15 @@ template<typename V>	struct	rosenbrock  : objective0<V> {
  template<typename V>   typename V::value_type    plain_fn_rosenbrock  (V& X) { const int B = V::ibg;   return  100 * pow2(X[1+B]-pow2(X[0+B])) + pow2(1-X[0+B]); };
  /////////////////////////////////////////////////////////////////////////////////////////  OF: BAD SCALE ROSENBROCK
 template<typename V, int FACTOR>	struct	bad_scale_rosenbrock	 : objective0<V> { 	OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(bad_scale_rosenbrock);
-	bad_scale_rosenbrock() : objective0<V>("bad_scale_rosenbrock") { V const  X_answ = {{ 1.0, 1.0*FACTOR }};   known_optimum(X_answ); };
+	bad_scale_rosenbrock() { V const  X_answ = {{ 1.0, 1.0*FACTOR }};   known_optimum(X_answ); };
 	T	operator() 		(V& X)   {  iter_++; return  100 * pow2(X[1+B]/FACTOR-pow2(X[0+B])) + pow2(1-X[0+B]); };
  };
  /////////////////////////////////////////////////////////////////////////////////////////  OF: CHEBYQUAD
 
 template<typename V>	struct	chebyquad: objective0<V>		{	 OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(chebyquad)		// The Chebyquad test problem (Fletcher, 1965) 
 
-			chebyquad		()	: objective0<V>("chebyquad") 	{};
 
-	T		operator() 		(V& X)  {
+	T		operator() 		(const V& X)  {
 
 			iter_++;
 
@@ -180,49 +168,51 @@ template<typename V>	struct	chebyquad: objective0<V>		{	 OBJECTIVE_TYPES;  OBJEC
 
 			return F;
 	}
+
+	virtual const string 	name() const		{ return "chebyquad"; };
  };
  /////////////////////////////////////////////////////////////////////////////////////////  WRAPPER: RESCALE
-template<typename V>	struct	rescale :  objective0<V> 	{		OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(rescale)
+template<typename V>	struct	rescale :  wrapper<V> 	{		OBJECTIVE_TYPES;   OBJECTIVE_MEMBERS;  CLONER(rescale)
 				V R;
-			rescale		(objective_cref_t objective_v, V& _R)  : 	R(_R)  {  X_opt_ = objective_v.X_opt_; X_opt_ /= _R;   objective(objective_v); /*cout << "rescaled opt: " << X_opt_ << endl <<  "opt: " << objective_v.X_opt_ << endl;*/  };
-	const string	name		()	const	{ return  name_ + " rescaled"; };
-	T		operator()	(V&  X)		{ iter_++;  	V XR = X;  XR *= R;    return  (*wrapped_objective_v)(XR); };
-	T 		opt_distance	(V& X)	const	{ V XR = X;   XR*=R;    return  distance_norm2(wrapped_objective_v->X_opt_, XR); }; // distance in normalized coord
+			rescale		(objective_cref_t ref, V& _R)  : 	R(_R)  {  X_opt_ = ref.X_opt_;  X_opt_ /= _R;   objective(ref); /*cout << "rescaled opt: " << X_opt_ << endl <<  "opt: " << objective_v.X_opt_ << endl;*/  };
+	virtual const string	name		()	const	{ return  wrapper<V>::objective_v->name() + " rescaled"; };
+	T		operator()	(const V&  X)		{ iter_++;  	V XR = X;  XR *= R;    return  (*wrapper<V>::objective_v)(XR); };
+	T 		opt_distance	(const V& X)	const	{ V XR = X;   XR*=R;    return  distance_norm2(wrapper<V>::objective_v->X_opt_, XR); }; // distance in normalized coord
  };
  /////////////////////////////////////////////////////////////////////////////////////////  WRAPPER:  XG_LOG (xgraphic)
  template<typename V> class minimizer;
 
-template<typename V>	struct	xg_log : objective0<V> 		{		OBJECTIVE_TYPES;   OBJECTIVE_MEMBERS;  CLONER(xg_log)
+template<typename V>	struct	xg_log : wrapper<V> 		{		OBJECTIVE_TYPES;   OBJECTIVE_MEMBERS;  CLONER(xg_log)
 				std::shared_ptr<ofstream>	log_file;  // need smart ptr becase xg_log dtor-ed on coping
 	xg_log	 (objective_cref_t _objective_v, minimizer<V>& mzr)	{
 		objective(_objective_v);											assert(log_file == 0 );
 		// FIXME: test if there is a "log" dir
-		log_file = shared_ptr<ofstream>(new ofstream(("log/" +  (&mzr)->name() + "(" + name() + ")" ).c_str()));	assert(log_file->good());
+		log_file = shared_ptr<ofstream>(new ofstream(("log/" +  (&mzr)->name() + "(" + wrapper<V>::name() + ")" ).c_str()));	assert(log_file->good());
 	};
 
-	T		operator()	(V&  X)			{
-		T   y = (*wrapped_objective_v)(X); 			assert(log_file->good());
+	T		operator()	(const V&  X)			{
+		T   y = (*wrapper<V>::objective_v)(X); 			assert(log_file->good());
 		// 1 - iter no(gp: splot label);  2 - hight (y);  3 - |X-opt| ignored;  4,5 - X coord;  
-		//*log_file << format("%d \t %22.18g \t %22.18g \t %22.18g \n")   % (wrapped_objective_v->iter())   %y   % wrapped_objective_v->opt_distance(X)  %X  << flush;  
-		*log_file << setprecision(18) << wrapped_objective_v->iter() << " 	" <<  y  << " " <<  wrapped_objective_v->opt_distance(X)  << " " <<  X  << endl;  
+		//*log_file << format("%d \t %22.18g \t %22.18g \t %22.18g \n")   % (wrapper<V>::objective_v->iter())   %y   % wrapper<V>::objective_v->opt_distance(X)  %X  << flush;  
+		*log_file << setprecision(18) << wrapper<V>::objective_v->iter() << " 	" <<  y  << " " <<  wrapper<V>::objective_v->opt_distance(X)  << " " <<  X  << endl;  
 		return  y;
 	};
  };
 
-template<typename V>	struct	trace : objective0<V> 		{		  CLONER(trace); OBJECTIVE_TYPES;   OBJECTIVE_MEMBERS;
-	Timer	timer;
-	trace	 (objective_cref_t _objective_v)	{ objective(_objective_v);	};
+template<typename V>	struct	trace :  wrapper<V> 		{		  CLONER(trace); OBJECTIVE_TYPES;   OBJECTIVE_MEMBERS;
+						Timer	timer;
+	explicit 	trace	 	(objective_cref_t ref)	{ objective(ref); };
 
-	T		operator()	(V&  X)			{
+	T		operator()	(const V&  X)			{
 
-		if (wrapped_objective_v->iter()==0)   cout << "# (iter)              X[*]               ==F-value" << endl;
-		//cout << format("(%d) \t % 11.8g")   % (wrapped_objective_v->iter())  %X;
-		printf("(%d) 	 ",  wrapped_objective_v->iter());  cout <<  X;
+		if (wrapper<V>::objective_v->iter()==0)   cout << "# (iter)              X[*]               ==F-value" << endl;
+		//cout << format("(%d) \t % 11.8g")   % (wrapper<V>::objective_v->iter())  %X;
+		printf("(%d) 	 ",  wrapper<V>::objective_v->iter());  cout <<  X;
 
 		//MSG("(%d/%.1fs") % cnt++  %timer();                                                                                                                
 		//for(int i=0; i<param_size; ++i)      MSG("%=10.6g")   %param[i];
 
-		T   y = (*wrapped_objective_v)(X); 			
+		T   y = (*wrapper<V>::objective_v)(X); 			
 		//cout << format("\t(%.1fs)   ==%18.13g\n")  %timer()    %y<< flush;  
 		printf("	(%.1fs)   ==%18.13g\n", timer(), y);	cout << flush;
 		return  y;
