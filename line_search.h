@@ -5,7 +5,7 @@
 	#include <lopti/lopti.h>
 
 	#include <cassert>
-		//using namespace std;
+		using namespace lvv;
 
 	#include <lvv/array.h>
 		using lvv::array;
@@ -58,7 +58,7 @@ struct 	line_search_backtracking_t   {
 	{};
 
 
-	V&&	find( const V&	X0,	const V& DX) {
+	const V	find( const V&	X0,	const V& DX) {
 				T  t       = t0;
 				T  f0      ( objective_v->eval0 (X0) );
 				V  G0      ( objective_v->eval1 (X0) );
@@ -68,13 +68,14 @@ struct 	line_search_backtracking_t   {
 			X = X0 + t * DX;
 			T f = objective_v->eval0(X);
 			if ( f  <  f0 + alpha * t * dot(G0,DX)) 	 {
-				return  std::move(X);
+				return  X;
 			}
 			t = beta * t;
 		}
 
+		
 		assert(false);
-		return  std::move(X);
+		return  X;
 	};
  };
 

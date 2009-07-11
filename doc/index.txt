@@ -2,41 +2,20 @@
 Leonid Volnitsky <leonid@volnitsky.com>
 v0.3 (alpha) Jul 2009
 :icons: Yes
-:iconsdir: /
+:iconsdir: /images/icons
 :language: cpp
 :caption:
 :compact-option: compact
 
 //  To see HTML rendered web page go to:   http://volnitsky.com/project/lopti
 
-:gh-lvvlib:	http://github.com/lvv/lvvlib/tree/master
+:gh-lvvlib:	httpx://github.com/lvv/lvvlib/tree/master
 :v-p:		http://volnitsky.com/project
 
 +++<div style="float: right; margin-left: 2em">+++
 image:xgr001.gif["Visualization with xgraphics", width="400", link="xgr001.gif"]
 
-LOPTI is mathematical optimization  C++ library. There are three major parts.
-1st and main part is solver-driver which either wraps external solver or uses
-LOPTI native solvers and presents to library user consistent and simple
-optimization API.
-
-2nd part is collection of solvers.  Currently 4
-solvers are included (or supported):
-NEWUOA, CONDOR, Nelder-Mead (simplex) and Hook-Jeevs.
-All these solvers are derivative free and have open source (GPL or BSD like)
-licences.  Some of them (Condor) are unchanged and treated as black-box.  Some
-of them (NEWUOA - fortran source) went through heavy modification to interface
-with LOPTI.  And other (Hook-Jeevs) were completely rewritten into LOPTI native
-solver.
-
-Though I am primarily interested in derivative-free, unconstrained
-solvers for expensive objective, LOPTI inherently not limited to these methods
-and in future there might be other types of solvers and constraints interface.
-Also I am developing my own solver, preliminary results are
-very promising, stay tuned.
-
-3rd part is collection of object function and
-object function modifiers.
+include::summary.txt[]
 
 +++</div>+++
 
@@ -67,7 +46,7 @@ For installation external solvers see corresponding section bellow.
 - Compiler. LOPTI tested only on x86-64 with:
    * GNU GCC  with gfortran included (if you want NEWUOA solver), tested with v4.4
    * INTEL ICC, tested with vervion 11
--	{v-p}/lvvlib/[lvvlib] - you will need {v-p}/lvvlib/array.h[array.h] for `lvv::array` class.
+-	{v-p}/lvvlib/[lvvlib] - you will need {v-p}/lvvlib/array/[array.h] for `lvv::array` class.
 -       BOOST C++ libraries, tested with 1.3.37
 -       GIT - your distribution probably have package for GIT.
 -       XGraphic (+++cmap.polytechnique.fr/~jouve/xd3d+++)  - simple visualisation utility.  This is optional.
