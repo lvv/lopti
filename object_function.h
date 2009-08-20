@@ -36,6 +36,7 @@
 							static const int B = V::ibg; \
 							static const int N = V::sz;
 
+
 						
 						#define 	OBJECTIVE_TYPES	\
 							typedef		std::shared_ptr<objective0<V> >	objective_p_t; \
@@ -220,10 +221,12 @@ template<typename V>	struct	trace :  wrapper<V> 		{		  CLONER(trace); OBJECTIVE_
  };
 
  /////////////////////////////////////////////////////////////////////////////////////////  ADAPTER: PLAIN_FN
-template<typename V>	struct	make_objective : objective0<V>		{  				OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(make_objective)
+template<typename V>	struct	make_objective : objective0<V>	{OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(make_objective)
 						std::function<T(V&)>	of;
-	explicit	make_objective	(std::function<T(V&)> _of, const string& _name)	 : objective0<V>(_name) , of(_of)   {};
-	T	operator()	(V&  X)	  { assert(!of.empty() && ">> NOT DEFINED OBJ FUNC <<");  iter_++;   T y = (of)(X); return y; }
+						const string 		name_;
+	explicit	make_objective	(std::function<T(V&)> _of, const string& _name)	 : name_(_name), objective0<V>() , of(_of)   {};
+	T		operator()	(V&  X)	  	{ assert(!of.empty() && ">> NOT DEFINED OBJ FUNC <<");  iter_++;   T y = (of)(X); return y; }
+	const string 	name		() const	{ return std::move(name_); };
  };
  }; // namespace lopti
  #endif // LOPTI_OF_H

@@ -16,7 +16,7 @@
 	#include <boost/bind.hpp>
 		using boost::bind;
 
-	//#include	<lopti/object_function.h>
+	#include	<lopti/object_function.h>
 	//#include	<lopti/lopti.h>
 	#include	<lopti/condor-wrap.h>
 	#include   	<lopti/newuoa-wrap.h>
@@ -28,6 +28,11 @@
 int main(int argc, char **argv) {
 	
 			///////////////////////////////////////////////// CONFIG
+		
+			#if  ! defined(NEWUOA) && ! defined(NM)  && !defined(CONDOR)  && !defined(PLAIN_FN)
+				#define ALL
+			#endif
+
 			#ifdef  ALL
 				#define CONDOR
 				#define NEWUOA
@@ -36,12 +41,6 @@ int main(int argc, char **argv) {
 				#define PLAIN_FN
 			#endif
 
-			#if  ! defined(NEWUOA) && ! defined(NM)  && !defined(CONDOR)
-				#define CONDOR
-				#define NEWUOA
-				#define NM
-				#define HJ
-			#endif
 
 			#if  ! defined(FN) 
 				#define FN rosenbrock
@@ -72,43 +71,34 @@ int main(int argc, char **argv) {
 			#endif
 
 			
-cout << "@@@@@@@  " << rosenbrock<V1>().name() << endl; 
-cout << "@@@@@@@  " << chebyquad<V1>().name() << endl; 
-cout << "@@@@@@@  " << (trace<V1>(chebyquad<V1>())).name() << endl; 
-V1 RR;
-cout << "@@@@@@@  " << rescale<V1>
-			(
-				rosenbrock<V1>(),
-				RR
-			)
-			.name() << endl; 
-//cout << "@@@@@@@  " << rescale<V1>(rosenbrock<V1>(), (const V1)()) .name() << endl; 
+						/*
+						cout << "@@@@@@@  " << rosenbrock<V1>().name() << endl; 
+						cout << "@@@@@@@  " << chebyquad<V1>().name() << endl; 
+						cout << "@@@@@@@  " << (trace<V1>(chebyquad<V1>())).name() << endl; 
+						V1 RR;
+						cout << "@@@@@@@  " << rescale<V1>
+									(
+										rosenbrock<V1>(),
+										RR
+									)
+									.name() << endl; 
+						cout << "@@@@@@@  " << rescale<V1>(rosenbrock<V1>(), (const V1)()) .name() << endl; 
+						*/
 
 	#ifdef CONDOR
 
 		{  condor_minimizer<V0>	mzr;////  condor  LOGGED 
 			mzr	.x0		(_X0);
-			mzr	.objective		(xg_log<V0>(FN<V0>(),  mzr));
+			mzr	.objective	(xg_log<V0>(FN<V0>(),  mzr));
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
 			mzr	.argmin();
 			mzr	.print();	
 		}
 
-		#ifdef  PLAIN_FN
-		{  condor_minimizer<V0> mzr;////  CONDOR  x PLAIN_FN  ROSENBROCK		// TODO: why results deffrent from objective?
-			mzr	.objective			( make_objective<V0> (&plain_fn_rosenbrock<V0>, "make_objective") );
-			mzr	.x0			(_X0);	// X[0..N-1]	
-			mzr	.rho_begin		(1);
-			mzr	.rho_end		(STOP_AT_X_STEP);
-			mzr	.argmin();
-			mzr	.print(); 
-		}
-		#endif
-
 		#ifdef  NAKED
 		{  condor_minimizer<V0>	mzr;	////  CONDOR  x NAKED ROSENBERG
-			mzr	.objective		(  rosenbrock<V0>() );
+			mzr	.objective	(  rosenbrock<V0>() );
 			mzr	.x0		(_X0);
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
@@ -120,7 +110,7 @@ cout << "@@@@@@@  " << rescale<V1>
 		#ifdef  RESCALE
 		{  	V0 R = {{ 1, 0.0100 }};   V0 X = _X0; V0  X_opt;
 		condor_minimizer<V0>	mzr;////  condor  logged RESCALED rosenbrock
-			mzr	.objective		(xg_log<V0>  (rescale<V0>  ( trace<V0>(rosenbrock<V0>()), R),  mzr));
+			mzr	.objective	(xg_log<V0>  (rescale<V0>  ( trace<V0>(rosenbrock<V0>()), R),  mzr));
 			mzr	.x0		(X/=R);	// X[0..N-1]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
@@ -139,7 +129,7 @@ cout << "@@@@@@@  " << rescale<V1>
 
 		/*
 		{ newuoa_minimizer<V1>	mzr;		 ////  NEWUOA :  2*N + 1 
-			mzr	.objective		(xg_log<V1>(FN<V1>(),mzr));
+			mzr	.objective	(xg_log<V1>(FN<V1>(),mzr));
 			mzr	.x0		(*(V1*)&(_X0));	// X[1..N]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
@@ -153,7 +143,7 @@ cout << "@@@@@@@  " << rescale<V1>
 		X0 = _X0;
 
 		newuoa_minimizer<V>	mzr;		 ////  NEWUOA :  2*N + 1 
-			mzr	.objective		(xg_log<V>(FN<V>(),mzr));
+			mzr	.objective	(xg_log<V>(FN<V>(),mzr));
 			mzr	.x0		(X0);		// X[1..N]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
@@ -166,7 +156,7 @@ cout << "@@@@@@@  " << rescale<V1>
 		#if _N < 15
 		{	const int N=V1::sz;
 		newuoa_minimizer<V0, (N+1)*(N+2)/2>	mzr; ////  NEWUOA  (N+1)*(N+2)/2
-			mzr	.objective		(xg_log<V0>(FN<V0>(),mzr));
+			mzr	.objective	(xg_log<V0>(FN<V0>(),mzr));
 			mzr	.x0		(_X0);	// X[1..N]
 			mzr	.rho_begin	(RHO_BEGIN);
 			mzr	.rho_end	(STOP_AT_X_STEP);
@@ -175,6 +165,18 @@ cout << "@@@@@@@  " << rescale<V1>
 		}
 		#endif
 
+	#endif
+
+	#ifdef  PLAIN_FN
+	{  newuoa_minimizer<V0> mzr;
+		mzr	.objective		( make_objective<V0> (&plain_fn_rosenbrock<V0>, "make_objective(plain_fn_rosenbrock)") );
+		mzr	.x0			(_X0);	// X[0..N-1]	
+		mzr	.rho_begin		(1);
+		mzr	.rho_end		(STOP_AT_X_STEP);
+		mzr	.argmin();
+		mzr	.print(); 
+		cout << "???????????????????????" << endl;
+	}
 	#endif
 
 

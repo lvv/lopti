@@ -5,7 +5,8 @@ v0.3 (alpha) Jul 2009
 :iconsdir: /images/icons
 :language: cpp
 :caption:
-:compact-option: compact
+
+//  :compact-option: compact
 
 //  To see HTML rendered web page go to:   http://volnitsky.com/project/lopti
 
@@ -219,7 +220,7 @@ Only `double` vector,  index should start from 0.
 [[Hook-Jeevs]]
 === Hook-Jeevs
 Native LOPTI solver, converted from Oleg
-Kiselev, 1998 implementation (+++netlib.org/c++/linalg.tgz+++) . Old and
+Kiselev, 1998 implementation (http://netlib.org/c++/linalg.tgz[]) . Old and
 usually slow solver. 
 But sometimes can outperform all other at not trivial high dimension tasks. 
 
@@ -306,18 +307,31 @@ cout << "optimum at: " << X_opt << endl;
 include::../../volnitsky.com/project/howto-submit-patch.txt[]
 
 == TODO
-- fix all type-puning
-- add box and polyhedron constraints
-- remove `using` from headers
-- unify and simplify termination criteria. 
-- add `mkl TR solver` solver
-- add `zib nlqe1` solver
-- add `zib newton_test` functions
-- add `gsl bfgs` solver
-- add `assert` / `throw` on use uninitialized data in `minimizer` class
 
-[bibliography]
-.References
+~ fix all type-puning
+~ add box and polyhedron constraints
+~ remove `using` from headers
+~ unify and simplify termination criteria. 
+~ add `mkl TR solver` solver
+~ add `zib nlqe1` solver
+~ add `zib newton_test` functions
+~ add `gsl bfgs` solver
+~ add `assert` / `throw` on use uninitialized data in `minimizer` class
+
+=== Microformat
+
+++++++++++++++++++++++++++++
+<div class="hproduct">
+   <div class="fn">LOPTI</div>
+   <div class="category">C++ library</div>
+   <div class="description">Mathematical Optimization Labrary</div>
+   <div class="url">http://volnitsky.com/project/lopti</div>
+   <div class="photo">http://volnitsky.com/project/lopti/xgr001.gif</div>
+</div>
++++++++++++++++++++++++++++++
+
+
+=== References
 - [[[1]]] J.A. Nelder and R. Mead, 'A simplex method for function minimization', Computer Journal vol. 7 (1965), 308-315.
 - [[[2]]] R. Hooke and T. A. Jeeves,  'Direct Search Solution of Numerical and Statistical Problems',  Journal of the ACM, Vol. 8, April 1961, pp. 212-229
 - [[[3]]] M. J. D. Powell. 'The NEWUOA software for unconstrained optimization with derivatives'. DAMTP Report 2004/NA05, University of Cambridge, 2004.
@@ -345,15 +359,16 @@ include::../../volnitsky.com/project/howto-submit-patch.txt[]
 	* Quasi-Newton (BFGS)			(p521 §10.9)
 
 - [[[11]]] Quarteroni A., Sacco R., Saleri F. 'Numerical mathematics',  2nd ed., Springer 2007
+[options="compact"]
 	* The Hooke and Jeeves Method (p300 §7.2.1)
 	* Descent Methods (good overview, Newton, quasi-Newton, Gradient, Conjugate Gradient method) (p306 §7.2.2)
 	* Newton  (p313 §7.2.6)
 	* quasi-Newton  (p313 §7.2.7)
 
 - [[[12]]]  Schwartz R. 'Biological modeling and simulation. A survey of practical models, algorithms, and numerical methods' MIT-2008,  ISBN 0262195844
-	* The Levenberg–Marquardt Method (p90 §5.6.2) 
+	~ The Levenberg–Marquardt Method (p90 §5.6.2) 
 
 - [[[13]]] Zarowsky C.J. 'An introduction to numerical analysis for electrical and computer engineers',  Wiley 2004
-	* Backtraking Line Search (p353) 
-	* Newton’s algorithm with the backtracking (p353 §8.4)
+	~ Backtraking Line Search (p353) 
+	~ Newton’s algorithm with the backtracking (p353 §8.4)
 // vim: set filetype=asciidoc nu:
