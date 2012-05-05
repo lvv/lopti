@@ -23,7 +23,7 @@ include::summary.txt[]
 [icon="under-construction.gif"]
 CAUTION: Though LOPTI is quite usable and everything works for me,
 this is still work in progress, documentation is incomplete,
-API have not stabilized, it requires GCC-4.4 or ICC-11 and 
+API have not stabilized, it requires >=GCC-4.4 or >=ICC-11 and 
 some +++C++0x+++ features are used.
 
 == Quick Start
@@ -154,10 +154,11 @@ class gsl_nelder_mead_minimizer<V>
 
 `LDFLAGS=-lgsl`
 
-Old, somewhat slow, can be used with discontinues functions.  Termination criteria is set with member function `characteristic_size(double x)`
-Solver iteration is not equal to eval-count, it is about 1.5*eval-count.
-Rarely but it can happens, algorithm can get stuck, you can unstuck it by restarting form stuck point.
-Only `double` vector,  index should start from 0. 
+Old, somewhat slow, can be used with non-smooth functions.  Termination
+criteria is set with member function `characteristic_size(double x)` Solver
+iteration is not equal to eval-count, it is about 1.5*eval-count.  Rarely but
+it can happens, algorithm can get stuck, you can unstuck it by restarting form
+stuck point.  Only `double` vector,  index should start from 0. 
 
 === Trust Region solvers
 
@@ -165,11 +166,11 @@ The Trust-Region (TR) solvers are derived from newton method.
 TR solvers work by approximating OF with quadratic model function, which is constructed
 in such way that it passes through evaluation points near current minimum (basis).  Near means: at
 distance less then `rho`, which is dynamically changed by solver for each
-iteration.  To build an exact model,  +++`NP=(N+1)*(N+2)`+++  evaluation points are needed, so TR
+iteration.  To build an exact model,  +++NP=(N+1)*(N+2)+++  evaluation points are needed, so TR
 solvers at first `NP` iterations just evaluate `NP` points near `X0`. You can notice
 this slow start on convergence charts.  For high `N` (>10) this can be especially noticeable. 
 Instead of exact model it is possible with NEWUOA to use approximate model with less
-then +++`(N+1)*(N+2)`+++ points.
+then +++(N+1)*(N+2)+++ points.
 
 Uses member `rho_begin(T)`, instead of `S0(V)`,  defaults to
 0.2.  Because `rho` is scalar (applied equally to all directions) it is recommended
@@ -224,7 +225,7 @@ Kiselev, 1998 implementation (http://netlib.org/c++/linalg.tgz[]) . Old and
 usually slow solver. 
 But sometimes can outperform all other at not trivial high dimension tasks. 
 
-CAUTION: Might segfaulted.   Lowerer optimization from -O3 to -O2 to fix.
+CAUTION: Might segfault.   Try lowering optimization from -O3 to -O2 to fix.
 
 Code still needs some style cleanup, and thread safety. 
 
@@ -318,6 +319,10 @@ include::../../volnitsky.com/project/howto-submit-patch.txt[]
 ~ add `gsl bfgs` solver
 ~ add `assert` / `throw` on use uninitialized data in `minimizer` class
 
+
+// NOTES
+// http://code.google.com/p/ceres-solver/
+
 === Microformat
 
 ++++++++++++++++++++++++++++
@@ -371,4 +376,6 @@ include::../../volnitsky.com/project/howto-submit-patch.txt[]
 - [[[13]]] Zarowsky C.J. 'An introduction to numerical analysis for electrical and computer engineers',  Wiley 2004
 	~ Backtraking Line Search (p353) 
 	~ Newton’s algorithm with the backtracking (p353 §8.4)
+- [[[14]]] 'Wolfram Alpha: Examples: Optimization' http://www.wolframalpha.com/examples/Optimization.html ;  http://www.wolframalpha.com/input/?i=local+extrema+sin+x^2
+
 // vim: set filetype=asciidoc nu:
