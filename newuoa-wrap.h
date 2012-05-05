@@ -43,7 +43,7 @@ struct  newuoa_minimizer:  trust_region_minimizer<V> {
 	//typedef 	typename V::value_type		T;
 	typedef 	double				newuoa_t;
 	const static int 	N  = V::sz;
-	typedef 	array<newuoa_t,N,1>		Vd;
+	typedef 	lvv::array<newuoa_t,N,1>		Vd;
 
 						MINIMIZER_MEMBERS;  TR_MINIMIZER_MEMBERS;  OBJECTIVE_TYPES;
 	array<double,N,1>	Xd;	
@@ -80,16 +80,16 @@ newuoa_minimizer<V,NPT>::argmin () {
 	Vd		XNEW;
 	Vd		GQ;
 	Vd		D;
-	lvv::vector<double,NPT>		FVAL;
-	lvv::vector<double,NPT>		PQ;
-	lvv::vector<double,NDIM>		VLAG;
-	lvv::vector<double,(N*NP)/2>		HQ;
+	lvv::array<double,NPT,1>		FVAL;
+	lvv::array<double,NPT,1>		PQ;
+	lvv::array<double,NDIM,1>		VLAG;
+	lvv::array<double,(N*NP)/2,1>		HQ;
 
-	matrix<double,NDIM,N>		BMAT;
-	matrix<double,NPT,N>		XPT;  
-	matrix<double,NPT,NPTM>		ZMAT;   
+	lvv::matrix<double,NDIM,N>		BMAT;
+	lvv::matrix<double,NPT,N>		XPT;  
+	lvv::matrix<double,NPT,NPTM>		ZMAT;   
 		
-	array<double,1000,1>		W; //ws
+	lvv::array<double,1000,1>		W; //ws
 
 	// lvv: fortran auto declared
 	double CRVMIN;

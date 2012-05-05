@@ -101,7 +101,7 @@ struct	wrapper: objective0<V>		{
  /////////////////////////////////////////////////////////////////////////////////////////  OF: ROSENBROCK
 template<typename V>	struct	rosenbrock  : objective0<V> { 
 			OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(rosenbrock)
-	explicit 	rosenbrock		()		{ V const  X_answ = {{ 1.0, 1.0 }};   known_optimum(X_answ); };
+				rosenbrock		()		{ V const  X_answ = {{ 1.0, 1.0 }};   this->known_optimum(X_answ); };
 									// unset view; set surface;  set isosamples 150,150;  set contour base; set cntrparam levels 20; splot  [-3:4] [-2:8]  log10 (100*(y-x**2)**2 + (1-x)**2)
 									// set view map ; unset surface;  set grid ; set samples 500,500;  set contour base; set cntrparam levels 20; splot  [-3:4] [-2:8]  log10 (100*(y-x**2)**2 + (1-x)**2)
 	virtual const string	name() const  		{  return  "rosenbrock";  };
@@ -188,7 +188,7 @@ template<typename V>	struct	rescale :  wrapper<V> 	{		OBJECTIVE_TYPES;   OBJECTI
 template<typename V>	struct	xg_log : wrapper<V> 		{		OBJECTIVE_TYPES;   OBJECTIVE_MEMBERS;  CLONER(xg_log)
 				std::shared_ptr<ofstream>	log_file;  // need smart ptr becase xg_log dtor-ed on coping
 	xg_log	 (objective_cref_t _objective_v, minimizer<V>& mzr)	{
-		objective(_objective_v);											assert(log_file == 0 );
+		this->objective(_objective_v);								assert(log_file == 0 );
 		// FIXME: test if there is a "log" dir
 		log_file = shared_ptr<ofstream>(new ofstream(("log/" +  (&mzr)->name() + "(" + wrapper<V>::name() + ")" ).c_str()));	assert(log_file->good());
 	};
