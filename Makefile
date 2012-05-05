@@ -1,6 +1,14 @@
 
 # this include is part of lvvlib
-include  ../lvv/include.mk
+ifeq ($(USER),lvv)
+        HOMEDIR := /home/lvv/p/volnitsky.com/
+        INCLUDE := $(HOMEDIR)/include.mk
+else
+        INCLUDE := /dev/null
+endif
+
+include $(INCLUDE)
+
 	
 SPEED ?= DEBUG
 PREFIX ?= /usr/local
@@ -23,7 +31,7 @@ install: liblopti.so
 	mkdir -p		$(PREFIX)/lib/
 	cp -va liblopti.so*	$(PREFIX)/lib/
 
-clean:
+doclean:
 	rm -f liblopti.so*
 	rm -f {,newuoa/}*.o
 	rm -f doc/*.{html,css}
