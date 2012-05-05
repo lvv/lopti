@@ -12,7 +12,7 @@
 		using std::ofstream;
 
 	#include <lvv/timer.h>
-		using lvv::Timer;
+		using lvv::timer_t;
 
 	#include <lvv/array.h>
 		using lvv::array;
@@ -25,6 +25,8 @@
 	//	using boost::function;
 
  namespace lopti {
+
+	 					// TODO: replace macro with CRTP: http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
 
 						#define CLONER(CLASS)		\
 							virtual CLASS& 	clone()  const		{  return  *new CLASS(*this); }
@@ -200,8 +202,9 @@ template<typename V>	struct	xg_log : wrapper<V> 		{		OBJECTIVE_TYPES;   OBJECTIV
 	};
  };
 
+
 template<typename V>	struct	trace :  wrapper<V> 		{		  CLONER(trace); OBJECTIVE_TYPES;   OBJECTIVE_MEMBERS;
-						Timer	timer;
+						timer_t	 timer;
 	explicit 	trace	 	(objective_cref_t ref)	{ objective(ref); };
 
 	T		operator()	(const V&  X)			{
@@ -219,6 +222,7 @@ template<typename V>	struct	trace :  wrapper<V> 		{		  CLONER(trace); OBJECTIVE_
 		return  y;
 	};
  };
+
 
  /////////////////////////////////////////////////////////////////////////////////////////  ADAPTER: PLAIN_FN
 template<typename V>	struct	make_objective : objective0<V>	{OBJECTIVE_TYPES;  OBJECTIVE_MEMBERS;  CLONER(make_objective)
