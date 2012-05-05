@@ -29,7 +29,7 @@
 	 					// TODO: replace macro with CRTP: http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
 
 						#define CLONER(CLASS)		\
-							virtual CLASS& 	clone()  const		{  return  *new CLASS(*this); }
+							CLASS& 	clone()  const		{  return  *new CLASS(*this); }
 
 						
 						 #define         OBJECTIVE_MEMBERS    \
@@ -57,7 +57,7 @@ struct	objective0		{
 			int			iter_;
 
 	// CTOR
-	explicit		objective0	()			:  	iter_(0)				{ X_opt_ = -1; };
+				objective0	()			:  	iter_(0)				{ X_opt_ = -1; };
 	virtual			~objective0	()	 = 0;
 	virtual objective0<V>&	clone		() const = 0; 
 
@@ -70,7 +70,7 @@ struct	objective0		{
 	virtual	T 		opt_distance	(const V& X) const	{ return  distance_norm2(X_opt_, X);  };
 
 	// do-ers
-	virtual T		operator()	(const V&  X) = 0;
+	virtual T		operator()	(const V&  X) 		{ return T(); }
 	virtual T		eval0		(const V&  X) 		{ return  operator()(X); };
 	virtual V&&		eval1		(const V&  X) 		{ assert(false);      return std::move(V()); };
  };

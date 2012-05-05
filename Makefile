@@ -18,6 +18,7 @@ FCFLAGS += -frange-check -fbounds-check -O0 -ggdb3
 LDFLAGS += -L. -L /usr/local/lib  -lgsl -lgslcblas -lcondor -llopti -lgfortran 
 CXXFLAGS += -std=c++11 -I /usr/local/include/ -I .. -I .
 XGRAPHIC = xgraphic  -scat -markcol=-1  -g2 -logy -leg -legpos=3  -legsiz=1 -legtyp=2 -titgen="Convergance speed for dirivative-free algorithms" -titx="Objective function evaluation count" -tity="Distance to optimum:  log10 ( | X - X_opt | )" 
+FC=gfortran
 
 #.DEFAULT_GOAL := t-lopti-r
 #.PHONY: t-lopti-r all
