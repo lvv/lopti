@@ -8,10 +8,6 @@
 		using lvv::array;
 		using lvv::matrix;
 
-	#include	<functional>
-		using std::unary_function;
-	#include	<boost/function.hpp>
-		using boost::function;
 
 	///////////////////////////////////////////////////////////////////  SELECT SOLVER
 	#ifdef NM
@@ -77,8 +73,7 @@ int main(int argc, char **argv) {
 		#endif
 
 		V X_opt = mzr.argmin();
-		cout << endl;
 		mzr	.print		();
+		cout << endl;
 
-	return 0;
  }

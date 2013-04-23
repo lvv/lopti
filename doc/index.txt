@@ -1,30 +1,24 @@
 = LOPTI - mathematical optimization library.
 Leonid Volnitsky <leonid@volnitsky.com>
-v0.3 (alpha) Jul 2009
+v0.4 (alpha) Jul 2012
 :icons: Yes
 :iconsdir: /images/icons
 :language: cpp
 :caption:
-
-//  :compact-option: compact
-
+:compact-option: compact
 //  To see HTML rendered web page go to:   http://volnitsky.com/project/lopti
-
 :gh-lvvlib:	httpx://github.com/lvv/lvvlib/tree/master
 :v-p:		http://volnitsky.com/project
 
+* Repo: httpx://github.com/lvv/lopti[GitHub]
+//,  httpx://bitbucket.org/lvv/lopti[BitBucket]
+* Requires:  httpx://gcc.gnu.org/[gcc-4.7] (or newer),    httpx://github.com/lvv/lvvlib[lvv/array.h] 
+
 +++<div style="float: right; margin-left: 2em">+++
-image:xgr001.gif["Visualization with xgraphics", width="400", link="xgr001.gif"]
+image:xgr001.gif["Visualization with xgraphics", width="400", link="xgr001.gif", float=right]
 
 include::summary.txt[]
-
 +++</div>+++
-
-[icon="under-construction.gif"]
-CAUTION: Though LOPTI is quite usable and everything works for me,
-this is still work in progress, documentation is incomplete,
-API have not stabilized, it requires >=GCC-4.4 or >=ICC-11 and 
-some +++C++0x+++ features are used.
 
 == Quick Start
 
@@ -45,7 +39,7 @@ For installation external solvers see corresponding section bellow.
 
 .You will need
 - Compiler. LOPTI tested only on x86-64 with:
-   * GNU GCC  with gfortran included (if you want NEWUOA solver), tested with v4.4
+   * GNU GCC  with gfortran included (if you want NEWUOA solver), tested with v4.7
    * INTEL ICC, tested with vervion 11
 -	{v-p}/lvvlib/[lvvlib] - you will need {v-p}/lvvlib/array/[array.h] for `lvv::array` class.
 -       BOOST C++ libraries, tested with 1.3.37
@@ -240,14 +234,13 @@ Planned wrappers are also noise-adder, constrain-adder-by-barrier-function,
 
 Is optional convenience class which can convert plain function to LOPTI objective class.
 
-`make_objective(boost::function<T (*)(V& X)> callable_object)` +
+`make_objective(std::function<T (*)(V& X)> callable_object)` +
 
 It can convert any callable object
-(www.boost.org/doc/libs/1_37_0/doc/html/function/tutorial.html)
 to objective class.  Callable object can be plain function, class
 member function, or functor. 
 A callable object passed (and possibly casted) to `make_objective` constructor.
-Because `make_objective` expects a `boost::function` as its argument, it is converted to `boost::function` internally.
+Because `make_objective` expects a `std::function` as its argument, it is converted to `std::function` internally.
 
 ---------------------------------
 double   plain_function(lvv::array<double,2> X);
@@ -256,12 +249,7 @@ mzr.objective ( make_objective<V> (&plain_function);
 ------------------------------
 
 
-See also boost function_tutorial - www.boost.org/doc/libs/1_37_0/doc/html/function/tutorial.html.
 
-Objective should have one argument - optimization vector.  If your original function have more arguments use 
-`boost::bind()`
-or 
-`std::bind1st(), bind2end()`
 
 === trace() - progress tracer
 `trace(objective o,)` +
@@ -335,6 +323,10 @@ include::../../volnitsky.com/project/howto-submit-patch.txt[]
 </div>
 +++++++++++++++++++++++++++++
 
+///////////////////////////////////////////////////////////////////////
+NOTES
+	http://en.wikipedia.org/wiki/Radial_basis_function
+///////////////////////////////////////////////////////////////////////
 
 === References
 - [[[1]]] J.A. Nelder and R. Mead, 'A simplex method for function minimization', Computer Journal vol. 7 (1965), 308-315.
@@ -377,5 +369,8 @@ include::../../volnitsky.com/project/howto-submit-patch.txt[]
 	~ Backtraking Line Search (p353) 
 	~ Newton’s algorithm with the backtracking (p353 §8.4)
 - [[[14]]] 'Wolfram Alpha: Examples: Optimization' http://www.wolframalpha.com/examples/Optimization.html ;  http://www.wolframalpha.com/input/?i=local+extrema+sin+x^2
+- [[[15]]] 'Mixing C++ an Fortran http://solarianprogrammer.com/2012/05/11/mixed-language-programming-cpp-11-fortran-2008/
+
+
 
 // vim: set filetype=asciidoc nu:

@@ -72,7 +72,7 @@ newuoa_minimizer<V,NPT>::argmin () {
 
 	//if ((NPT < N+2) || ( NPT > ((N+2)*NP)/2))  { cout << "error: NPT should be  N+2 <= NPT  <=  (N+2)*NP)/2  is not in the required interval\n"; exit(33); }
 	static_assert(N+2 <= NPT  &&   NPT <= (N+2)*NP/2,  "newuoa error: NPT should be  in  N+2 <= NPT  <=  (N+2)*NP)/2  interval\n");
-	if (verbose_) cout << format("newuoa:  N =%d and NPT =%d   ----------------------------------------------------------\n")  % N  % NPT;
+	if (verbose_) cout << "newuoa:  N =" << N <<  " and NPT =" << NPT << "  ----------------------------------------------------------\n";
 	//if (verbose_) printf("newuoa:  N =%d and NPT =%d   ----------------------------------------------------------\n",  N, NPT);
 
 	Vd		XBASE;
@@ -475,7 +475,8 @@ eval_f_310:
 
 	F = (*this->objective_v)(X);
 
-	if (verbose_) cout << format ("%d \t %18.10g  \t  %18.10g \n")  %iter_  %F  %Xd;
+	//if (verbose_) cout << format ("%d \t %18.10g  \t  %18.10g \n")  %iter_  %F  %Xd;
+	if (verbose_) cout << iter_ << " \t " << std::setprecision(10) <<  F << "  \t  " << Xd << endl; 
 	//if (verbose_) {  printf("%d 	 %18.10g  	  ",  iter_, F);   cout <<  Xd << endl; }
 
 	if (iter_ <= NPT) goto return_to_init_from_eval_70;
@@ -716,7 +717,12 @@ new_rho_490:
 		
 		DELTA = max(DELTA,RHO);
 
-		if (verbose_) cout << format("-- (%d) RHO =%9.6g \t F =%9.6g   Xd%.8g \n")   %iter_  %RHO  %FOPT  %Xd;
+		//if (verbose_) cout << format("-- (%d) RHO =%9.6g \t F =%9.6g   Xd%.8g \n")   %iter_  %RHO  %FOPT  %Xd;
+		if (verbose_) cout
+			<< "-- (" << iter_
+			<< ") RHO =\t" << std::setprecision(6) << RHO
+			<< " \t F =" << FOPT
+			<< "    Xd" << Xd << endl;
 		//if (verbose_) printf("-- (%d) RHO =%9.6g 	 F =%9.6g   Xd: ", iter_,  RHO,  FOPT);  cout << Xd << endl;
 		goto  begin_iter_90; 
      	}
@@ -733,7 +739,8 @@ new_rho_490:
 		F = FOPT;
 	}
 
-	if (verbose_)  cout << format("-- (%d) RETURNED: \t F =%.15g    Xd is: %.15g\n\n")  %iter_ %F  %Xd;
+	//if (verbose_)  cout << format("-- (%d) RETURNED: \t F =%.15g    Xd is: %.15g\n\n")  %iter_ %F  %Xd;
+	if (verbose_)  cout << "-- (" << iter_ << ") RETURNED: \t F =" << setprecision(15) << F << "    Xd is: " << Xd << "\n\n";
 	//if (verbose_)  { printf("-- (%d) RETURNED: 	 F =%.15g    Xd is: ",  iter_,  F);   cout << Xd << endl << endl; }
 
 	ymin_ = F;

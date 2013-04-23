@@ -8,3 +8,4 @@ liblopti.so*
 t-rval-ref
 example
 t-lopti
+t-generic

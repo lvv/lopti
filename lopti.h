@@ -6,14 +6,9 @@
 	#include <lvv/array.h>
 		using lvv::array;
 
-	#include <boost/format.hpp>
-		using boost::format;
-
 	#include <limits>
 		using 	std::numeric_limits;
 
-	#include <boost/bind.hpp>
-	
 	#include <lopti/object_function.h>
 
 namespace lopti {
@@ -75,7 +70,7 @@ struct	minimizer {
 
 	// get-ters
 	virtual const string		name			() 	const	{  return mk_name(""); };
-		const string		mk_name			(const string&& name_base) 	const	{  return (format("%s-%d")  %name_base  %(V::size()) ).str(); };
+		const string		mk_name			(const string&& name_base) 	const	{  return ({ std::ostringstream oss; oss << name_base << V::size(); oss.str();}); };
 	virtual T 	 		ymin			()	const	{  return ymin_; };
 	virtual V 	 		Xmin			()	const	{  return Xmin_; };
 	virtual T 	 		iter			()	const	{  return iter_; };
@@ -83,15 +78,7 @@ struct	minimizer {
 
 	// do-ers
 	virtual V&			argmin			() 		{  return Xmin_; };
-	virtual void			print			()		{  cout << format("%s(%s)  %35t  iter/max=%d/%d  \t ymin=%g \t Xmin=%22.15g \n") %name() %objective_v->name() %objective_v->iter()  %max_iter_ %ymin()  %Xmin();};
-	/*virtual void			print			()		{
-		printf("%s(%s)  	  iter=%d  	 ymin=%g 	 Xmin: ",
-			name().c_str(), 
-			objective_v->name().c_str(),
-			iter_, 
-			ymin()
-		);
-		cout <<  Xmin() << endl; }; */
+	virtual void			print			()		{  cout << name() << "(" << objective_v->name() << ") \t iter/max=" << objective_v->iter()  << "/" << max_iter_  << "\t ymin=" << ymin()  << "\t Xmin=" << Xmin(); };
  };
 
 				 template<typename V>

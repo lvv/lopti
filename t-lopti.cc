@@ -7,17 +7,7 @@
 		using lvv::array;
 		using lvv::matrix;
 
-	// functional 
-	#include <functional>
-		//using std::binder1st;
-		using std::unary_function;
-	#include <boost/function.hpp>
-		using boost::function;
-	#include <boost/bind.hpp>
-		using boost::bind;
-
 	#include	<lopti/object_function.h>
-	//#include	<lopti/lopti.h>
 	#include	<lopti/condor-wrap.h>
 	#include   	<lopti/newuoa-wrap.h>
 	#include	<lopti/gsl-nelder-mead-wrap.h>
@@ -206,5 +196,5 @@ int main(int argc, char **argv) {
 		}
 	#endif 
 
-	return 0;
+	cout << endl;
  }

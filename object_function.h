@@ -2,7 +2,6 @@
 	#ifndef LOPTI_OF_H
 	#define LOPTI_OF_H
 
-	//#include <boost/shared_ptr.hpp>
 		using std::shared_ptr; // used as ofstream ptr
 
 	//#include <gzstream.h>
@@ -21,12 +20,15 @@
 	#include	<lvv/math.h>
 		using lvv::pow2;
 
-	//#include <boost/function.hpp>
-	//	using boost::function;
 
  namespace lopti {
 
-	 					// TODO: replace macro with CRTP: http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
+/* TODO: replace CLONER macro with CRTP: http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
+template<typename Derived> struct cloneable { Derived* clone() const {  return new Derived(static_cast<Derived const&>(*this)); } };
+used as:
+	obj: cloneable<obj> { ...};
+	obj* o = other_o.clone();
+*/
 
 						#define CLONER(CLASS)		\
 							CLASS& 	clone()  const		{  return  *new CLASS(*this); }
@@ -189,14 +191,11 @@ template<typename V>	struct	xg_log : wrapper<V> 		{		OBJECTIVE_TYPES;   OBJECTIV
 				std::shared_ptr<ofstream>	log_file;  // need smart ptr becase xg_log dtor-ed on coping
 	xg_log	 (objective_cref_t _objective_v, minimizer<V>& mzr)	{
 		this->objective(_objective_v);								assert(log_file == 0 );
-		// FIXME: test if there is a "log" dir
 		log_file = shared_ptr<ofstream>(new ofstream(("log/" +  (&mzr)->name() + "(" + wrapper<V>::name() + ")" ).c_str()));	assert(log_file->good());
 	};
 
 	T		operator()	(const V&  X)			{
 		T   y = (*wrapper<V>::objective_v)(X); 			assert(log_file->good());
-		// 1 - iter no(gp: splot label);  2 - hight (y);  3 - |X-opt| ignored;  4,5 - X coord;  
-		//*log_file << format("%d \t %22.18g \t %22.18g \t %22.18g \n")   % (wrapper<V>::objective_v->iter())   %y   % wrapper<V>::objective_v->opt_distance(X)  %X  << flush;  
 		*log_file << setprecision(18) << wrapper<V>::objective_v->iter() << " 	" <<  y  << " " <<  wrapper<V>::objective_v->opt_distance(X)  << " " <<  X  << endl;  
 		return  y;
 	};
@@ -204,21 +203,16 @@ template<typename V>	struct	xg_log : wrapper<V> 		{		OBJECTIVE_TYPES;   OBJECTIV
 
 
 template<typename V>	struct	trace :  wrapper<V> 		{		  CLONER(trace); OBJECTIVE_TYPES;   OBJECTIVE_MEMBERS;
-						timer_t	 timer;
-	explicit 	trace	 	(objective_cref_t ref)	{ objective(ref); };
+						lvv::timer_t	 timer;
+	explicit 	trace	 	(objective_cref_t ref)	{ this->objective(ref); };
 
 	T		operator()	(const V&  X)			{
 
 		if (wrapper<V>::objective_v->iter()==0)   cout << "# (iter)              X[*]               ==F-value" << endl;
-		//cout << format("(%d) \t % 11.8g")   % (wrapper<V>::objective_v->iter())  %X;
 		printf("(%d) 	 ",  wrapper<V>::objective_v->iter());  cout <<  X;
 
-		//MSG("(%d/%.1fs") % cnt++  %timer();                                                                                                                
-		//for(int i=0; i<param_size; ++i)      MSG("%=10.6g")   %param[i];
-
 		T   y = (*wrapper<V>::objective_v)(X); 			
-		//cout << format("\t(%.1fs)   ==%18.13g\n")  %timer()    %y<< flush;  
-		printf("	(%.1fs)   ==%18.13g\n", timer(), y);	cout << flush;
+		cout << "	(" << timer.interval_ticks() << " ticks)  " << y << endl;
 		return  y;
 	};
  };

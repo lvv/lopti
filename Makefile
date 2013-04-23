@@ -12,7 +12,7 @@ include $(INCLUDE)
 	
 SPEED ?= DEBUG
 PREFIX ?= /usr/local
-VERSION = 0.3
+VERSION = 0.4
 #FCFLAGS +=  -O2
 FCFLAGS += -frange-check -fbounds-check -O0 -ggdb3
 LDFLAGS += -L. -L /usr/local/lib  -lgsl -lgslcblas -lcondor -llopti -lgfortran 

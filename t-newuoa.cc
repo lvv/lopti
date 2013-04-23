@@ -8,11 +8,6 @@
 		using lvv::array;
 		using lvv::matrix;
 
-	#include	<functional>
-		using std::unary_function;
-	#include	<boost/function.hpp>
-		using boost::function;
-
 	#include   	<lopti/newuoa-wrap.h>
 
 	using namespace lopti;
